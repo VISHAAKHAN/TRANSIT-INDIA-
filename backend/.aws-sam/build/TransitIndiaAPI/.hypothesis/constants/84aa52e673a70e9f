@@ -1,0 +1,4 @@
+# file: /Users/sidharth/Desktop/AWS-Project /TRANSIT-INDIA-/backend/app/services/audit_logger.py
+# hypothesis_version: 6.141.1
+
+['audit_id', 'confidence', 'data', 'event_type', 'timestamp']

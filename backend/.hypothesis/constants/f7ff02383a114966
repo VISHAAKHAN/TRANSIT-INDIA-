@@ -1,0 +1,4 @@
+# file: /Users/sidharth/Desktop/AWS-Project /TRANSIT-INDIA-/backend/app/routers/query.py
+# hypothesis_version: 6.141.1
+
+[0.6, '/api/v1', '/query', '10-15 minutes', 'Heavy traffic', 'Late departure', 'Running Today', 'Status Not Confirmed', 'en', 'query']

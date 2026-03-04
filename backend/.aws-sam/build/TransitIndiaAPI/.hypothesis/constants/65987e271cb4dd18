@@ -1,0 +1,4 @@
+# file: /Users/sidharth/Desktop/AWS-Project /TRANSIT-INDIA-/backend/app/services/trip_status.py
+# hypothesis_version: 6.141.1
+
+[86400, 'bus_number', 'login_time', 'status', 'updated_at']

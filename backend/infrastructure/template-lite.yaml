@@ -1,0 +1,51 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Transit India - Backend API (Lambda + API Gateway)
+
+Globals:
+  Function:
+    Timeout: 30
+    Runtime: python3.9
+    MemorySize: 512
+  Api:
+    Cors:
+      AllowOrigin: "'*'"
+      AllowHeaders: "'Content-Type,Authorization'"
+      AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+
+Resources:
+  TransitIndiaAPI:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: transit-india-api
+      Handler: app.main.handler
+      CodeUri: ../
+      Environment:
+        Variables:
+          TRANSIT_DATABASE_URL: 'sqlite:////tmp/transit.db'
+          TRANSIT_REDIS_URL: 'redis://localhost:6379'
+          TRANSIT_AWS_REGION: !Ref AWS::Region
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - sns:Publish
+                - sms-voice:SendTextMessage
+                - sms-voice:DescribeAccountAttributes
+              Resource: '*'
+      Events:
+        ProxyApi:
+          Type: Api
+          Properties:
+            Path: /{proxy+}
+            Method: ANY
+        Health:
+          Type: Api
+          Properties:
+            Path: /health
+            Method: GET
+
+Outputs:
+  ApiEndpoint:
+    Value: !Sub 'https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod'

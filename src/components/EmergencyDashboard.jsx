@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Phone, ShieldCheck, MapPin, CheckCircle, ShieldAlert, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { t } from '../translations';
+import { api } from '../api';
 
 export default function EmergencyDashboard({ routeData, lang }) {
     const [showModal, setShowModal] = useState(false);
@@ -71,8 +72,28 @@ export default function EmergencyDashboard({ routeData, lang }) {
     const currentRoute = routeData?.route || '500A-1';
     const busId = routeData?.busNo || 'KA-01-F-1234';
 
-    const handleEscalation = () => {
+    const handleEscalation = async () => {
         if (!selectedCategory) return;
+
+        // Map frontend categories to backend enum values
+        const categoryMap = {
+            'harassment': 'Harassment',
+            'threat': 'Threat',
+            'fight': 'Fight',
+            'misconduct': 'Harassment',
+        };
+
+        // Submit escalation to real API
+        try {
+            await api.submitSafetyEscalation(
+                'anonymous',
+                routeData?.id || currentRoute,
+                categoryMap[selectedCategory] || 'Harassment',
+            );
+        } catch (e) {
+            console.warn('Escalation submission failed:', e);
+        }
+
         setShowModal(true);
     };
 

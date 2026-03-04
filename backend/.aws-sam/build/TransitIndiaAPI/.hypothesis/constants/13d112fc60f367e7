@@ -1,0 +1,4 @@
+# file: /Users/sidharth/Desktop/AWS-Project /TRANSIT-INDIA-/backend/app/routers/sms.py
+# hypothesis_version: 6.141.1
+
+['%H:%M', '/api/v1', '/sms/webhook', '10-15 minutes', '15-25 minutes', '5-12 minutes', 'Running Today', 'Status Not Confirmed', 'bus_number', 'response', 'sms', 'stop_name']

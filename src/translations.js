@@ -3,8 +3,8 @@
 export const translations = {
     English: {
         // General
-        citizenLogin: "Citizen Login",
-        pleaseSignIn: "Please sign in to access public transit intelligence.",
+        citizenLogin: "Operator Login",
+        pleaseSignIn: "Sign in to manage bus routes and activate trips.",
         aadharLabel: "Aadhaar Number (Optional Virtual ID)",
         aadharPlaceholder: "XXXX-XXXX-XXXX",
         sendOtpSecurely: "Send OTP Securely",
@@ -118,8 +118,8 @@ export const translations = {
     },
     Hindi: {
         // General
-        citizenLogin: "नागरिक लॉगिन",
-        pleaseSignIn: "सार्वजनिक परिवहन जानकारी तक पहुंचने के लिए कृपया साइन इन करें।",
+        citizenLogin: "ऑपरेटर लॉगिन",
+        pleaseSignIn: "बस मार्गों को प्रबंधित करने और ट्रिप सक्रिय करने के लिए साइन इन करें।",
         aadharLabel: "आधार नंबर (वैकल्पिक वर्चुअल आईडी)",
         aadharPlaceholder: "XXXX-XXXX-XXXX",
         sendOtpSecurely: "सुरक्षित रूप से ओटीपी भेजें",
@@ -233,8 +233,8 @@ export const translations = {
     },
     Tamil: {
         // General
-        citizenLogin: "குடிமக்கள் நுழைவு",
-        pleaseSignIn: "பொது போக்குவரத்து தகவல்களை அணுக தயவுசெய்து உள்நுழையவும்.",
+        citizenLogin: "ஆபரேட்டர் நுழைவு",
+        pleaseSignIn: "பஸ் வழிகளை நிர்வகிக்கவும் பயணங்களை செயல்படுத்தவும் உள்நுழையவும்.",
         aadharLabel: "ஆதார் எண் (விருப்பமான மெய்நிகர் ஐடி)",
         aadharPlaceholder: "XXXX-XXXX-XXXX",
         sendOtpSecurely: "OTP ஐ பாதுகாப்பாக அனுப்பவும்",

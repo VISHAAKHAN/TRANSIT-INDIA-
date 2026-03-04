@@ -1,0 +1,375 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Transit India - National Bus Information Platform
+Globals:
+  Function:
+    Timeout: 30
+    Runtime: python3.9
+    MemorySize: 512
+Parameters:
+  DBUsername:
+    Type: String
+    Default: transit
+  DBPassword:
+    Type: String
+    NoEcho: true
+    Default: TransitIndia2026!
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+      - Key: Name
+        Value: transit-india-vpc
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: VPC
+      CidrBlock: 10.0.1.0/24
+      AvailabilityZone:
+        Fn::Select:
+        - 0
+        - Fn::GetAZs: ''
+      MapPublicIpOnLaunch: true
+  PublicSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: VPC
+      CidrBlock: 10.0.2.0/24
+      AvailabilityZone:
+        Fn::Select:
+        - 1
+        - Fn::GetAZs: ''
+      MapPublicIpOnLaunch: true
+  PrivateSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: VPC
+      CidrBlock: 10.0.3.0/24
+      AvailabilityZone:
+        Fn::Select:
+        - 0
+        - Fn::GetAZs: ''
+  PrivateSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: VPC
+      CidrBlock: 10.0.4.0/24
+      AvailabilityZone:
+        Fn::Select:
+        - 1
+        - Fn::GetAZs: ''
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+  AttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId:
+        Ref: VPC
+      InternetGatewayId:
+        Ref: InternetGateway
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: VPC
+  PublicRoute:
+    Type: AWS::EC2::Route
+    DependsOn: AttachGateway
+    Properties:
+      RouteTableId:
+        Ref: PublicRouteTable
+      DestinationCidrBlock: '0.0.0.0/0'
+      GatewayId:
+        Ref: InternetGateway
+  PublicSubnet1RouteAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: PublicSubnet1
+      RouteTableId:
+        Ref: PublicRouteTable
+  PublicSubnet2RouteAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: PublicSubnet2
+      RouteTableId:
+        Ref: PublicRouteTable
+  EIP:
+    Type: AWS::EC2::EIP
+    DependsOn: AttachGateway
+  NATGateway:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId:
+        Fn::GetAtt:
+        - EIP
+        - AllocationId
+      SubnetId:
+        Ref: PublicSubnet1
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: VPC
+  PrivateRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId:
+        Ref: PrivateRouteTable
+      DestinationCidrBlock: '0.0.0.0/0'
+      NatGatewayId:
+        Ref: NATGateway
+  PrivateSubnet1RouteAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: PrivateSubnet1
+      RouteTableId:
+        Ref: PrivateRouteTable
+  PrivateSubnet2RouteAssoc:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: PrivateSubnet2
+      RouteTableId:
+        Ref: PrivateRouteTable
+  LambdaSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Transit India Lambda SG
+      VpcId:
+        Ref: VPC
+      SecurityGroupEgress:
+      - IpProtocol: -1
+        CidrIp: '0.0.0.0/0'
+  DBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Transit India DB SG
+      VpcId:
+        Ref: VPC
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 5432
+        ToPort: 5432
+        SourceSecurityGroupId:
+          Ref: LambdaSecurityGroup
+  RedisSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Transit India Redis SG
+      VpcId:
+        Ref: VPC
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 6379
+        ToPort: 6379
+        SourceSecurityGroupId:
+          Ref: LambdaSecurityGroup
+  DBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Transit India DB Subnets
+      SubnetIds:
+      - Ref: PrivateSubnet1
+      - Ref: PrivateSubnet2
+  PostgresDB:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceIdentifier: transit-india-db
+      DBInstanceClass: db.t3.micro
+      Engine: postgres
+      EngineVersion: '15'
+      MasterUsername:
+        Ref: DBUsername
+      MasterUserPassword:
+        Ref: DBPassword
+      DBName: transitindia
+      AllocatedStorage: 20
+      DBSubnetGroupName:
+        Ref: DBSubnetGroup
+      VPCSecurityGroups:
+      - Ref: DBSecurityGroup
+      PubliclyAccessible: false
+  RedisSubnetGroup:
+    Type: AWS::ElastiCache::SubnetGroup
+    Properties:
+      Description: Transit India Redis Subnets
+      SubnetIds:
+      - Ref: PrivateSubnet1
+      - Ref: PrivateSubnet2
+  RedisCluster:
+    Type: AWS::ElastiCache::CacheCluster
+    Properties:
+      CacheNodeType: cache.t3.micro
+      Engine: redis
+      NumCacheNodes: 1
+      CacheSubnetGroupName:
+        Ref: RedisSubnetGroup
+      VpcSecurityGroupIds:
+      - Ref: RedisSecurityGroup
+  AuditBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName:
+        Fn::Sub: transit-india-audit-${AWS::AccountId}
+      LifecycleConfiguration:
+        Rules:
+        - Id: DeleteAfter90Days
+          Status: Enabled
+          ExpirationInDays: 90
+  MLBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName:
+        Fn::Sub: transit-india-ml-${AWS::AccountId}
+  FrontendBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName:
+        Fn::Sub: transit-india-frontend-${AWS::AccountId}
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: index.html
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
+  FrontendBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket:
+        Ref: FrontendBucket
+      PolicyDocument:
+        Statement:
+        - Sid: PublicReadGetObject
+          Effect: Allow
+          Principal: '*'
+          Action: s3:GetObject
+          Resource:
+            Fn::Sub: ${FrontendBucket.Arn}/*
+  TransitIndiaAPI:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: transit-india-api
+      Handler: app.main.handler
+      CodeUri: TransitIndiaAPI
+      VpcConfig:
+        SecurityGroupIds:
+        - Ref: LambdaSecurityGroup
+        SubnetIds:
+        - Ref: PrivateSubnet1
+        - Ref: PrivateSubnet2
+      Environment:
+        Variables:
+          TRANSIT_DATABASE_URL:
+            Fn::Sub: postgresql://${DBUsername}:${DBPassword}@${PostgresDB.Endpoint.Address}:5432/transitindia
+          TRANSIT_REDIS_URL:
+            Fn::Sub: redis://${RedisCluster.RedisEndpoint.Address}:6379
+          TRANSIT_AWS_REGION:
+            Ref: AWS::Region
+          TRANSIT_AUDIT_BUCKET:
+            Ref: AuditBucket
+          TRANSIT_ML_BUCKET:
+            Ref: MLBucket
+      Policies:
+      - S3CrudPolicy:
+          BucketName:
+            Ref: AuditBucket
+      - S3CrudPolicy:
+          BucketName:
+            Ref: MLBucket
+      - Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action: sagemaker:InvokeEndpoint
+          Resource: '*'
+      - Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action:
+          - sns:Publish
+          - sms-voice:SendTextMessage
+          - sms-voice:DescribeAccountAttributes
+          Resource: '*'
+      Events:
+        ProxyApi:
+          Type: Api
+          Properties:
+            Path: /{proxy+}
+            Method: ANY
+        Health:
+          Type: Api
+          Properties:
+            Path: /health
+            Method: GET
+    Metadata:
+      SamResourceId: TransitIndiaAPI
+  FrontendCDN:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Origins:
+        - DomainName:
+            Fn::Select:
+            - 1
+            - Fn::Split:
+              - ://
+              - Fn::GetAtt:
+                - FrontendBucket
+                - WebsiteURL
+          Id: S3WebsiteOrigin
+          CustomOriginConfig:
+            OriginProtocolPolicy: http-only
+        Enabled: true
+        DefaultRootObject: index.html
+        DefaultCacheBehavior:
+          AllowedMethods:
+          - GET
+          - HEAD
+          TargetOriginId: S3WebsiteOrigin
+          ViewerProtocolPolicy: redirect-to-https
+          ForwardedValues:
+            QueryString: false
+        CustomErrorResponses:
+        - ErrorCode: 404
+          ResponseCode: 200
+          ResponsePagePath: /index.html
+Outputs:
+  ApiEndpoint:
+    Value:
+      Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod
+  FrontendURL:
+    Value:
+      Fn::GetAtt:
+      - FrontendCDN
+      - DomainName
+  FrontendBucketName:
+    Value:
+      Ref: FrontendBucket
+  DatabaseEndpoint:
+    Value:
+      Fn::GetAtt:
+      - PostgresDB
+      - Endpoint.Address
+  RedisEndpoint:
+    Value:
+      Fn::GetAtt:
+      - RedisCluster
+      - RedisEndpoint.Address
+  AuditBucketName:
+    Value:
+      Ref: AuditBucket
+  MLBucketName:
+    Value:
+      Ref: MLBucket

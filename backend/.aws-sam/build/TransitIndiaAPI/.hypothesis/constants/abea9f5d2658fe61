@@ -1,0 +1,4 @@
+# file: /Users/sidharth/Desktop/AWS-Project /TRANSIT-INDIA-/backend/app/models/schemas.py
+# hypothesis_version: 6.141.1
+
+[0.0, 1.0, 'Fight', 'Harassment', 'Heavy traffic', 'IVR', 'In Progress', 'Late departure', 'Medical', 'Needs Improvement', 'Not Running', 'Pending', 'Resolved', 'Road diversion', 'Running Today', 'SMS', 'Satisfactory', 'Service Discontinued', 'Service disruption', 'Status Not Confirmed', 'Status unknown', 'Threat', 'TicketSale', 'TripEnd', 'TripStart', 'Web', 'en']

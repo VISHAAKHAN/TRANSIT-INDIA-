@@ -3,6 +3,7 @@ import { Search, MapPin, Navigation, ArrowRight, Loader2, Bus } from 'lucide-rea
 import { motion, AnimatePresence } from 'framer-motion';
 import { t } from '../translations';
 import { districtStops } from '../data/districtStops';
+import { api } from '../api';
 
 export default function TrackingDashboard({ navigateTo, setGlobalRouteDetails, lang }) {
     const [loading, setLoading] = useState(false);
@@ -84,7 +85,7 @@ export default function TrackingDashboard({ navigateTo, setGlobalRouteDetails, l
         }));
     };
 
-    const activeDistrict = userContextDistrict || 'Chennai';
+    const activeDistrict = userContextDistrict || 'Coimbatore';
     const genericStops = [`${activeDistrict} New Bus Stand`, `${activeDistrict} Old Bus Stand`, `${activeDistrict} Junction`, `${activeDistrict} Hospital`, `${activeDistrict} Market`];
     const availableStops = districtStops[activeDistrict] || genericStops;
 
@@ -95,7 +96,7 @@ export default function TrackingDashboard({ navigateTo, setGlobalRouteDetails, l
         if (localDistrict) {
             setUserContextDistrict(localDistrict);
         } else {
-            setUserContextDistrict('Chennai');
+            setUserContextDistrict('Coimbatore');
         }
 
         // Only clear if district actually changed, thus preserving state upon backward navigation
@@ -110,7 +111,22 @@ export default function TrackingDashboard({ navigateTo, setGlobalRouteDetails, l
             sessionStorage.setItem('savedSearchState', 'idle');
         }
         if (localDistrict) sessionStorage.setItem('savedDistrict', localDistrict);
+
+        // Auto-load active buses on page load
+        if (!sessionStorage.getItem('savedRoutes') || sessionStorage.getItem('savedRoutes') === '[]') {
+            loadActiveBuses();
+        }
     }, []);
+
+    const loadActiveBuses = async () => {
+        setLoading(true);
+        const buses = await api.getActiveBuses();
+        if (Array.isArray(buses) && buses.length > 0) {
+            setRoutes(buses);
+            setSearchState('results');
+        }
+        setLoading(false);
+    };
 
     // Auto-save form and search states to preserve them during navigation
     React.useEffect(() => {
@@ -120,115 +136,31 @@ export default function TrackingDashboard({ navigateTo, setGlobalRouteDetails, l
         sessionStorage.setItem('savedRoutes', JSON.stringify(routes));
     }, [boarding, destination, searchState, routes]);
 
-    const handleSearch = (e) => {
+    const handleSearch = async (e) => {
         e.preventDefault();
-
-        // Disable search if both aren't selected (though button should be disabled, check just in case)
         if (!boarding || !destination) return;
 
         setLoading(true);
 
-        // Simulate API delay
-        setTimeout(() => {
+        if (boarding === destination && boarding !== '') {
             setLoading(false);
+            setSearchState('empty');
+            setRoutes([]);
+            return;
+        }
 
-            if (boarding === destination && boarding !== '') {
-                setSearchState('empty');
-                setRoutes([]);
-            } else {
-                setSearchState('results');
+        // Call real API
+        const result = await api.searchRoutes(boarding, destination, activeDistrict);
 
-                // Dynamically generate fully logical buses running right now from Boarding to Destination!
-                const safeBoardingPre = boarding.substring(0, 3).toUpperCase().replace(/[^A-Z]/g, '');
-                const safeDestPre = destination.substring(0, 2).toUpperCase().replace(/[^A-Z]/g, '');
-
-                const generateRandomETA = (min, max) => {
-                    const time1 = Math.floor(Math.random() * (max - min + 1) + min);
-                    const time2 = time1 + Math.floor(Math.random() * 5 + 3);
-                    const rangeStr = `${time1 < 10 ? '0' : ''}${time1} - ${time2 < 10 ? '0' : ''}${time2}`;
-                    return { expectedArrival: `${rangeStr} Minutes`, etaRange: rangeStr };
-                };
-
-                const eta1 = generateRandomETA(2, 8);
-                const eta2 = generateRandomETA(15, 25);
-                const eta3 = generateRandomETA(30, 45);
-                const eta4 = generateRandomETA(8, 14);
-
-                const mockGeneratedRoutes = [
-                    {
-                        id: `${safeBoardingPre}${safeDestPre}-1X`,
-                        route: 'Fast-Pass',
-                        status: 'running',
-                        currentLocation: boarding,
-                        expectedArrival: eta1.expectedArrival,
-                        etaRange: eta1.etaRange,
-                        confidence: 96,
-                        delayReason: null,
-                        lastConfirmedTime: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                        source: 'GPS Sync',
-                        currentStop: boarding,
-                        nextStop: `${destination} Checkpost`,
-                        destination: destination,
-                        arrivalStop: destination,
-                        district: activeDistrict
-                    },
-                    {
-                        id: `${safeBoardingPre}X-2`,
-                        route: 'Ordinary',
-                        status: 'delayed',
-                        currentLocation: `${boarding} Junction`,
-                        expectedArrival: eta2.expectedArrival,
-                        etaRange: eta2.etaRange,
-                        confidence: 88,
-                        delayReason: 'Traffic Congestion',
-                        lastConfirmedTime: 'Just Now',
-                        source: 'ETM Login',
-                        currentStop: `${boarding} Junction`,
-                        nextStop: `${destination} Corner`,
-                        destination: destination,
-                        arrivalStop: destination,
-                        district: activeDistrict
-                    },
-                    {
-                        id: `T-${safeDestPre}-99`,
-                        route: 'Super-Fast',
-                        status: 'running',
-                        currentLocation: `${activeDistrict} Central Terminal`,
-                        expectedArrival: eta3.expectedArrival,
-                        etaRange: eta3.etaRange,
-                        confidence: 90,
-                        delayReason: null,
-                        lastConfirmedTime: '10 Mins Ago',
-                        source: 'GPS Sync',
-                        currentStop: `${activeDistrict} Central Terminal`,
-                        nextStop: boarding,
-                        destination: destination,
-                        arrivalStop: destination,
-                        district: activeDistrict
-                    },
-                    {
-                        id: `${safeBoardingPre}-LCL-4`,
-                        route: 'City-Circular',
-                        status: 'running',
-                        currentLocation: `${boarding} Market`,
-                        expectedArrival: eta4.expectedArrival,
-                        etaRange: eta4.etaRange,
-                        confidence: 85,
-                        delayReason: null,
-                        lastConfirmedTime: '5 Mins Ago',
-                        source: 'Predictive ML',
-                        currentStop: `${boarding} Market`,
-                        nextStop: destination,
-                        destination: destination,
-                        arrivalStop: destination,
-                        district: activeDistrict
-                    }
-                ];
-
-                // Sort by shortest ETA roughly
-                setRoutes(mockGeneratedRoutes.sort((a, b) => parseInt(a.expectedArrival) - parseInt(b.expectedArrival)));
-            }
-        }, 1200);
+        if (result && result.routes && result.routes.length > 0) {
+            setRoutes(result.routes);
+            setSearchState('results');
+            setLoading(false);
+        } else {
+            setRoutes([]);
+            setSearchState('unavailable');
+            setLoading(false);
+        }
     };
 
     const handleRouteClick = (routeData) => {
@@ -359,26 +291,65 @@ export default function TrackingDashboard({ navigateTo, setGlobalRouteDetails, l
                                 "We currently do not have active buses operating between the selected boarding point and destination. Please try a different route combination."
                             </p>
 
-                            <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                            <button
+                                onClick={() => {
+                                    setDestination('');
+                                    setSearchState('idle');
+                                }}
+                                className="px-6 py-3 bg-[#f97316] hover:bg-[#ea580c] text-white font-bold rounded-lg shadow-md hover:shadow-lg transition-all"
+                            >
+                                Modify Search
+                            </button>
+                        </div>
+                    </motion.div>
+                )}
+
+                {/* Service Not Available State */}
+                {searchState === 'unavailable' && (
+                    <motion.div
+                        key="unavailable"
+                        initial={{ opacity: 0, y: 15 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -15 }}
+                        className="mt-8 relative z-10"
+                    >
+                        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-orange-100 dark:border-orange-900/30 p-10 max-w-2xl mx-auto text-center relative overflow-hidden transition-colors">
+                            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#f97316] via-[#fb923c] to-[#f97316]"></div>
+
+                            <div className="w-16 h-16 bg-orange-50 dark:bg-orange-950/30 rounded-full flex items-center justify-center mx-auto mb-5">
+                                <Bus className="w-8 h-8 text-[#f97316]" />
+                            </div>
+
+                            <h3 className="text-xl font-extrabold text-[#0f172a] dark:text-white mb-3 transition-colors">
+                                Service Not Available Yet
+                            </h3>
+
+                            <p className="text-gray-500 dark:text-gray-400 font-medium leading-relaxed mb-3 max-w-md mx-auto transition-colors">
+                                Buses on this route are not currently tracked in our system.
+                            </p>
+
+                            <div className="bg-orange-50 dark:bg-orange-950/20 rounded-lg px-5 py-3 inline-block mb-6">
+                                <p className="text-sm font-bold text-[#ea580c] dark:text-orange-400">
+                                    We will update you once live tracking is available for this route.
+                                </p>
+                            </div>
+
+                            <div className="flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-4">
                                 <button
                                     onClick={() => {
+                                        setBoarding('');
                                         setDestination('');
                                         setSearchState('idle');
                                     }}
-                                    className="px-6 py-3 bg-gradient-to-r from-ti-saffron to-ti-saffron-light text-white font-bold rounded-lg shadow-md hover:shadow-lg transition-all w-full sm:w-auto"
+                                    className="px-6 py-3 bg-[#f97316] hover:bg-[#ea580c] text-white font-bold rounded-lg shadow-md hover:shadow-lg transition-all w-full sm:w-auto"
                                 >
-                                    Modify Search
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        setSearchState('nearby');
-                                        setRoutes(generateDistrictRoutes(activeDistrict));
-                                    }}
-                                    className="px-6 py-3 bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-600 text-gray-700 dark:text-gray-300 font-bold rounded-lg shadow-sm hover:bg-gray-50 dark:hover:bg-slate-700 transition-all w-full sm:w-auto"
-                                >
-                                    View Nearby Routes
+                                    Try Another Route
                                 </button>
                             </div>
+
+                            <p className="text-[10px] text-gray-400 dark:text-gray-600 font-bold uppercase tracking-widest mt-6">
+                                Coimbatore Public Bus Network
+                            </p>
                         </div>
                     </motion.div>
                 )}

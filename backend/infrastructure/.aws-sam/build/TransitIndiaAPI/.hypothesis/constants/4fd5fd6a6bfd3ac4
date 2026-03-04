@@ -1,0 +1,4 @@
+# file: /Users/sidharth/Desktop/AWS-Project /TRANSIT-INDIA-/backend/app/data/seed.py
+# hypothesis_version: 6.141.1
+
+[0.2, 8.0, 13.5, 76.0, 80.5, 'Running Today', 'Status Not Confirmed', '__main__', 'active', 'actual_arrival', 'bus_number', 'day_of_week', 'delay_minutes', 'etm_login_time', 'id', 'latitude', 'longitude', 'monsoon', 'name', 'name_en', 'name_hi', 'name_ta', 'route_id', 'scheduled_departure', 'scheduled_time', 'season', 'status', 'stop_name', 'stops_sequence', 'summer', 'winter']

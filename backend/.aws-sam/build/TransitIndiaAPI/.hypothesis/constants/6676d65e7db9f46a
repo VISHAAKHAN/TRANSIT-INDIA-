@@ -1,0 +1,4 @@
+# file: /Users/sidharth/Desktop/AWS-Project /TRANSIT-INDIA-/backend/app/routers/admin.py
+# hypothesis_version: 6.141.1
+
+['/api/v1/admin', '/db-status', '/seed', 'Seed failed', 'admin', 'already_seeded', 'bus_number', 'connected', 'detail', 'error', 'etm_login_time', 'id', 'latitude', 'longitude', 'name', 'name_en', 'name_hi', 'name_ta', 'route_id', 'routes', 'scheduled_departure', 'seeded', 'status', 'stops', 'stops_sequence', 'trips']

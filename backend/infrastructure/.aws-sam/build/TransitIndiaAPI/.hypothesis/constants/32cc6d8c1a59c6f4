@@ -1,0 +1,4 @@
+# file: /Users/sidharth/Desktop/AWS-Project /TRANSIT-INDIA-/backend/app/routers/routes.py
+# hypothesis_version: 6.141.1
+
+[0.3, 0.5, 0.6, ' - ', '%I:%M %p', '/api/v1', '/routes/search', '/stops', 'Chennai', 'ETM Login', 'GPS Sync', 'Late Departure', 'Predictive ML', 'Route search failed', 'Running Today', 'Status Not Confirmed', 'Stops query failed', 'Traffic Congestion', 'active', 'arrivalStop', 'bus_number', 'confidence', 'count', 'currentLocation', 'currentStop', 'delayReason', 'delayed', 'destination', 'district', 'error', 'etaRange', 'expectedArrival', 'id', 'lastConfirmedTime', 'name', 'nextStop', 'route', 'routes', 'running', 'source', 'status', 'stops']

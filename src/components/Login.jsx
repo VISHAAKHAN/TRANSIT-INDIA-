@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { RefreshCcw, ShieldCheck, ArrowRight } from 'lucide-react';
+import { RefreshCcw, ShieldCheck, ArrowRight, Loader2 } from 'lucide-react';
 import { t } from '../translations';
+import { api } from '../api';
 
 const CAPTCHA_OPTIONS = [
     'H K 9 2 Q',
@@ -17,6 +18,7 @@ export default function Login({ navigateTo, lang }) {
     const [mobile, setMobile] = useState('');
     const [captchaInput, setCaptchaInput] = useState('');
     const [error, setError] = useState('');
+    const [sending, setSending] = useState(false);
     const [currentCaptcha, setCurrentCaptcha] = useState(CAPTCHA_OPTIONS[0]);
 
     const handleRefreshCaptcha = () => {
@@ -29,7 +31,7 @@ export default function Login({ navigateTo, lang }) {
         setError('');
     };
 
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
         const expectedCaptcha = currentCaptcha.replace(/\s/g, '');
         if (captchaInput.replace(/\s/g, '').toUpperCase() !== expectedCaptcha) {
@@ -37,7 +39,22 @@ export default function Login({ navigateTo, lang }) {
             return;
         }
         setError('');
-        navigateTo('otp'); // Simulate sending OTP
+        setSending(true);
+
+        // Send real OTP via AWS SNS
+        const result = await api.sendOTP(mobile);
+        setSending(false);
+
+        if (result.status === 'sent') {
+            sessionStorage.setItem('otpPhone', mobile);
+            // If SMS failed, backend returns debug_otp for testing
+            if (result.debug_otp) {
+                sessionStorage.setItem('debugOtp', result.debug_otp);
+            }
+            navigateTo('otp');
+        } else {
+            setError(result.detail || 'Failed to send OTP. Please try again.');
+        }
     };
 
     return (
@@ -122,9 +139,14 @@ export default function Login({ navigateTo, lang }) {
 
                     <button
                         type="submit"
-                        className="w-full py-4 bg-[#f97316] hover:bg-[#ea580c] text-white font-bold rounded-lg shadow-md hover:shadow-lg transition-all flex items-center justify-center group uppercase tracking-widest text-sm"
+                        disabled={sending}
+                        className="w-full py-4 bg-[#f97316] hover:bg-[#ea580c] text-white font-bold rounded-lg shadow-md hover:shadow-lg transition-all flex items-center justify-center group uppercase tracking-widest text-sm disabled:opacity-60"
                     >
-                        {t('sendOTP', lang)} <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                        {sending ? (
+                            <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Sending OTP...</>
+                        ) : (
+                            <>{t('sendOTP', lang)} <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" /></>
+                        )}
                     </button>
                 </form>
 

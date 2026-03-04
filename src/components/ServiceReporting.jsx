@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Bus, Bell, Home, ThumbsUp, ThumbsDown, AlertCircle, AlertTriangle, Send, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { api } from '../api';
 
 export default function ServiceReporting({ routeData, navigateTo }) {
     const [feedback, setFeedback] = useState(null); // 'satisfied' or 'unsatisfied'
@@ -14,7 +15,17 @@ export default function ServiceReporting({ routeData, navigateTo }) {
         navigateTo('track');
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
+        // Map to backend enum values
+        const feedbackType = feedback === 'satisfied' ? 'Satisfactory' : 'Needs Improvement';
+
+        // Submit feedback to real API
+        try {
+            await api.submitFeedback(activeRoute, feedbackType, 'Web');
+        } catch (e) {
+            console.warn('Feedback submission failed:', e);
+        }
+
         setShowModal(true);
     };
 

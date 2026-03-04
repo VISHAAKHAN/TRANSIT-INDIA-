@@ -1,7 +1,13 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { CheckCircle, Shield } from 'lucide-react';
 
 export default function LogoutSuccess({ navigateTo }) {
+    useEffect(() => {
+        sessionStorage.removeItem('userRole');
+        sessionStorage.removeItem('operatorId');
+        sessionStorage.removeItem('authToken');
+    }, []);
+
     return (
         <div className="flex-1 flex flex-col items-center justify-center py-20 px-4">
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden animate-in fade-in zoom-in-95 duration-200">
@@ -19,7 +25,7 @@ export default function LogoutSuccess({ navigateTo }) {
                     </div>
 
                     <button
-                        onClick={() => navigateTo('login')}
+                        onClick={() => navigateTo('track')}
                         className="w-full py-3.5 bg-[#0b162c] hover:bg-[#1a2b4c] text-white font-bold rounded-lg shadow-md transition-colors mb-6"
                     >
                         Return to Home

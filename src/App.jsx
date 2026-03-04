@@ -10,9 +10,12 @@ import OTP from './components/OTP';
 import RouteDetails from './components/RouteDetails';
 import Profile from './components/Profile';
 import LogoutSuccess from './components/LogoutSuccess';
+import AboutAI from './components/AboutAI';
+import OperatorDashboard from './components/OperatorDashboard';
 
 function App() {
-    const [currentPage, setCurrentPage] = useState('login');
+    const [currentPage, setCurrentPage] = useState('track');
+    const [isAdmin, setIsAdmin] = useState(false);
     const [lang, setLang] = useState('English');
     const [globalRouteDetails, setGlobalRouteDetails] = useState(null);
     const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -44,6 +47,8 @@ function App() {
                 return <EmergencyDashboard routeData={globalRouteDetails} navigateTo={setCurrentPage} lang={lang} />;
             case 'service-reporting':
                 return <ServiceReporting routeData={globalRouteDetails} navigateTo={setCurrentPage} lang={lang} />;
+            case 'operatorDashboard':
+                return <OperatorDashboard navigateTo={setCurrentPage} lang={lang} />;
             case 'about':
                 return <AboutAI lang={lang} />;
             case 'profile':

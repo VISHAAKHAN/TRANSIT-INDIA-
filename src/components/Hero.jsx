@@ -1,13 +1,17 @@
 import React from 'react';
-import { Bus, Home, LogOut, AlertCircle, Sun, Moon } from 'lucide-react';
+import { Bus, Home, LayoutDashboard, LogIn, LogOut, AlertCircle, Sun, Moon } from 'lucide-react';
 import { t } from '../translations';
 
 export default function Hero({ activeTab, setActiveTab, lang, setLang, navigateTo, isDarkMode, setIsDarkMode }) {
     const isLogoutSuccess = activeTab === 'logoutSuccess';
+    const isOperator = sessionStorage.getItem('userRole') === 'operator';
     const showHome = activeTab !== 'login' && activeTab !== 'otp' && !isLogoutSuccess;
     const showProfile = activeTab !== 'login' && activeTab !== 'otp' && !isLogoutSuccess;
     const showEmergency = activeTab !== 'login' && activeTab !== 'otp';
     const showLogout = activeTab === 'profile';
+    const isLoggedIn = !!sessionStorage.getItem('authToken');
+    const showOperatorLogin = !isLoggedIn && activeTab !== 'login' && activeTab !== 'otp' && !isLogoutSuccess;
+    const showDashboardLink = isOperator && activeTab !== 'login' && activeTab !== 'otp' && !isLogoutSuccess;
 
     return (
         <header className="bg-[#0f172a] dark:bg-slate-950 text-white w-full shadow-md z-50 transition-colors duration-300 border-b border-transparent dark:border-slate-800">
@@ -44,6 +48,29 @@ export default function Hero({ activeTab, setActiveTab, lang, setLang, navigateT
                         >
                             <Home size={18} />
                             <span className="hidden sm:inline">{t('home', lang)}</span>
+                        </button>
+                    )}
+
+                    {/* Operator Dashboard Link */}
+                    {showDashboardLink && (
+                        <button
+                            onClick={() => navigateTo('operatorDashboard')}
+                            className="flex items-center space-x-2 text-ti-saffron hover:text-orange-300 font-bold text-sm transition-colors"
+                        >
+                            <LayoutDashboard size={18} />
+                            <span className="hidden sm:inline">Dashboard</span>
+                        </button>
+                    )}
+
+                    {/* Operator Login Button */}
+                    {showOperatorLogin && (
+                        <button
+                            onClick={() => navigateTo('login')}
+                            className="flex items-center space-x-2 bg-ti-saffron hover:bg-orange-600 text-white px-4 py-1.5 rounded-lg text-sm font-bold transition-colors shadow-sm"
+                        >
+                            <LogIn size={16} />
+                            <span className="hidden sm:inline">Operator Login</span>
+                            <span className="sm:hidden">Login</span>
                         </button>
                     )}
 
