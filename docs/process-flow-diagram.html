@@ -1,0 +1,2037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Transit India - Process Flow Diagrams</title>
+<style>
+  /* ===== CSS RESET & BASE ===== */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy: #0B1F3A;
+    --navy-deep: #0f172a;
+    --navy-light: #1e293b;
+    --navy-card: #162032;
+    --saffron: #FF9933;
+    --saffron-dark: #e6851a;
+    --emerald: #138808;
+    --emerald-light: #16a34a;
+    --white: #f8fafc;
+    --text-primary: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --border: #334155;
+    --border-light: #475569;
+    --red: #ef4444;
+    --yellow: #eab308;
+    --blue: #3b82f6;
+    --purple: #a855f7;
+    --cyan: #06b6d4;
+    --status-running: #22c55e;
+    --status-not-running: #ef4444;
+    --status-unconfirmed: #eab308;
+    --status-discontinued: #6b7280;
+    --shadow: 0 4px 24px rgba(0,0,0,0.3);
+    --shadow-lg: 0 8px 40px rgba(0,0,0,0.4);
+    --radius: 12px;
+    --radius-sm: 8px;
+    --radius-xs: 6px;
+    --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--navy-deep);
+    color: var(--text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ===== LAYOUT ===== */
+  .app-container {
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* ===== SIDEBAR ===== */
+  .sidebar {
+    width: 280px;
+    background: var(--navy);
+    border-right: 1px solid var(--border);
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    overflow-y: auto;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    transition: transform var(--transition);
+  }
+
+  .sidebar-header {
+    padding: 28px 24px 20px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(135deg, var(--navy) 0%, #0d2847 100%);
+  }
+
+  .sidebar-header .logo-line {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 6px;
+  }
+
+  .sidebar-header .logo-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--saffron);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: var(--navy);
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+
+  .sidebar-header h1 {
+    font-size: 20px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.3px;
+  }
+
+  .sidebar-header .subtitle {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 600;
+    margin-top: 8px;
+  }
+
+  .sidebar-nav {
+    flex: 1;
+    padding: 16px 12px;
+  }
+
+  .nav-section-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+    font-weight: 700;
+    padding: 12px 12px 8px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all var(--transition);
+    border: 1.5px solid transparent;
+    margin-bottom: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    position: relative;
+    user-select: none;
+  }
+
+  .nav-item:hover {
+    background: rgba(255, 153, 51, 0.08);
+    color: var(--text-primary);
+  }
+
+  .nav-item.active {
+    background: rgba(255, 153, 51, 0.12);
+    border-color: var(--saffron);
+    color: var(--saffron);
+  }
+
+  .nav-item.active::before {
+    content: '';
+    position: absolute;
+    left: -12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 24px;
+    background: var(--saffron);
+    border-radius: 0 4px 4px 0;
+  }
+
+  .nav-item .nav-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-xs);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+    transition: all var(--transition);
+  }
+
+  .nav-item.active .nav-icon { background: var(--saffron); color: var(--navy); }
+  .nav-item:not(.active) .nav-icon { background: var(--navy-light); color: var(--text-muted); }
+
+  .nav-item .nav-badge {
+    margin-left: auto;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .sidebar-footer {
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align: center;
+  }
+
+  .sidebar-footer .tricolor {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+    margin-bottom: 8px;
+  }
+
+  .sidebar-footer .tricolor span {
+    width: 24px;
+    height: 3px;
+    border-radius: 2px;
+  }
+
+  /* ===== MAIN CONTENT ===== */
+  .main-content {
+    flex: 1;
+    margin-left: 280px;
+    padding: 0;
+    min-height: 100vh;
+  }
+
+  /* ===== PAGE HEADER ===== */
+  .page-header {
+    background: linear-gradient(135deg, var(--navy) 0%, #0d2847 60%, #102a4c 100%);
+    padding: 48px 48px 40px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .page-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(255,153,51,0.06) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+
+  .page-header h2 {
+    font-size: 32px;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+    position: relative;
+  }
+
+  .page-header .header-desc {
+    color: var(--text-secondary);
+    font-size: 15px;
+    max-width: 600px;
+    position: relative;
+  }
+
+  .page-header .header-meta {
+    display: flex;
+    gap: 24px;
+    margin-top: 20px;
+    position: relative;
+  }
+
+  .page-header .meta-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+
+  .meta-chip .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* ===== FLOW SECTIONS ===== */
+  .flow-container {
+    padding: 40px 48px 80px;
+  }
+
+  .flow-section {
+    display: none;
+    animation: fadeIn 0.4s ease;
+  }
+
+  .flow-section.active {
+    display: block;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ===== FLOW DIAGRAM CARD ===== */
+  .flow-card {
+    background: var(--navy-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px;
+    margin-bottom: 32px;
+    box-shadow: var(--shadow);
+  }
+
+  .flow-card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .flow-card-header .fc-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+
+  .flow-card-header h3 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+
+  .flow-card-header p {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  /* ===== FLOW DIAGRAM (Vertical) ===== */
+  .flow-diagram {
+    position: relative;
+    padding: 0 0 0 36px;
+  }
+
+  .flow-diagram::before {
+    content: '';
+    position: absolute;
+    left: 17px;
+    top: 24px;
+    bottom: 24px;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--border), var(--saffron), var(--emerald), var(--border));
+    border-radius: 1px;
+  }
+
+  .flow-step {
+    position: relative;
+    padding: 0 0 28px 28px;
+    cursor: pointer;
+    transition: all var(--transition);
+  }
+
+  .flow-step:last-child { padding-bottom: 0; }
+
+  .flow-step .step-dot {
+    position: absolute;
+    left: -28px;
+    top: 6px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 3px solid var(--border-light);
+    background: var(--navy-deep);
+    transition: all var(--transition);
+    z-index: 2;
+  }
+
+  .flow-step:hover .step-dot,
+  .flow-step.expanded .step-dot {
+    border-color: var(--saffron);
+    background: var(--saffron);
+    box-shadow: 0 0 0 4px rgba(255, 153, 51, 0.2);
+  }
+
+  .flow-step.step-start .step-dot { border-color: var(--emerald); background: var(--emerald); }
+  .flow-step.step-end .step-dot { border-color: var(--saffron); background: var(--saffron); }
+  .flow-step.step-decision .step-dot { border-color: var(--yellow); background: var(--yellow); }
+  .flow-step.step-error .step-dot { border-color: var(--red); background: var(--red); }
+
+  .step-label {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+    transition: color var(--transition);
+  }
+
+  .flow-step:hover .step-label { color: #fff; }
+
+  .step-sublabel {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  .step-details {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, padding 0.3s ease;
+    padding: 0;
+  }
+
+  .flow-step.expanded .step-details {
+    max-height: 600px;
+    padding: 12px 0 0 0;
+  }
+
+  .step-detail-box {
+    background: rgba(255, 153, 51, 0.05);
+    border: 1px solid rgba(255, 153, 51, 0.15);
+    border-radius: var(--radius-sm);
+    padding: 14px 18px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+
+  .step-detail-box code {
+    background: rgba(255, 153, 51, 0.12);
+    color: var(--saffron);
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-family: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+    font-weight: 600;
+  }
+
+  .step-detail-box .api-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--navy-light);
+    border: 1px solid var(--border);
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'SF Mono', monospace;
+    color: var(--emerald-light);
+    margin: 4px 2px;
+  }
+
+  .step-detail-box .api-badge.post { color: var(--saffron); }
+  .step-detail-box .api-badge.get { color: var(--emerald-light); }
+
+  /* ===== HORIZONTAL FLOW (for smaller diagrams) ===== */
+  .flow-horizontal {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    overflow-x: auto;
+    padding: 20px 0;
+    position: relative;
+  }
+
+  .flow-h-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 140px;
+    max-width: 180px;
+    position: relative;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .flow-h-step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 24px;
+    right: -2px;
+    width: calc(100% - 48px);
+    height: 2px;
+    background: var(--border-light);
+    left: calc(50% + 24px);
+  }
+
+  .flow-h-node {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    margin-bottom: 12px;
+    border: 2px solid var(--border-light);
+    background: var(--navy-card);
+    transition: all var(--transition);
+    position: relative;
+    z-index: 2;
+  }
+
+  .flow-h-step:hover .flow-h-node {
+    border-color: var(--saffron);
+    box-shadow: 0 0 0 4px rgba(255, 153, 51, 0.15);
+    transform: scale(1.1);
+  }
+
+  .flow-h-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-align: center;
+    line-height: 1.4;
+    transition: color var(--transition);
+  }
+
+  .flow-h-step:hover .flow-h-label { color: #fff; }
+
+  /* ===== STATUS TABLE ===== */
+  .status-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+  }
+
+  .status-table th {
+    text-align: left;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    font-weight: 700;
+    padding: 10px 16px;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .status-table td {
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border);
+    font-weight: 500;
+  }
+
+  .status-table tr:last-child td { border-bottom: none; }
+
+  .status-dot {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+  }
+
+  .status-dot::before {
+    content: '';
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .status-dot.running::before { background: var(--status-running); box-shadow: 0 0 6px rgba(34,197,94,0.4); }
+  .status-dot.not-running::before { background: var(--status-not-running); }
+  .status-dot.unconfirmed::before { background: var(--status-unconfirmed); }
+  .status-dot.discontinued::before { background: var(--status-discontinued); }
+
+  /* ===== CONFIDENCE GAUGE ===== */
+  .confidence-visual {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 16px 0;
+    flex-wrap: wrap;
+  }
+
+  .gauge-item {
+    background: var(--navy-light);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 16px 20px;
+    flex: 1;
+    min-width: 160px;
+    text-align: center;
+  }
+
+  .gauge-item .gauge-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .gauge-item .gauge-value {
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 4px;
+  }
+
+  .gauge-item .gauge-desc {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  /* ===== LEGEND ===== */
+  .legend-card {
+    background: var(--navy-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 28px;
+    margin-bottom: 32px;
+  }
+
+  .legend-card h4 {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 16px;
+  }
+
+  .legend-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  .legend-symbol {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 13px;
+    border: 2px solid;
+  }
+
+  /* ===== DATA FLOW BOXES ===== */
+  .data-flow-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 12px 0;
+  }
+
+  .df-box {
+    background: var(--navy-light);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xs);
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-align: center;
+    min-width: 100px;
+    transition: all var(--transition);
+  }
+
+  .df-box:hover {
+    border-color: var(--saffron);
+    transform: translateY(-2px);
+  }
+
+  .df-box.highlight {
+    border-color: var(--saffron);
+    background: rgba(255, 153, 51, 0.08);
+  }
+
+  .df-box.green { border-color: var(--emerald); background: rgba(19, 136, 8, 0.08); }
+  .df-box.red { border-color: var(--red); background: rgba(239, 68, 68, 0.08); }
+  .df-box.blue { border-color: var(--blue); background: rgba(59, 130, 246, 0.08); }
+  .df-box.purple { border-color: var(--purple); background: rgba(168, 85, 247, 0.08); }
+
+  .df-arrow {
+    color: var(--text-muted);
+    font-size: 18px;
+    font-weight: 400;
+    flex-shrink: 0;
+  }
+
+  .df-box small {
+    display: block;
+    font-size: 10px;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 2px;
+  }
+
+  /* ===== ANNOTATION ===== */
+  .annotation {
+    background: rgba(59, 130, 246, 0.06);
+    border-left: 3px solid var(--blue);
+    padding: 12px 16px;
+    margin: 16px 0;
+    border-radius: 0 var(--radius-xs) var(--radius-xs) 0;
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  .annotation.warning {
+    background: rgba(234, 179, 8, 0.06);
+    border-left-color: var(--yellow);
+  }
+
+  .annotation.success {
+    background: rgba(19, 136, 8, 0.06);
+    border-left-color: var(--emerald);
+  }
+
+  .annotation strong { color: var(--text-primary); }
+
+  /* ===== COMPONENT TAG ===== */
+  .component-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'SF Mono', monospace;
+    letter-spacing: 0.3px;
+  }
+
+  .component-tag.frontend { background: rgba(6,182,212,0.12); color: var(--cyan); border: 1px solid rgba(6,182,212,0.2); }
+  .component-tag.backend { background: rgba(168,85,247,0.12); color: var(--purple); border: 1px solid rgba(168,85,247,0.2); }
+  .component-tag.aws { background: rgba(255,153,51,0.12); color: var(--saffron); border: 1px solid rgba(255,153,51,0.2); }
+  .component-tag.db { background: rgba(59,130,246,0.12); color: var(--blue); border: 1px solid rgba(59,130,246,0.2); }
+
+  /* ===== HAMBURGER (mobile) ===== */
+  .hamburger {
+    display: none;
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    z-index: 200;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-sm);
+    background: var(--navy);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    color: var(--saffron);
+    font-size: 22px;
+  }
+
+  .overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 90;
+  }
+
+  .overlay.active { display: block; }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 900px) {
+    .hamburger { display: flex; }
+    .sidebar { transform: translateX(-100%); }
+    .sidebar.open { transform: translateX(0); }
+    .main-content { margin-left: 0; }
+    .page-header { padding: 72px 24px 32px; }
+    .flow-container { padding: 24px; }
+    .flow-card { padding: 20px; }
+    .flow-horizontal { flex-wrap: wrap; gap: 16px; }
+    .page-header .header-meta { flex-wrap: wrap; gap: 12px; }
+  }
+
+  @media (max-width: 600px) {
+    .flow-diagram { padding-left: 28px; }
+    .flow-step { padding-left: 20px; }
+    .legend-grid { grid-template-columns: 1fr; }
+    .data-flow-row { flex-direction: column; align-items: stretch; }
+    .df-arrow { transform: rotate(90deg); align-self: center; }
+    .confidence-visual { flex-direction: column; }
+  }
+
+  /* ===== PRINT ===== */
+  @media print {
+    .sidebar, .hamburger { display: none !important; }
+    .main-content { margin-left: 0 !important; }
+    .flow-section { display: block !important; page-break-inside: avoid; margin-bottom: 32px; }
+    body { background: #fff; color: #000; }
+    .flow-card { border: 1px solid #ccc; box-shadow: none; background: #fff; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Hamburger -->
+<button class="hamburger" id="hamburger" onclick="toggleSidebar()" aria-label="Toggle Navigation">&#9776;</button>
+
+<!-- Overlay -->
+<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+<div class="app-container">
+
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-line">
+        <div class="logo-icon">TI</div>
+        <h1>Transit India</h1>
+      </div>
+      <div class="subtitle">Process Flow Diagrams</div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">User Flows</div>
+
+      <div class="nav-item active" data-flow="passenger" onclick="switchFlow('passenger')">
+        <div class="nav-icon">&#128652;</div>
+        <span>Passenger Journey</span>
+        <span class="nav-badge" style="background:rgba(34,197,94,0.15);color:#22c55e;">WEB</span>
+      </div>
+
+      <div class="nav-item" data-flow="operator" onclick="switchFlow('operator')">
+        <div class="nav-icon">&#128100;</div>
+        <span>Operator Flow</span>
+        <span class="nav-badge" style="background:rgba(168,85,247,0.15);color:#a855f7;">AUTH</span>
+      </div>
+
+      <div class="nav-item" data-flow="safety" onclick="switchFlow('safety')">
+        <div class="nav-icon">&#128721;</div>
+        <span>Safety Escalation</span>
+        <span class="nav-badge" style="background:rgba(239,68,68,0.15);color:#ef4444;">SOS</span>
+      </div>
+
+      <div class="nav-section-label">System Flows</div>
+
+      <div class="nav-item" data-flow="sms" onclick="switchFlow('sms')">
+        <div class="nav-icon">&#128172;</div>
+        <span>SMS Query</span>
+        <span class="nav-badge" style="background:rgba(59,130,246,0.15);color:#3b82f6;">API</span>
+      </div>
+
+      <div class="nav-item" data-flow="prediction" onclick="switchFlow('prediction')">
+        <div class="nav-icon">&#128202;</div>
+        <span>Arrival Prediction</span>
+        <span class="nav-badge" style="background:rgba(234,179,8,0.15);color:#eab308;">ML</span>
+      </div>
+
+      <div class="nav-item" data-flow="admin" onclick="switchFlow('admin')">
+        <div class="nav-icon">&#128736;</div>
+        <span>Data Seeding</span>
+        <span class="nav-badge" style="background:rgba(6,182,212,0.15);color:#06b6d4;">DB</span>
+      </div>
+
+      <div class="nav-section-label">Reference</div>
+
+      <div class="nav-item" data-flow="legend" onclick="switchFlow('legend')">
+        <div class="nav-icon">&#128214;</div>
+        <span>Legend & Symbols</span>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="tricolor">
+        <span style="background:var(--saffron);"></span>
+        <span style="background:#fff;"></span>
+        <span style="background:var(--emerald);"></span>
+      </div>
+      College Project Submission &middot; 2026
+    </div>
+  </aside>
+
+  <!-- ===== MAIN ===== -->
+  <div class="main-content">
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <h2>Process Flow Diagrams</h2>
+      <p class="header-desc">
+        Comprehensive visual documentation of all process flows in the Transit India national bus transit information platform, covering passenger interactions, operator workflows, and backend system logic.
+      </p>
+      <div class="header-meta">
+        <div class="meta-chip"><div class="dot" style="background:var(--emerald);"></div> 6 Process Flows</div>
+        <div class="meta-chip"><div class="dot" style="background:var(--saffron);"></div> 11 API Endpoints</div>
+        <div class="meta-chip"><div class="dot" style="background:var(--blue);"></div> React + FastAPI + AWS</div>
+        <div class="meta-chip"><div class="dot" style="background:var(--purple);"></div> SQLite / DynamoDB</div>
+      </div>
+    </div>
+
+    <!-- Flow Content -->
+    <div class="flow-container">
+
+      <!-- ============================================================ -->
+      <!-- FLOW 1: PASSENGER JOURNEY                                     -->
+      <!-- ============================================================ -->
+      <div class="flow-section active" id="flow-passenger">
+
+        <div class="flow-card">
+          <div class="flow-card-header">
+            <div class="fc-icon" style="background:rgba(34,197,94,0.12);color:var(--status-running);">&#128652;</div>
+            <div>
+              <h3>Passenger Journey Flow (Web)</h3>
+              <p>End-to-end flow from landing page to viewing live bus status with time windows. The primary user-facing workflow of the platform.</p>
+              <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
+                <span class="component-tag frontend">App.jsx</span>
+                <span class="component-tag frontend">TrackingDashboard.jsx</span>
+                <span class="component-tag frontend">RouteDetails.jsx</span>
+                <span class="component-tag backend">routes.py</span>
+                <span class="component-tag backend">query.py</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Main Vertical Flow -->
+          <div class="flow-diagram">
+            <div class="flow-step step-start" onclick="toggleStep(this)">
+              <div class="step-dot"></div>
+              <div class="step-label">1. User Opens Website</div>
+              <div class="step-sublabel">Landing page renders Hero + TrackingDashboard components</div>
+              <div class="step-details">
+                <div class="step-detail-box">
+                  <code>App.jsx</code> initializes with <code>currentPage = 'track'</code>. The <code>&lt;Hero&gt;</code> component renders the navigation header with district selector, language picker (English/Tamil/Hindi), and dark mode toggle. <code>&lt;TrackingDashboard&gt;</code> loads below as the main content area. On mount, <code>loadActiveBuses()</code> auto-fetches currently running buses.
+                  <br><br>
+                  <span class="api-badge get">GET</span> <code>/api/v1/routes/active-buses</code>
+                </div>
+              </div>
+            </div>
+
+            <div class="flow-step" onclick="toggleStep(this)">
+              <div class="step-dot"></div>
+              <div class="step-label">2. Select District & Boarding Point</div>
+              <div class="step-sublabel">User picks district from dropdown, stops populate dynamically</div>
+              <div class="step-details">
+                <div class="step-detail-box">
+                  District selection is stored in <code>localStorage('userDistrict')</code>. Available districts include <strong>Chennai, Salem, Coimbatore, Ernakulam, Thiruvananthapuram</strong>, and dynamic fallback for any other district. Stop lists come from <code>districtStops.js</code> data file. When district changes, previous search state is cleared via <code>sessionStorage</code>.
+                </div>
+              </div>
+            </div>
+
+            <div class="flow-step" onclick="toggleStep(this)">
+              <div class="step-dot"></div>
+              <div class="step-label">3. Select Destination & Search</div>
+              <div class="step-sublabel">Form validation: boarding !== destination, both required</div>
+              <div class="step-details">
+                <div class="step-detail-box">
+                  The search form uses <code>handleSearch()</code> which calls the API with boarding point, destination, and active district.
+                  <br><br>
+                  <span class="api-badge get">GET</span> <code>/api/v1/routes/search?from_stop=X&amp;to_stop=Y&amp;district=Z</code>
+                  <br><br>
+                  Three possible outcomes: <strong>results</strong> (matching routes found), <strong>empty</strong> (boarding = destination), or <strong>unavailable</strong> (no routes for this pair).
+                </div>
+              </div>
+            </div>
+
+            <div class="flow-step step-decision" onclick="toggleStep(this)">
+              <div class="step-dot"></div>
+              <div class="step-label">4. System Searches Routes</div>
+              <div class="step-sublabel">Backend queries Route + Trip tables; frontend generates district routes</div>
+              <div class="step-details">
+                <div class="step-detail-box">
+                  The backend <code>routes.py</code> searches the database for active routes matching the from/to stops. The frontend also has <code>generateDistrictRoutes()</code> which creates realistic route data for each district. Each route object contains: <code>id</code>, <code>route</code>, <code>status</code>, <code>currentLocation</code>, <code>expectedArrival</code>, <code>confidence</code>, <code>delayReason</code>, and <code>district</code>.
+                </div>
+              </div>
+            </div>
+
+            <div class="flow-step" onclick="toggleStep(this)">
+              <div class="step-dot"></div>
+              <div class="step-label">5. Display Matching Routes with Live Status</div>
+              <div class="step-sublabel">Grid of route cards showing real-time status indicators</div>
+              <div class="step-details">
+                <div class="step-detail-box">
+                  Routes render in a responsive 4-column grid. Each card shows:
+                  <br>&bull; <strong>Route ID</strong> (e.g., 500A-1X)
+                  <br>&bull; <strong>Status badge</strong>: ON TIME (green) or DELAYED (red)
+                  <br>&bull; <strong>RUNNING TODAY</strong> confirmation badge
+                  <br>&bull; <strong>Current Location</strong> of the bus
+                  <br>&bull; <strong>ETA window</strong> (e.g., "5 - 10 Minutes")
+                  <br><br>
+                  Status types per <code>TripStatusEnum</code>:
+                </div>
+              </div>
+            </div>
+
+            <div class="flow-step" onclick="toggleStep(this)">
+              <div class="step-dot"></div>
+              <div class="step-label">6. Click Route Card for Details</div>
+              <div class="step-sublabel">navigateTo('routeDetails') with full route data payload</div>
+              <div class="step-details">
+                <div class="step-detail-box">
+                  <code>handleRouteClick(routeData)</code> saves the route object into <code>globalRouteDetails</code> state and navigates to the <code>&lt;RouteDetails&gt;</code> component. This page shows: full stop sequence, timing information, bus type, and live GPS status. From here, passengers can access Emergency Dashboard or submit Feedback.
+                </div>
+              </div>
+            </div>
+
+            <div class="flow-step step-end" onclick="toggleStep(this)">
+              <div class="step-dot"></div>
+              <div class="step-label">7. Optional: Emergency / Feedback</div>
+              <div class="step-sublabel">EmergencyDashboard.jsx or ServiceReporting.jsx</div>
+              <div class="step-details">
+                <div class="step-detail-box">
+                  From route details, passengers can:
+                  <br>&bull; <strong>Emergency tab</strong> &rarr; Access safety escalation panel (see Safety Escalation Flow)
+                  <br>&bull; <strong>Service Reporting</strong> &rarr; Submit feedback via <code>/api/v1/feedback</code>
+                  <br>&bull; <strong>Notify ETA</strong> &rarr; Get SMS notification via <code>/api/v1/notify/eta</code> using AWS SNS
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Status Types Table -->
+          <div style="margin-top:28px;">
+            <h4 style="font-size:14px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px;">Trip Status Types (TripStatusEnum)</h4>
+            <table class="status-table">
+              <thead>
+                <tr>
+                  <th>Status</th>
+                  <th>Enum Value</th>
+                  <th>Visual Indicator</th>
+                  <th>Meaning</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="status-dot running">Running Today</span></td>
+                  <td><code>RUNNING</code></td>
+                  <td>Green badge</td>
+                  <td>ETM login confirmed; bus is active on route</td>
+                </tr>
+                <tr>
+                  <td><span class="status-dot not-running">Not Running</span></td>
+                  <td><code>NOT_RUNNING</code></td>
+                  <td>Red badge</td>
+                  <td>Admin-cancelled; bus will not operate today</td>
+                </tr>
+                <tr>
+                  <td><span class="status-dot unconfirmed">Status Not Confirmed</span></td>
+                  <td><code>UNCONFIRMED</code></td>
+                  <td>Yellow badge</td>
+                  <td>No ETM login and past timeout (30 min)</td>
+                </tr>
+                <tr>
+                  <td><span class="status-dot discontinued">Service Discontinued</span></td>
+                  <td><code>DISCONTINUED</code></td>
+                  <td>Gray badge</td>
+                  <td>Route permanently removed from service</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- FLOW 2: OPERATOR FLOW                                         -->
+      <!-- ============================================================ -->
+      <div class="flow-section" id="flow-operator">
+
+        <div class="flow-card">
+          <div class="flow-card-header">
+            <div class="fc-icon" style="background:rgba(168,85,247,0.12);color:var(--purple);">&#128100;</div>
+            <div>
+              <h3>Operator Authentication & Dashboard Flow</h3>
+              <p>Secure OTP-based authentication via AWS SNS, followed by route management and trip activation/deactivation.</p>
+              <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
+                <span class="component-tag frontend">Login.jsx</span>
+                <span class="component-tag frontend">OTP.jsx</span>
+                <span class="component-tag frontend">OperatorDashboard.jsx</span>
+                <span class="component-tag backend">auth.py</span>
+                <span class="component-tag backend">operator.py</span>
+                <span class="component-tag aws">AWS SNS</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Auth Sub-flow -->
+          <h4 style="font-size:14px;font-weight:700;color:var(--saffron);margin-bottom:16px;">Phase 1: Authentication</h4>
+
+          <div class="flow-diagram">
+            <div class="flow-step step-start" onclick="toggleStep(this)">
+              <div class="step-dot"></div>
+              <div class="step-label">1. Operator Opens Login Page</div>
+              <div class="step-sublabel">Login.jsx renders mobile number input + CAPTCHA</div>
+              <div class="step-details">
+                <div class="step-detail-box">
+                  <code>App.jsx</code> routes to <code>&lt;Login&gt;</code> component when <code>currentPage = 'login'</code>. The login form requires a valid 10-digit Indian mobile number. CAPTCHA verification is performed client-side before the form can be submitted.
+                </div>
+              </div>
+            </div>
+
+            <div class="flow-step" onclick="toggleStep(this)">
+              <div class="step-dot"></div>
+              <div class="step-label">2. Submit Mobile Number</div>
+              <div class="step-sublabel">POST /api/v1/auth/send-otp with phone_number</div>
+              <div class="step-details">
+                <div class="step-detail-box">
+                  <span class="api-badge post">POST</span> <code>/api/v1/auth/send-otp</code>
+                  <br><br>
+                  Backend validates: <code>phone.isdigit() and len(phone) == 10</code>. Generates a 6-digit OTP via <code>random.randint(100000, 999999)</code>. Phone number is hashed using SHA-256 (first 16 chars) for privacy: <code>hashlib.sha256(phone.encode()).hexdigest()[:16]</code>. OTP stored in database <code>OTPRecord</code> table with 5-minute expiry (<code>OTP_EXPIRY_SECONDS = 300</code>).
+                </div>
+              </div>
+            </div>
+
+            <div class="flow-step" onclick="toggleStep(this)">
+              <div class="step-dot"></div>
+              <div class="step-label">3. AWS SNS Sends OTP via SMS</div>
+              <div class="step-sublabel">Transactional SMS to +91XXXXXXXXXX with SenderID "TRANSIT"</div>
+              <div class="step-details">
+                <div class="step-detail-box">
+                  <code>boto3.client("sns")</code> publishes the message:
+                  <br><em>"Transit India: Your OTP is XXXXXX. Valid for 5 minutes. Do not share this code."</em>
+                  <br><br>
+                  SMS attributes: <strong>SenderID</strong> = "TRANSIT", <strong>SMSType</strong> = "Transactional". Region: <code>ap-south-1</code> (Mumbai). If SNS fails, OTP is still returned in <code>debug_otp</code> field for development.
+                </div>
+              </div>
+            </div>
+
+            <div class="flow-step step-decision" onclick="toggleStep(this)">
+              <div class="step-dot"></div>
+              <div class="step-label">4. Verify OTP</div>
+              <div class="step-sublabel">POST /api/v1/auth/verify-otp validates OTP and assigns role</div>
+              <div class="step-details">
+                <div class="step-detail-box">
+                  <span class="api-badge post">POST</span> <code>/api/v1/auth/verify-otp</code>
+                  <br><br>
+                  Validation checks: OTP must be exactly 6 digits, must match stored OTP, must not be expired. After verification:
+                  <br>&bull; OTP record is deleted (one-time use)
+                  <br>&bull; System checks <code>Operator</code> table for matching <code>phone_hash</code>
+                  <br>&bull; Returns <code>role: "operator"</code> with <code>operator_id</code> if found, else <code>role: "passenger"</code>
+                  <br>&bull; Auth token generated: <code>sha256(phone + timestamp)[:32]</code>
+                </div>
+              </div>
+            </div>
+
+            <div class="flow-step step-end" onclick="toggleStep(this)">
+              <div class="step-dot"></div>
+              <div class="step-label">5. Redirect to OperatorDashboard</div>
+              <div class="step-sublabel">navigateTo('operatorDashboard') with operator_id stored in session</div>
+              <div class="step-details">
+                <div class="step-detail-box">
+                  If <code>role === "operator"</code>, the system navigates to the OperatorDashboard. The <code>operator_id</code> (e.g., "OP-001") is stored in <code>localStorage</code> for subsequent API calls. If role is "passenger", user is redirected to the TrackingDashboard instead.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dashboard Sub-flow -->
+          <h4 style="font-size:14px;font-weight:700;color:var(--saffron);margin:28px 0 16px;">Phase 2: Trip Management</h4>
+
+          <div class="flow-diagram">
+            <div class="flow-step step-start" onclick="toggleStep(this)">
+              <div class="step-dot"></div>
+              <div class="step-label">6. Browse & Select Route</div>
+              <div class="step-sublabel">GET /api/v1/operator/routes lists all active routes</div>
+              <div class="step-details">
+                <div class="step-detail-box">
+                  <span class="api-badge get">GET</span> <code>/api/v1/operator/routes</code>
+                  <br><br>
+                  Returns all routes where <code>Route.status == "active"</code>. Each route includes: <code>id</code>, <code>name</code>, <code>stops_sequence</code> (ordered list), and <code>stop_count</code>. Operator selects a route to view its GPS-enriched stop details.
+                </div>
+              </div>
+            </div>
+
+            <div class="flow-step" onclick="toggleStep(this)">
+              <div class="step-dot"></div>
+              <div class="step-label">7. View Route Stops with GPS</div>
+              <div class="step-sublabel">GET /api/v1/operator/routes/{route_id} enriched with coordinates</div>
+              <div class="step-details">
+                <div class="step-detail-box">
+                  <span class="api-badge get">GET</span> <code>/api/v1/operator/routes/{route_id}</code>
+                  <br><br>
+                  Each stop in <code>stops_sequence</code> is enriched by querying the <code>Stop</code> table for matching <code>name_en</code>. Returns: <code>name</code>, <code>latitude</code>, <code>longitude</code> for map display.
+                </div>
+              </div>
+            </div>
+
+            <div class="flow-step" onclick="toggleStep(this)">
+              <div class="step-dot"></div>
+              <div class="step-label">8. Enter Bus Number & Activate Trip</div>
+              <div class="step-sublabel">POST /api/v1/operator/trips/activate creates Running Today trip</div>
+              <div class="step-details">
+                <div class="step-detail-box">
+                  <span class="api-badge post">POST</span> <code>/api/v1/operator/trips/activate</code>
+                  <br><br>
+                  Payload: <code>{ route_id, bus_number, operator_id }</code>. Backend verifies route exists and operator is valid. Creates <code>Trip</code> record with: <code>id = "T-{uuid[:8]}"</code>, <code>status = "Running Today"</code>, <code>etm_login_time = now</code>. Bus number is normalized: <code>strip().upper()</code>.
+                </div>
+              </div>
+            </div>
+
+            <div class="flow-step" onclick="toggleStep(this)">
+              <div class="step-dot"></div>
+              <div class="step-label">9. Monitor Active Trips</div>
+              <div class="step-sublabel">GET /api/v1/operator/trips/active?operator_id=OP-001</div>
+              <div class="step-details">
+                <div class="step-detail-box">
+                  <span class="api-badge get">GET</span> <code>/api/v1/operator/trips/active?operator_id={id}</code>
+                  <br><br>
+                  Filters trips where <code>status == "Running Today"</code>, <code>administrative_note</code> contains operator_id, and <code>etm_login_time</code> is today. Returns list of active trips with route names for the dashboard view.
+                </div>
+              </div>
+            </div>
+
+            <div class="flow-step step-end" onclick="toggleStep(this)">
+              <div class="step-dot"></div>
+              <div class="step-label">10. Deactivate Trip on Completion</div>
+              <div class="step-sublabel">POST /api/v1/operator/trips/{trip_id}/deactivate sets status to "Completed"</div>
+              <div class="step-details">
+                <div class="step-detail-box">
+                  <span class="api-badge post">POST</span> <code>/api/v1/operator/trips/{trip_id}/deactivate</code>
+                  <br><br>
+                  Updates <code>Trip.status = "Completed"</code> and <code>Trip.last_updated = utcnow()</code>. The trip no longer appears in active bus lists or passenger search results.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="annotation" style="margin-top:20px;">
+            <strong>Auth Data Flow:</strong> Phone number is never stored in plaintext. All records use <code>phone_hash = SHA-256[:16]</code>. OTP records are deleted after successful verification. Operator records are pre-seeded in the database with known phone hashes.
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- FLOW 3: SAFETY ESCALATION                                     -->
+      <!-- ============================================================ -->
+      <div class="flow-section" id="flow-safety">
+
+        <div class="flow-card">
+          <div class="flow-card-header">
+            <div class="fc-icon" style="background:rgba(239,68,68,0.12);color:var(--red);">&#128721;</div>
+            <div>
+              <h3>Safety Escalation Flow</h3>
+              <p>Emergency incident reporting system with control room integration, rate limiting, and GPS-verified submissions.</p>
+              <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
+                <span class="component-tag frontend">EmergencyDashboard.jsx</span>
+                <span class="component-tag backend">safety.py</span>
+                <span class="component-tag backend">rate_limiter.py</span>
+                <span class="component-tag db">SafetyEscalationRecord</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flow-diagram">
+            <div class="flow-step step-start" onclick="toggleStep(this)">
+              <div class="step-dot"></div>
+              <div class="step-label">1. Passenger Accesses Emergency Tab</div>
+              <div class="step-sublabel">navigateTo('emergency') from route details or navigation</div>
+              <div class="step-details">
+                <div class="step-detail-box">
+                  The <code>&lt;EmergencyDashboard&gt;</code> component receives <code>routeData</code> as a prop containing the active route/bus information. The page displays the current transit session info (route number, bus ID) with a "LIVE GPS VERIFIED" indicator, followed by the escalation panel and emergency helpline numbers (112, 108, 1091).
+                </div>
+              </div>
+            </div>
+
+            <div class="flow-step" onclick="toggleStep(this)">
+              <div class="step-dot"></div>
+              <div class="step-label">2. Select Incident Category</div>
+              <div class="step-sublabel">Four categories defined by IncidentCategoryEnum</div>
+              <div class="step-details">
+                <div class="step-detail-box">
+                  Categories from <code>schemas.py</code> / <code>IncidentCategoryEnum</code>:
+                  <br>&bull; <strong>Harassment</strong> - Covers harassment and staff misconduct
+                  <br>&bull; <strong>Threat</strong> - Threat to life situations
+                  <br>&bull; <strong>Fight</strong> - Physical altercation on bus
+                  <br>&bull; <strong>Medical</strong> - Medical emergency
+                  <br><br>
+                  Frontend maps "Staff Misconduct" to the "Harassment" backend enum value via <code>categoryMap</code>.
+                </div>
+              </div>
+            </div>
+
+            <div class="flow-step" onclick="toggleStep(this)">
+              <div class="step-dot"></div>
+              <div class="step-label">3. Submit Escalation Report</div>
+              <div class="step-sublabel">POST /api/v1/safety/escalate with phone_hash, bus_number, category</div>
+              <div class="step-details">
+                <div class="step-detail-box">
+                  <span class="api-badge post">POST</span> <code>/api/v1/safety/escalate</code>
+                  <br><br>
+                  Payload: <code>{ phone_number, bus_number, incident_category, trip_id }</code>
+                  <br><br>
+                  Backend generates unique escalation ID: <code>"esc-{uuid[:8]}"</code>. Phone is hashed for privacy. Creates <code>SafetyEscalationRecord</code> in database with <code>control_room_status = "Pending"</code>.
+                </div>
+              </div>
+            </div>
+
+            <div class="flow-step step-decision" onclick="toggleStep(this)">
+              <div class="step-dot"></div>
+              <div class="step-label">4. Rate Limit Check</div>
+              <div class="step-sublabel">Max 3 escalations per day per phone number</div>
+              <div class="step-details">
+                <div class="step-detail-box">
+                  <code>RateLimiter</code> enforces: <code>LIMITS["safety"] = { max: 3, ttl: 86400 }</code> (3 per 24 hours).
+                  <br><br>
+                  Redis key pattern: <code>rate:{phone_hash}:safety</code>. If limit exceeded, returns <code>(False, 0)</code> and the request is rejected. This prevents abuse of the emergency system.
+                </div>
+              </div>
+            </div>
+
+            <div class="flow-step" onclick="toggleStep(this)">
+              <div class="step-dot"></div>
+              <div class="step-label">5. Control Room Receives Alert</div>
+              <div class="step-sublabel">EscalationStatusEnum: Pending -> In Progress -> Resolved</div>
+              <div class="step-details">
+                <div class="step-detail-box">
+                  The escalation record is created with status <code>"Pending"</code>. Control room operators review and update the status through the admin interface. Status progression follows <code>EscalationStatusEnum</code>:
+                  <br>&bull; <strong>Pending</strong> &rarr; Initial state after submission
+                  <br>&bull; <strong>In Progress</strong> &rarr; Control room is investigating
+                  <br>&bull; <strong>Resolved</strong> &rarr; Issue addressed, resolution notes added
+                </div>
+              </div>
+            </div>
+
+            <div class="flow-step step-end" onclick="toggleStep(this)">
+              <div class="step-dot"></div>
+              <div class="step-label">6. Confirmation Modal Displayed</div>
+              <div class="step-sublabel">Success modal with escalation ID and GPS forwarding confirmation</div>
+              <div class="step-details">
+                <div class="step-detail-box">
+                  The frontend shows a modal: "Escalation Successfully Logged" with the message: "Your details and live GPS coordinates have been securely forwarded to the Depot Control Room. A safety officer is reviewing this case and will contact the bus crew immediately."
+                  <br><br>
+                  Additionally, direct dial buttons are available: <strong>112</strong> (Police), <strong>108</strong> (Ambulance), <strong>1091</strong> (Women Safety) with a 5-second countdown before auto-dialing.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="annotation warning">
+            <strong>Legal Notice (displayed in UI):</strong> "Misuse of these emergency services results in severe criminal penalties under suitable sections of the law. All escalations are logged with verified GPS and device credentials."
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- FLOW 4: SMS QUERY                                             -->
+      <!-- ============================================================ -->
+      <div class="flow-section" id="flow-sms">
+
+        <div class="flow-card">
+          <div class="flow-card-header">
+            <div class="fc-icon" style="background:rgba(59,130,246,0.12);color:var(--blue);">&#128172;</div>
+            <div>
+              <h3>SMS Query Flow</h3>
+              <p>SMS-based bus status inquiry for feature phone users. Parses natural language messages and returns arrival information within 10 seconds.</p>
+              <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
+                <span class="component-tag backend">sms.py</span>
+                <span class="component-tag db">Trip table</span>
+                <span class="component-tag aws">AWS SNS (Inbound)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Horizontal overview -->
+          <div class="data-flow-row" style="margin-bottom:24px;">
+            <div class="df-box blue">
+              User SMS
+              <small>Feature Phone</small>
+            </div>
+            <div class="df-arrow">&rarr;</div>
+            <div class="df-box purple">
+              SMS Gateway
+              <small>AWS SNS Webhook</small>
+            </div>
+            <div class="df-arrow">&rarr;</div>
+            <div class="df-box highlight">
+              Parse Message
+              <small>Regex Pattern</small>
+            </div>
+            <div class="df-arrow">&rarr;</div>
+            <div class="df-box">
+              Query Database
+              <small>Trip Lookup</small>
+            </div>
+            <div class="df-arrow">&rarr;</div>
+            <div class="df-box green">
+              SMS Response
+              <small>&lt; 10 seconds</small>
+            </div>
+          </div>
+
+          <div class="flow-diagram">
+            <div class="flow-step step-start" onclick="toggleStep(this)">
+              <div class="step-dot"></div>
+              <div class="step-label">1. User Sends SMS</div>
+              <div class="step-sublabel">Format: "BUS &lt;BusNumber&gt; &lt;StopName&gt;" (e.g., "BUS 42B Adyar")</div>
+              <div class="step-details">
+                <div class="step-detail-box">
+                  The SMS webhook receives messages at <code>/api/v1/sms/webhook</code>. Expected format matches the regex pattern:
+                  <br><code>SMS_PATTERN = r'^bus\s+(\S+)(?:\s+(.+))?$'</code> (case-insensitive)
+                  <br><br>
+                  Group 1: Bus number (required, uppercased). Group 2: Stop name (optional, title-cased).
+                </div>
+              </div>
+            </div>
+
+            <div class="flow-step" onclick="toggleStep(this)">
+              <div class="step-dot"></div>
+              <div class="step-label">2. Parse SMS Message</div>
+              <div class="step-sublabel">parse_sms() extracts bus_number and optional stop_name</div>
+              <div class="step-details">
+                <div class="step-detail-box">
+                  <code>parse_sms(message)</code> returns:
+                  <br>&bull; <code>None</code> if message is empty or does not match pattern
+                  <br>&bull; <code>{ "bus_number": "42B", "stop_name": "Adyar" }</code> on success
+                  <br><br>
+                  Invalid format returns: <em>"Invalid format. Please use: BUS &lt;BusNumber&gt; &lt;StopName&gt;. Example: BUS 45A Adyar"</em>
+                </div>
+              </div>
+            </div>
+
+            <div class="flow-step" onclick="toggleStep(this)">
+              <div class="step-dot"></div>
+              <div class="step-label">3. Query Trip Database</div>
+              <div class="step-sublabel">Lookup latest trip by bus_number, ordered by scheduled_departure DESC</div>
+              <div class="step-details">
+                <div class="step-detail-box">
+                  Database query: <code>session.query(Trip).filter(Trip.bus_number == bus_number).order_by(Trip.scheduled_departure.desc()).first()</code>
+                  <br><br>
+                  If trip found: status from DB, arrival based on ETM login.
+                  <br>If no trip found: defaults to <code>status = "Running Today"</code>, <code>arrival = "10-15 minutes"</code>.
+                </div>
+              </div>
+            </div>
+
+            <div class="flow-step step-decision" onclick="toggleStep(this)">
+              <div class="step-dot"></div>
+              <div class="step-label">4. Calculate Arrival Window</div>
+              <div class="step-sublabel">ETM login present: 5-12 min, absent: 15-25 min</div>
+              <div class="step-details">
+                <div class="step-detail-box">
+                  Arrival calculation in SMS handler:
+                  <br>&bull; <strong>ETM login exists</strong> (<code>trip.etm_login_time</code> is not None): <code>"5-12 minutes"</code> (higher confidence)
+                  <br>&bull; <strong>No ETM login</strong>: <code>"15-25 minutes"</code> (lower confidence, wider window)
+                  <br>&bull; <strong>No trip found</strong>: <code>"10-15 minutes"</code> (fallback default)
+                </div>
+              </div>
+            </div>
+
+            <div class="flow-step step-end" onclick="toggleStep(this)">
+              <div class="step-dot"></div>
+              <div class="step-label">5. Send Response SMS</div>
+              <div class="step-sublabel">Response within 10 seconds: "Bus 42B: Running Today. Arrival: 5-12 minutes."</div>
+              <div class="step-details">
+                <div class="step-detail-box">
+                  Response format: <code>"Bus {bus_number}: {status}. Arrival: {arrival}. Time: {HH:MM}"</code>
+                  <br><br>
+                  Example: <em>"Bus 42B: Running Today. Arrival: 5-12 minutes. Time: 14:30"</em>
+                  <br><br>
+                  Rate limit: <code>LIMITS["sms"] = { max: 10, ttl: 3600 }</code> &mdash; 10 queries per hour per phone number.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="annotation">
+            <strong>Rate Limiting:</strong> The <code>RateLimiter</code> class uses Redis with key pattern <code>rate:{phone}:sms</code>. Max <strong>10 queries/hour</strong> for SMS, <strong>5 queries/hour</strong> for IVR. TTL is enforced via Redis EXPIRE command.
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- FLOW 5: ARRIVAL PREDICTION                                    -->
+      <!-- ============================================================ -->
+      <div class="flow-section" id="flow-prediction">
+
+        <div class="flow-card">
+          <div class="flow-card-header">
+            <div class="fc-icon" style="background:rgba(234,179,8,0.12);color:var(--yellow);">&#128202;</div>
+            <div>
+              <h3>Arrival Prediction Flow (Backend)</h3>
+              <p>Multi-factor confidence-based arrival prediction engine. Produces time windows (never exact ETAs) based on ETM, GPS, and historical data sources.</p>
+              <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
+                <span class="component-tag backend">arrival_prediction.py</span>
+                <span class="component-tag backend">trip_status.py</span>
+                <span class="component-tag backend">ml/confidence.py</span>
+                <span class="component-tag backend">ml/forecasting.py</span>
+                <span class="component-tag db">ArrivalPrediction schema</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Prediction Pipeline -->
+          <div class="data-flow-row" style="margin-bottom:24px;">
+            <div class="df-box blue">
+              Query Request
+              <small>trip_id + stop_id</small>
+            </div>
+            <div class="df-arrow">&rarr;</div>
+            <div class="df-box">
+              TripStatusService
+              <small>check_status()</small>
+            </div>
+            <div class="df-arrow">&rarr;</div>
+            <div class="df-box purple">
+              ConfidenceCalculator
+              <small>0.0 - 1.0 score</small>
+            </div>
+            <div class="df-arrow">&rarr;</div>
+            <div class="df-box highlight">
+              Window Calculation
+              <small>confidence_to_window()</small>
+            </div>
+            <div class="df-arrow">&rarr;</div>
+            <div class="df-box green">
+              Time Window
+              <small>"7-14 minutes"</small>
+            </div>
+          </div>
+
+          <div class="flow-diagram">
+            <div class="flow-step step-start" onclick="toggleStep(this)">
+              <div class="step-dot"></div>
+              <div class="step-label">1. Prediction Query Received</div>
+              <div class="step-sublabel">ArrivalPredictionService.predict() called with trip context</div>
+              <div class="step-details">
+                <div class="step-detail-box">
+                  Input parameters to <code>predict()</code>:
+                  <br>&bull; <code>trip_id</code> - Unique trip identifier
+                  <br>&bull; <code>stop_id</code> - Target stop for arrival estimate
+                  <br>&bull; <code>data_recency_minutes</code> - How fresh the latest data is
+                  <br>&bull; <code>has_gps</code> - Boolean, whether GPS data is available
+                  <br>&bull; <code>historical_accuracy</code> - Past prediction accuracy (0.0-1.0)
+                  <br>&bull; <code>ml_predicted_minutes</code> - ML model's point estimate (optional)
+                  <br>&bull; <code>ml_variance</code> - ML model's prediction variance (optional)
+                </div>
+              </div>
+            </div>
+
+            <div class="flow-step step-decision" onclick="toggleStep(this)">
+              <div class="step-dot"></div>
+              <div class="step-label">2. Check Trip Status via TripStatusService</div>
+              <div class="step-sublabel">Cache check (Redis) then DB fallback; TIMEOUT_MINUTES = 30</div>
+              <div class="step-details">
+                <div class="step-detail-box">
+                  <code>TripStatusService.check_status()</code> logic:
+                  <br>&bull; First check Redis cache: <code>trip:{trip_id}</code> key
+                  <br>&bull; If cached, return <code>TripStatusEnum(cached["status"])</code>
+                  <br>&bull; If ETM login time exists &rarr; <code>RUNNING</code>
+                  <br>&bull; If past scheduled_departure + 30 min with no ETM &rarr; <code>UNCONFIRMED</code>
+                  <br><br>
+                  Cache TTL: <code>CACHE_TTL_SECONDS = 86400</code> (24 hours).
+                </div>
+              </div>
+            </div>
+
+            <div class="flow-step" onclick="toggleStep(this)">
+              <div class="step-dot"></div>
+              <div class="step-label">3. ML Prediction Check</div>
+              <div class="step-sublabel">If ml_predicted_minutes is None, return "Status Not Confirmed"</div>
+              <div class="step-details">
+                <div class="step-detail-box">
+                  If the ML model has no prediction (<code>ml_predicted_minutes is None</code>), the service immediately returns:
+                  <br><code>{ "arrival_window": "Status Not Confirmed", "confidence": 0.0, "prediction": None }</code>
+                  <br><br>
+                  This ensures the system never fabricates arrival estimates when data is insufficient.
+                </div>
+              </div>
+            </div>
+
+            <div class="flow-step" onclick="toggleStep(this)">
+              <div class="step-dot"></div>
+              <div class="step-label">4. Calculate Confidence Score</div>
+              <div class="step-sublabel">ConfidenceCalculator weighs data recency, GPS, history, variance</div>
+              <div class="step-details">
+                <div class="step-detail-box">
+                  <code>ConfidenceCalculator.calculate()</code> factors:
+                  <br>&bull; <strong>Data Recency</strong> - Fresher data = higher confidence
+                  <br>&bull; <strong>GPS Availability</strong> - GPS present = significant confidence boost
+                  <br>&bull; <strong>Historical Accuracy</strong> - Past accuracy of this route/time
+                  <br>&bull; <strong>Prediction Variance</strong> - Lower ML variance = higher confidence
+                  <br><br>
+                  Default variance if not provided: <code>ml_variance or 15.0</code>
+                </div>
+              </div>
+            </div>
+
+            <div class="flow-step" onclick="toggleStep(this)">
+              <div class="step-dot"></div>
+              <div class="step-label">5. Convert Confidence to Time Window</div>
+              <div class="step-sublabel">confidence_to_window() maps score to min/max arrival range</div>
+              <div class="step-details">
+                <div class="step-detail-box">
+                  <code>confidence_to_window(confidence, ml_predicted_minutes)</code> determines the window width:
+                  <br>&bull; <strong>High confidence (>0.8)</strong> &rarr; Narrow window (~5 min spread)
+                  <br>&bull; <strong>Medium confidence (0.5-0.8)</strong> &rarr; Moderate window (~10 min spread)
+                  <br>&bull; <strong>Low confidence (0.2-0.5)</strong> &rarr; Wide window (~15 min spread)
+                  <br>&bull; <strong>Very low (&lt;0.2)</strong> &rarr; Returns <code>None</code> ("Status Not Confirmed")
+                  <br><br>
+                  Returns <code>{ "min": X, "max": Y }</code> or <code>None</code>.
+                </div>
+              </div>
+            </div>
+
+            <div class="flow-step step-end" onclick="toggleStep(this)">
+              <div class="step-dot"></div>
+              <div class="step-label">6. Return ArrivalPrediction Object</div>
+              <div class="step-sublabel">Structured response with window, confidence, and data sources</div>
+              <div class="step-details">
+                <div class="step-detail-box">
+                  Final <code>ArrivalPrediction</code> schema fields:
+                  <br>&bull; <code>prediction_id</code>: <code>"pred-{uuid[:8]}"</code>
+                  <br>&bull; <code>predicted_arrival_min</code> / <code>predicted_arrival_max</code>: integer minutes
+                  <br>&bull; <code>confidence_level</code>: float 0.0 - 1.0 (validated by Pydantic <code>Field(ge=0.0, le=1.0)</code>)
+                  <br>&bull; <code>data_sources_used</code>: list, always includes ["ETM", "Historical"], adds ["GPS"] if available
+                  <br>&bull; <code>query_time</code>: timestamp of prediction
+                  <br><br>
+                  Output: <code>{ "arrival_window": "7-14 minutes", "confidence": 0.72, "prediction": {...} }</code>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Confidence Gauges -->
+          <h4 style="font-size:14px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.5px;margin:24px 0 12px;">Confidence-to-Window Mapping</h4>
+          <div class="confidence-visual">
+            <div class="gauge-item">
+              <div class="gauge-label">High Confidence</div>
+              <div class="gauge-value" style="color:var(--status-running);">> 0.8</div>
+              <div class="gauge-desc">~5 min window</div>
+            </div>
+            <div class="gauge-item">
+              <div class="gauge-label">Medium Confidence</div>
+              <div class="gauge-value" style="color:var(--saffron);">0.5 - 0.8</div>
+              <div class="gauge-desc">~10 min window</div>
+            </div>
+            <div class="gauge-item">
+              <div class="gauge-label">Low Confidence</div>
+              <div class="gauge-value" style="color:var(--yellow);">0.2 - 0.5</div>
+              <div class="gauge-desc">~15 min window</div>
+            </div>
+            <div class="gauge-item">
+              <div class="gauge-label">Insufficient</div>
+              <div class="gauge-value" style="color:var(--status-discontinued);">&lt; 0.2</div>
+              <div class="gauge-desc">"Status Not Confirmed"</div>
+            </div>
+          </div>
+
+          <div class="annotation success">
+            <strong>Design Principle:</strong> The system intentionally provides <strong>time windows</strong> (e.g., "7-14 minutes") rather than exact ETAs. This sets realistic expectations and accounts for inherent uncertainty in public transit timing. The window width directly reflects data quality.
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- FLOW 6: DATA SEEDING / ADMIN                                  -->
+      <!-- ============================================================ -->
+      <div class="flow-section" id="flow-admin">
+
+        <div class="flow-card">
+          <div class="flow-card-header">
+            <div class="fc-icon" style="background:rgba(6,182,212,0.12);color:var(--cyan);">&#128736;</div>
+            <div>
+              <h3>Data Seeding / Admin Flow</h3>
+              <p>Database initialization workflow that populates realistic transit data including routes, stops, trips, and operator records.</p>
+              <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
+                <span class="component-tag backend">admin.py</span>
+                <span class="component-tag backend">data/seed_db.py</span>
+                <span class="component-tag backend">data/seed.py</span>
+                <span class="component-tag db">SQLite / PostgreSQL</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flow-diagram">
+            <div class="flow-step step-start" onclick="toggleStep(this)">
+              <div class="step-dot"></div>
+              <div class="step-label">1. Admin Triggers Seed Endpoint</div>
+              <div class="step-sublabel">POST /api/v1/admin/seed (or via frontend api.seedDatabase())</div>
+              <div class="step-details">
+                <div class="step-detail-box">
+                  <span class="api-badge post">POST</span> <code>/api/v1/admin/seed</code>
+                  <br><br>
+                  Triggered from the frontend via <code>api.seedDatabase()</code> or directly via the API. The endpoint first ensures all database tables exist via <code>Base.metadata.create_all(engine)</code>, then clears existing Trip, Route, and Stop data before re-seeding.
+                </div>
+              </div>
+            </div>
+
+            <div class="flow-step" onclick="toggleStep(this)">
+              <div class="step-dot"></div>
+              <div class="step-label">2. Generate Routes</div>
+              <div class="step-sublabel">generate_routes(25) creates routes across districts</div>
+              <div class="step-details">
+                <div class="step-detail-box">
+                  <code>generate_routes(25)</code> creates 25 routes (production seed_db uses 50). Each route has:
+                  <br>&bull; <code>id</code>: unique route identifier
+                  <br>&bull; <code>name</code>: human-readable name
+                  <br>&bull; <code>stops_sequence</code>: ordered list of stop names
+                  <br>&bull; <code>status</code>: "active"
+                  <br><br>
+                  Routes span across multiple districts covering 5 bus types.
+                </div>
+              </div>
+            </div>
+
+            <div class="flow-step" onclick="toggleStep(this)">
+              <div class="step-dot"></div>
+              <div class="step-label">3. Generate Stops with GPS Coordinates</div>
+              <div class="step-sublabel">generate_stops() creates 95+ stops with multilingual names</div>
+              <div class="step-details">
+                <div class="step-detail-box">
+                  Each stop record includes:
+                  <br>&bull; <code>id</code>: unique stop identifier
+                  <br>&bull; <code>name_en</code>: English name
+                  <br>&bull; <code>name_ta</code>: Tamil name
+                  <br>&bull; <code>name_hi</code>: Hindi name
+                  <br>&bull; <code>latitude</code> / <code>longitude</code>: GPS coordinates
+                  <br><br>
+                  These multilingual names support the platform's language switcher (English, Tamil, Hindi).
+                </div>
+              </div>
+            </div>
+
+            <div class="flow-step" onclick="toggleStep(this)">
+              <div class="step-dot"></div>
+              <div class="step-label">4. Generate Trip Data (7 Days)</div>
+              <div class="step-sublabel">generate_trips(routes, days=7) with realistic ETM login patterns</div>
+              <div class="step-details">
+                <div class="step-detail-box">
+                  <code>generate_trips(routes_data, days=7)</code> creates trip records spanning 7 days. Each trip includes:
+                  <br>&bull; <code>id</code>: <code>"T-{uuid[:8]}"</code> format
+                  <br>&bull; <code>route_id</code>: reference to a generated route
+                  <br>&bull; <code>bus_number</code>: realistic bus plate numbers
+                  <br>&bull; <code>scheduled_departure</code>: ISO datetime
+                  <br>&bull; <code>status</code>: mix of Running Today / Not Running / etc.
+                  <br>&bull; <code>etm_login_time</code>: simulated ETM device login times (null for some to test "Status Not Confirmed" logic)
+                </div>
+              </div>
+            </div>
+
+            <div class="flow-step" onclick="toggleStep(this)">
+              <div class="step-dot"></div>
+              <div class="step-label">5. Seed Operator Records</div>
+              <div class="step-sublabel">Pre-registered operators with hashed phone numbers</div>
+              <div class="step-details">
+                <div class="step-detail-box">
+                  Operator seed data from <code>admin.py</code>:
+                  <br><code>OPERATOR_PHONES = [</code>
+                  <br>&nbsp;&nbsp;<code>{ "phone": "97867XXXXX", "name": "Operator 1" },</code>
+                  <br>&nbsp;&nbsp;<code>{ "phone": "97150XXXXX", "name": "Operator 2" }</code>
+                  <br><code>]</code>
+                  <br><br>
+                  Phone numbers are SHA-256 hashed. Operators are created as: <code>id = "OP-001"</code>, <code>is_active = True</code>. These operators can then authenticate via the OTP flow.
+                </div>
+              </div>
+            </div>
+
+            <div class="flow-step step-end" onclick="toggleStep(this)">
+              <div class="step-dot"></div>
+              <div class="step-label">6. Return Seed Summary</div>
+              <div class="step-sublabel">JSON response with counts of all seeded entities</div>
+              <div class="step-details">
+                <div class="step-detail-box">
+                  Response: <code>{ "status": "seeded", "stops": 95, "routes": 25, "trips": 350, "operators": 2 }</code>
+                  <br><br>
+                  Additionally, <code>/api/v1/admin/db-status</code> provides a health check:
+                  <br><span class="api-badge get">GET</span> <code>/api/v1/admin/db-status</code>
+                  <br>Returns: <code>{ "status": "connected", "routes": 25, "stops": 95, "trips": 350 }</code>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Seed Data Summary -->
+          <h4 style="font-size:14px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.5px;margin:24px 0 12px;">Seeded Data Summary</h4>
+          <table class="status-table">
+            <thead>
+              <tr>
+                <th>Entity</th>
+                <th>Count</th>
+                <th>Database Table</th>
+                <th>Key Fields</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Routes</strong></td>
+                <td>25 - 50</td>
+                <td><code>Route</code></td>
+                <td>id, name, stops_sequence, status</td>
+              </tr>
+              <tr>
+                <td><strong>Stops</strong></td>
+                <td>95+</td>
+                <td><code>Stop</code></td>
+                <td>id, name_en/ta/hi, latitude, longitude</td>
+              </tr>
+              <tr>
+                <td><strong>Trips</strong></td>
+                <td>7 days worth</td>
+                <td><code>Trip</code></td>
+                <td>id, route_id, bus_number, status, etm_login_time</td>
+              </tr>
+              <tr>
+                <td><strong>Operators</strong></td>
+                <td>2</td>
+                <td><code>Operator</code></td>
+                <td>id, phone_hash, name, is_active</td>
+              </tr>
+              <tr>
+                <td><strong>Bus Types</strong></td>
+                <td>5</td>
+                <td>Embedded in routes</td>
+                <td>Ordinary, Express, Deluxe, Super Fast, AC</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- LEGEND                                                        -->
+      <!-- ============================================================ -->
+      <div class="flow-section" id="flow-legend">
+
+        <div class="legend-card">
+          <h4>Flow Diagram Symbols</h4>
+          <div class="legend-grid">
+            <div class="legend-item">
+              <div class="legend-symbol" style="border-color:var(--emerald);background:var(--emerald);color:#fff;font-size:11px;font-weight:700;">S</div>
+              <span>Start / Entry Point</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-symbol" style="border-color:var(--saffron);background:var(--saffron);color:var(--navy);font-size:11px;font-weight:700;">E</div>
+              <span>End / Terminal Point</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-symbol" style="border-color:var(--yellow);background:var(--yellow);color:var(--navy);font-size:11px;font-weight:700;">?</div>
+              <span>Decision / Branch Point</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-symbol" style="border-color:var(--red);background:var(--red);color:#fff;font-size:11px;font-weight:700;">!</div>
+              <span>Error / Alert State</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-symbol" style="border-color:var(--border-light);background:var(--navy-deep);"></div>
+              <span>Processing Step</span>
+            </div>
+            <div class="legend-item">
+              <div style="width:28px;height:3px;background:linear-gradient(to right,var(--border),var(--saffron),var(--emerald),var(--border));border-radius:2px;flex-shrink:0;margin:0 0;"></div>
+              <span>Flow Direction Line</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="legend-card">
+          <h4>Trip Status Colors</h4>
+          <div class="legend-grid">
+            <div class="legend-item">
+              <div class="legend-symbol" style="border-color:var(--status-running);background:rgba(34,197,94,0.15);"><div style="width:10px;height:10px;background:var(--status-running);border-radius:50%;"></div></div>
+              <span>Running Today (Active)</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-symbol" style="border-color:var(--status-not-running);background:rgba(239,68,68,0.15);"><div style="width:10px;height:10px;background:var(--status-not-running);border-radius:50%;"></div></div>
+              <span>Not Running (Cancelled)</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-symbol" style="border-color:var(--status-unconfirmed);background:rgba(234,179,8,0.15);"><div style="width:10px;height:10px;background:var(--status-unconfirmed);border-radius:50%;"></div></div>
+              <span>Status Not Confirmed</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-symbol" style="border-color:var(--status-discontinued);background:rgba(107,114,128,0.15);"><div style="width:10px;height:10px;background:var(--status-discontinued);border-radius:50%;"></div></div>
+              <span>Service Discontinued</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="legend-card">
+          <h4>Component Tags</h4>
+          <div class="legend-grid">
+            <div class="legend-item">
+              <span class="component-tag frontend">ComponentName.jsx</span>
+              <span>React Frontend Component</span>
+            </div>
+            <div class="legend-item">
+              <span class="component-tag backend">module.py</span>
+              <span>FastAPI Backend Module</span>
+            </div>
+            <div class="legend-item">
+              <span class="component-tag aws">AWS Service</span>
+              <span>AWS Cloud Service (SNS, Lambda)</span>
+            </div>
+            <div class="legend-item">
+              <span class="component-tag db">Table / Store</span>
+              <span>Database Table or Cache</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="legend-card">
+          <h4>API Endpoint Badges</h4>
+          <div class="legend-grid" style="grid-template-columns:1fr;">
+            <div class="legend-item" style="gap:16px;flex-wrap:wrap;">
+              <span class="api-badge get" style="font-size:12px;">GET</span>
+              <span>Read-only data retrieval endpoint</span>
+            </div>
+            <div class="legend-item" style="gap:16px;flex-wrap:wrap;">
+              <span class="api-badge post" style="font-size:12px;">POST</span>
+              <span>Data mutation / creation endpoint</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="legend-card">
+          <h4>Complete API Endpoint Map</h4>
+          <table class="status-table">
+            <thead>
+              <tr>
+                <th>Method</th>
+                <th>Endpoint</th>
+                <th>Router</th>
+                <th>Purpose</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><span class="api-badge post">POST</span></td><td><code>/api/v1/query</code></td><td>query.py</td><td>Bus status query</td></tr>
+              <tr><td><span class="api-badge get">GET</span></td><td><code>/api/v1/routes/search</code></td><td>routes.py</td><td>Search routes by stops</td></tr>
+              <tr><td><span class="api-badge get">GET</span></td><td><code>/api/v1/routes/active-buses</code></td><td>routes.py</td><td>List currently active buses</td></tr>
+              <tr><td><span class="api-badge post">POST</span></td><td><code>/api/v1/auth/send-otp</code></td><td>auth.py</td><td>Send OTP via AWS SNS</td></tr>
+              <tr><td><span class="api-badge post">POST</span></td><td><code>/api/v1/auth/verify-otp</code></td><td>auth.py</td><td>Verify OTP and assign role</td></tr>
+              <tr><td><span class="api-badge get">GET</span></td><td><code>/api/v1/operator/routes</code></td><td>operator.py</td><td>List all active routes</td></tr>
+              <tr><td><span class="api-badge get">GET</span></td><td><code>/api/v1/operator/routes/{id}</code></td><td>operator.py</td><td>Route detail with GPS stops</td></tr>
+              <tr><td><span class="api-badge post">POST</span></td><td><code>/api/v1/operator/trips/activate</code></td><td>operator.py</td><td>Activate a trip</td></tr>
+              <tr><td><span class="api-badge get">GET</span></td><td><code>/api/v1/operator/trips/active</code></td><td>operator.py</td><td>List active trips</td></tr>
+              <tr><td><span class="api-badge post">POST</span></td><td><code>/api/v1/operator/trips/{id}/deactivate</code></td><td>operator.py</td><td>Deactivate completed trip</td></tr>
+              <tr><td><span class="api-badge post">POST</span></td><td><code>/api/v1/safety/escalate</code></td><td>safety.py</td><td>Submit safety escalation</td></tr>
+              <tr><td><span class="api-badge post">POST</span></td><td><code>/api/v1/sms/webhook</code></td><td>sms.py</td><td>Handle inbound SMS query</td></tr>
+              <tr><td><span class="api-badge post">POST</span></td><td><code>/api/v1/feedback</code></td><td>feedback.py</td><td>Submit route feedback</td></tr>
+              <tr><td><span class="api-badge post">POST</span></td><td><code>/api/v1/notify/eta</code></td><td>notify.py</td><td>Send ETA via SMS</td></tr>
+              <tr><td><span class="api-badge post">POST</span></td><td><code>/api/v1/admin/seed</code></td><td>admin.py</td><td>Seed database</td></tr>
+              <tr><td><span class="api-badge get">GET</span></td><td><code>/api/v1/admin/db-status</code></td><td>admin.py</td><td>Database health check</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div><!-- /flow-container -->
+  </div><!-- /main-content -->
+</div><!-- /app-container -->
+
+<script>
+  // ===== Flow Switching =====
+  function switchFlow(flowId) {
+    // Update nav items
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.classList.toggle('active', item.dataset.flow === flowId);
+    });
+
+    // Update flow sections
+    document.querySelectorAll('.flow-section').forEach(section => {
+      section.classList.remove('active');
+    });
+    const target = document.getElementById('flow-' + flowId);
+    if (target) {
+      target.classList.add('active');
+      // Reset expanded steps
+      target.querySelectorAll('.flow-step.expanded').forEach(step => {
+        step.classList.remove('expanded');
+      });
+    }
+
+    // Close mobile sidebar
+    if (window.innerWidth <= 900) {
+      document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('overlay').classList.remove('active');
+    }
+
+    // Scroll to top of content
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // ===== Step Toggle =====
+  function toggleStep(stepEl) {
+    const wasExpanded = stepEl.classList.contains('expanded');
+
+    // Close all steps in the same diagram
+    const diagram = stepEl.closest('.flow-diagram');
+    if (diagram) {
+      diagram.querySelectorAll('.flow-step.expanded').forEach(s => {
+        s.classList.remove('expanded');
+      });
+    }
+
+    // Toggle the clicked step
+    if (!wasExpanded) {
+      stepEl.classList.add('expanded');
+    }
+  }
+
+  // ===== Mobile Sidebar Toggle =====
+  function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('overlay').classList.toggle('active');
+  }
+
+  // ===== Keyboard Navigation =====
+  document.addEventListener('keydown', function(e) {
+    const flows = ['passenger', 'operator', 'safety', 'sms', 'prediction', 'admin', 'legend'];
+    const activeNav = document.querySelector('.nav-item.active');
+    if (!activeNav) return;
+    const currentIdx = flows.indexOf(activeNav.dataset.flow);
+
+    if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+      e.preventDefault();
+      const nextIdx = (currentIdx + 1) % flows.length;
+      switchFlow(flows[nextIdx]);
+    } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+      e.preventDefault();
+      const prevIdx = (currentIdx - 1 + flows.length) % flows.length;
+      switchFlow(flows[prevIdx]);
+    }
+  });
+</script>
+
+</body>
+</html>

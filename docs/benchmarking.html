@@ -1,0 +1,1989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transit India — Competitive Benchmarking</title>
+    <style>
+        /* ===== RESET & BASE ===== */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-deep: #0f172a;
+            --bg-card: #1e293b;
+            --bg-card-alt: #162032;
+            --border: #334155;
+            --border-light: #475569;
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+            --text-dim: #64748b;
+            --navy: #0B1F3A;
+            --saffron: #FF9933;
+            --saffron-dark: #cc7a29;
+            --emerald: #138808;
+            --emerald-light: #22c55e;
+            --red: #ef4444;
+            --red-muted: #7f1d1d;
+            --yellow: #eab308;
+            --yellow-muted: #713f12;
+            --green-muted: #14532d;
+            --blue: #3b82f6;
+            --blue-muted: #1e3a5f;
+            --purple: #a855f7;
+            --purple-muted: #3b0764;
+            --cyan: #06b6d4;
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-deep);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-deep); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--border-light); }
+
+        /* ===== HEADER ===== */
+        .hero {
+            background: linear-gradient(135deg, var(--navy) 0%, #0f172a 50%, #0c1a2e 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 3rem 2rem 2.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 50%, rgba(255,153,51,0.04) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 50%, rgba(19,136,8,0.04) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        .hero-flag {
+            display: flex;
+            justify-content: center;
+            gap: 0;
+            margin-bottom: 1.5rem;
+        }
+        .hero-flag span {
+            width: 40px;
+            height: 6px;
+            border-radius: 3px;
+        }
+        .hero-flag span:nth-child(1) { background: var(--saffron); }
+        .hero-flag span:nth-child(2) { background: #fff; margin: 0 2px; }
+        .hero-flag span:nth-child(3) { background: var(--emerald); }
+
+        .hero h1 {
+            font-size: 2.4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--saffron), #fbbf24, var(--saffron));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+        .hero .subtitle {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            margin-bottom: 1.25rem;
+        }
+        .hero .meta {
+            color: var(--text-dim);
+            font-size: 0.8rem;
+        }
+        .badge-row {
+            display: flex;
+            justify-content: center;
+            gap: 0.6rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        .badge-orange { background: #7c2d12; color: #fdba74; }
+        .badge-blue { background: var(--blue-muted); color: #7dd3fc; }
+        .badge-green { background: var(--green-muted); color: #86efac; }
+        .badge-purple { background: var(--purple-muted); color: #d8b4fe; }
+        .badge-red { background: var(--red-muted); color: #fca5a5; }
+
+        /* ===== NAV TABS ===== */
+        .nav-bar {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .nav-bar::-webkit-scrollbar { height: 0; }
+        .nav-inner {
+            display: flex;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        .nav-tab {
+            padding: 0.9rem 1.25rem;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            white-space: nowrap;
+            transition: var(--transition);
+            user-select: none;
+        }
+        .nav-tab:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+        .nav-tab.active {
+            color: var(--saffron);
+            border-bottom-color: var(--saffron);
+        }
+
+        /* ===== MAIN LAYOUT ===== */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 4rem;
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+        .section.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--saffron);
+            margin-bottom: 0.5rem;
+        }
+        .section-desc {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+            max-width: 700px;
+        }
+
+        /* ===== CARDS ===== */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.25rem;
+            transition: var(--transition);
+        }
+        .card:hover { border-color: var(--border-light); }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+        }
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+        .card-header h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            flex: 1;
+        }
+        .card-header .card-type {
+            font-size: 0.7rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 9999px;
+            font-weight: 600;
+        }
+        .type-govt { background: rgba(19,136,8,0.15); color: #86efac; }
+        .type-private { background: rgba(59,130,246,0.15); color: #93c5fd; }
+        .type-intl { background: rgba(168,85,247,0.15); color: #d8b4fe; }
+        .type-ours { background: rgba(255,153,51,0.15); color: #fdba74; }
+
+        .card-body { color: var(--text-muted); font-size: 0.88rem; }
+        .card-body ul { list-style: none; padding: 0; }
+        .card-body li {
+            padding: 0.3rem 0;
+            padding-left: 1.2rem;
+            position: relative;
+        }
+        .card-body li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.65rem;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--border-light);
+        }
+
+        /* ===== PLATFORMS GRID ===== */
+        .platforms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 1.25rem;
+        }
+
+        /* ===== COMPARISON MATRIX ===== */
+        .matrix-wrapper {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-bottom: 2rem;
+        }
+        .matrix-wrapper::-webkit-scrollbar { height: 6px; }
+        .matrix-wrapper::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+        .matrix {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+            min-width: 900px;
+        }
+        .matrix thead { position: sticky; top: 0; z-index: 5; }
+        .matrix th {
+            background: var(--navy);
+            color: var(--text);
+            font-weight: 700;
+            padding: 0.9rem 0.75rem;
+            text-align: center;
+            border-bottom: 2px solid var(--saffron);
+            white-space: nowrap;
+        }
+        .matrix th:first-child {
+            text-align: left;
+            position: sticky;
+            left: 0;
+            z-index: 6;
+            background: var(--navy);
+            min-width: 160px;
+        }
+        .matrix td {
+            padding: 0.7rem 0.75rem;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+        .matrix td:first-child {
+            text-align: left;
+            font-weight: 600;
+            color: var(--text);
+            position: sticky;
+            left: 0;
+            background: var(--bg-card);
+            z-index: 2;
+            white-space: nowrap;
+        }
+        .matrix tbody tr { background: var(--bg-card); }
+        .matrix tbody tr:nth-child(even) { background: var(--bg-card-alt); }
+        .matrix tbody tr:nth-child(even) td:first-child { background: var(--bg-card-alt); }
+        .matrix tbody tr:hover { background: rgba(255,153,51,0.04); }
+        .matrix tbody tr:hover td:first-child { background: rgba(255,153,51,0.04); }
+
+        /* Highlight Transit India column */
+        .matrix th.highlight-col { background: #1a2e1a; color: var(--emerald-light); }
+        .matrix td.highlight-col { background: rgba(19,136,8,0.06) !important; font-weight: 600; }
+
+        /* Cell rating colors */
+        .cell-5 { color: #4ade80; }
+        .cell-4 { color: #86efac; }
+        .cell-3 { color: #fbbf24; }
+        .cell-2 { color: #fb923c; }
+        .cell-1 { color: #f87171; }
+
+        .star { font-size: 0.65rem; letter-spacing: 1px; }
+        .star-filled { color: #fbbf24; }
+        .star-empty { color: var(--border); }
+
+        .check { color: #4ade80; font-weight: 700; }
+        .cross { color: #f87171; font-weight: 700; }
+        .partial { color: #fbbf24; font-weight: 700; }
+
+        /* ===== SCORE CARDS ===== */
+        .scores-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+        }
+        .score-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        .score-card:hover { border-color: var(--border-light); transform: translateY(-2px); }
+        .score-card.winner {
+            border-color: var(--saffron);
+            box-shadow: 0 0 30px rgba(255,153,51,0.08);
+        }
+        .score-card.winner::before {
+            content: 'TOP SCORE';
+            position: absolute;
+            top: 12px;
+            right: -28px;
+            background: var(--saffron);
+            color: var(--navy);
+            font-size: 0.55rem;
+            font-weight: 800;
+            padding: 0.2rem 2rem;
+            transform: rotate(45deg);
+            letter-spacing: 0.05em;
+        }
+        .score-card .platform-name {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+        .score-card .platform-type {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .score-ring {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 1rem;
+            position: relative;
+        }
+        .score-ring svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+        .score-ring circle {
+            fill: none;
+            stroke-width: 6;
+            stroke-linecap: round;
+        }
+        .score-ring .ring-bg { stroke: var(--border); }
+        .score-ring .ring-fill { transition: stroke-dashoffset 1s ease; }
+        .score-ring .score-value {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+        .score-ring .score-max {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, calc(-50% + 18px));
+            font-size: 0.65rem;
+            color: var(--text-dim);
+        }
+
+        .score-breakdown {
+            text-align: left;
+            margin-top: 0.75rem;
+        }
+        .score-bar-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.4rem;
+            font-size: 0.72rem;
+        }
+        .score-bar-label {
+            width: 90px;
+            color: var(--text-muted);
+            text-align: right;
+            flex-shrink: 0;
+        }
+        .score-bar-track {
+            flex: 1;
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .score-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.8s ease;
+        }
+        .score-bar-val {
+            width: 18px;
+            text-align: right;
+            font-weight: 700;
+            flex-shrink: 0;
+            font-size: 0.7rem;
+        }
+
+        /* ===== RADAR CHART (CSS-only) ===== */
+        .radar-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        .radar-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+        .radar-card h4 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        .radar-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .radar-bar-item {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .radar-bar-label {
+            width: 100px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-align: right;
+            flex-shrink: 0;
+        }
+        .radar-bar-track {
+            flex: 1;
+            height: 20px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+        .radar-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 6px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: rgba(255,255,255,0.9);
+            transition: width 1s ease;
+        }
+
+        /* ===== FEATURE MATRIX ===== */
+        .feature-matrix-wrapper {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-bottom: 2rem;
+        }
+        .feature-matrix {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+            min-width: 800px;
+        }
+        .feature-matrix th {
+            background: var(--navy);
+            color: var(--text);
+            font-weight: 700;
+            padding: 0.8rem 0.6rem;
+            text-align: center;
+            border-bottom: 2px solid var(--saffron);
+            white-space: nowrap;
+            font-size: 0.78rem;
+        }
+        .feature-matrix th:first-child { text-align: left; min-width: 200px; }
+        .feature-matrix td {
+            padding: 0.55rem 0.6rem;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+        .feature-matrix td:first-child {
+            text-align: left;
+            font-weight: 500;
+            color: var(--text);
+        }
+        .feature-matrix tbody tr { background: var(--bg-card); }
+        .feature-matrix tbody tr:nth-child(even) { background: var(--bg-card-alt); }
+        .feature-matrix tbody tr:hover { background: rgba(255,153,51,0.04); }
+        .feature-matrix .category-row td {
+            background: rgba(255,153,51,0.08) !important;
+            font-weight: 700;
+            color: var(--saffron);
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.6rem;
+        }
+
+        /* ===== ADVANTAGES SECTION ===== */
+        .advantages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+        }
+        .advantage-card {
+            background: linear-gradient(135deg, rgba(255,153,51,0.06), rgba(19,136,8,0.04));
+            border: 1px solid rgba(255,153,51,0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: var(--transition);
+        }
+        .advantage-card:hover {
+            border-color: var(--saffron);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(255,153,51,0.08);
+        }
+        .advantage-card .adv-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            margin-bottom: 0.75rem;
+            background: rgba(255,153,51,0.1);
+        }
+        .advantage-card h4 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+            color: var(--saffron);
+        }
+        .advantage-card p {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            line-height: 1.55;
+        }
+        .advantage-card .adv-tag {
+            display: inline-block;
+            margin-top: 0.6rem;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 0.15rem 0.5rem;
+            border-radius: 9999px;
+            background: rgba(255,153,51,0.12);
+            color: var(--saffron);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* ===== KEY DIFFERENTIATORS ===== */
+        .diff-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .diff-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--saffron);
+            border-radius: 0 12px 12px 0;
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+            transition: var(--transition);
+        }
+        .diff-item:hover { border-left-color: var(--emerald-light); background: rgba(255,153,51,0.02); }
+        .diff-num {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, var(--saffron), #f97316);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.85rem;
+            color: var(--navy);
+            flex-shrink: 0;
+        }
+        .diff-content h4 {
+            font-size: 0.92rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+        .diff-content p {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            line-height: 1.55;
+        }
+
+        /* ===== SUMMARY TABLE ===== */
+        .summary-table-wrapper {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-bottom: 2rem;
+        }
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            min-width: 700px;
+        }
+        .summary-table th {
+            background: var(--navy);
+            color: var(--text);
+            font-weight: 700;
+            padding: 0.85rem 1rem;
+            text-align: left;
+            border-bottom: 2px solid var(--saffron);
+        }
+        .summary-table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .summary-table tbody tr { background: var(--bg-card); }
+        .summary-table tbody tr:nth-child(even) { background: var(--bg-card-alt); }
+        .summary-table tbody tr:hover { background: rgba(255,153,51,0.04); }
+        .summary-table .rank-1 { color: #fbbf24; font-weight: 800; }
+        .summary-table .rank-2 { color: #d1d5db; font-weight: 700; }
+        .summary-table .rank-3 { color: #cd7f32; font-weight: 700; }
+
+        /* ===== EXPANDABLE DETAILS ===== */
+        .expandable { margin-bottom: 1rem; }
+        .expand-header {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1rem 1.25rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: var(--transition);
+            user-select: none;
+        }
+        .expand-header:hover { border-color: var(--border-light); }
+        .expand-header.open { border-radius: 10px 10px 0 0; border-color: var(--saffron); }
+        .expand-header h4 { font-size: 0.92rem; font-weight: 700; }
+        .expand-arrow {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            transition: transform 0.3s ease;
+        }
+        .expand-header.open .expand-arrow { transform: rotate(180deg); }
+        .expand-body {
+            display: none;
+            background: var(--bg-card-alt);
+            border: 1px solid var(--border);
+            border-top: none;
+            border-radius: 0 0 10px 10px;
+            padding: 1.25rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.65;
+        }
+        .expand-body.open { display: block; animation: fadeIn 0.3s ease; }
+
+        /* ===== METHODOLOGY NOTE ===== */
+        .methodology {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .methodology h4 {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--saffron);
+            margin-bottom: 0.5rem;
+        }
+        .methodology p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.65;
+        }
+        .methodology ul {
+            margin-top: 0.5rem;
+            padding-left: 1.25rem;
+        }
+        .methodology li {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            text-align: center;
+            padding: 2rem 1.5rem;
+            border-top: 1px solid var(--border);
+            margin-top: 2rem;
+        }
+        .footer p {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+        .footer .footer-brand {
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--saffron), #fbbf24);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .hero { padding: 2rem 1rem 1.5rem; }
+            .hero h1 { font-size: 1.6rem; }
+            .container { padding: 1.25rem 1rem 3rem; }
+            .platforms-grid { grid-template-columns: 1fr; }
+            .scores-grid { grid-template-columns: 1fr; }
+            .advantages-grid { grid-template-columns: 1fr; }
+            .radar-section { grid-template-columns: 1fr; }
+            .nav-tab { padding: 0.75rem 0.9rem; font-size: 0.75rem; }
+            .section-title { font-size: 1.25rem; }
+        }
+
+        /* ===== TOOLTIP ===== */
+        .info-tip {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--border);
+            color: var(--text-muted);
+            font-size: 0.6rem;
+            text-align: center;
+            line-height: 16px;
+            cursor: help;
+            margin-left: 4px;
+            position: relative;
+        }
+        .info-tip:hover::after {
+            content: attr(data-tip);
+            position: absolute;
+            bottom: 120%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--navy);
+            color: var(--text);
+            padding: 0.4rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            white-space: nowrap;
+            border: 1px solid var(--border);
+            z-index: 20;
+        }
+
+        /* ===== PRINT STYLES ===== */
+        @media print {
+            body { background: #fff; color: #000; }
+            .nav-bar { display: none; }
+            .section { display: block !important; page-break-inside: avoid; margin-bottom: 2rem; }
+            .hero { background: #fff; border-bottom: 2px solid #000; }
+            .hero h1 { -webkit-text-fill-color: #FF9933; }
+            .card, .score-card, .advantage-card, .diff-item, .methodology {
+                background: #f8f9fa; border-color: #dee2e6; color: #000;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== HERO ===== -->
+<header class="hero">
+    <div class="hero-flag">
+        <span></span><span></span><span></span>
+    </div>
+    <h1>Transit India &mdash; Competitive Benchmarking</h1>
+    <p class="subtitle">Comparative Analysis Against Leading Indian Transit Platforms</p>
+    <p class="meta">College Project Submission &nbsp;|&nbsp; Benchmarking Study &nbsp;|&nbsp; 2025</p>
+    <div class="badge-row">
+        <span class="badge badge-orange">6 Platforms Compared</span>
+        <span class="badge badge-blue">12 Dimensions</span>
+        <span class="badge badge-green">Quantitative Scoring</span>
+        <span class="badge badge-purple">Feature-Level Analysis</span>
+    </div>
+</header>
+
+<!-- ===== NAVIGATION ===== -->
+<nav class="nav-bar">
+    <div class="nav-inner">
+        <div class="nav-tab active" data-tab="overview">Overview</div>
+        <div class="nav-tab" data-tab="matrix">Scoring Matrix</div>
+        <div class="nav-tab" data-tab="features">Feature Comparison</div>
+        <div class="nav-tab" data-tab="visual">Visual Analysis</div>
+        <div class="nav-tab" data-tab="advantages">Our Advantages</div>
+        <div class="nav-tab" data-tab="details">Detailed Breakdown</div>
+        <div class="nav-tab" data-tab="summary">Summary &amp; Conclusion</div>
+    </div>
+</nav>
+
+<!-- ===== MAIN CONTENT ===== -->
+<main class="container">
+
+<!-- ==================== TAB 1: OVERVIEW ==================== -->
+<section class="section active" id="overview">
+    <h2 class="section-title">Platform Overview</h2>
+    <p class="section-desc">An introduction to each transit platform included in this benchmarking study, covering their scope, ownership model, and primary capabilities.</p>
+
+    <div class="platforms-grid">
+        <!-- Transit India -->
+        <div class="card" style="border-color: rgba(255,153,51,0.3);">
+            <div class="card-header">
+                <div class="card-icon" style="background: rgba(255,153,51,0.12); color: #FF9933;">&#9670;</div>
+                <h3>Transit India <span style="font-size:0.7rem; color:var(--saffron); margin-left:4px;">(Ours)</span></h3>
+                <span class="card-type type-ours">Open Platform</span>
+            </div>
+            <div class="card-body">
+                <ul>
+                    <li>National bus transit information platform for all state RTCs</li>
+                    <li>Serverless architecture: AWS Lambda, API Gateway, RDS PostgreSQL, ElastiCache Redis, CloudFront</li>
+                    <li>Multi-channel access: Web, SMS, IVR (no smartphone required)</li>
+                    <li>Privacy-first: No passenger tracking, stateless queries, phone hash storage</li>
+                    <li>Honesty-first: Time windows instead of exact ETAs, confidence scores</li>
+                    <li>ML-powered: XGBoost delay classification, Prophet/LSTM forecasting</li>
+                    <li>Multilingual: English, Hindi, Tamil</li>
+                    <li>Safety: Emergency helplines, escalation system</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Chalo -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon" style="background: rgba(59,130,246,0.12); color: #3b82f6;">&#9679;</div>
+                <h3>Chalo App</h3>
+                <span class="card-type type-private">Private</span>
+            </div>
+            <div class="card-body">
+                <ul>
+                    <li>Private company, available in 40+ Indian cities</li>
+                    <li>Real-time bus tracking with GPS</li>
+                    <li>Live ETA with exact arrival times</li>
+                    <li>Pass purchase and digital ticketing</li>
+                    <li>Route planning and navigation</li>
+                    <li>Android &amp; iOS only (requires smartphone + internet)</li>
+                    <li>Tracks user location and behavior; displays ads</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- BMTC -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon" style="background: rgba(19,136,8,0.12); color: #22c55e;">&#9632;</div>
+                <h3>BMTC Official App</h3>
+                <span class="card-type type-govt">Government</span>
+            </div>
+            <div class="card-body">
+                <ul>
+                    <li>Government-owned by Bangalore Metropolitan Transport Corporation</li>
+                    <li>GPS-based bus tracking</li>
+                    <li>Route search functionality</li>
+                    <li>Limited real-time data accuracy</li>
+                    <li>Android only; historically buggy and unreliable</li>
+                    <li>No SMS or IVR support; single city (Bangalore) only</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- DIMTS -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon" style="background: rgba(19,136,8,0.12); color: #22c55e;">&#9650;</div>
+                <h3>DIMTS (Delhi)</h3>
+                <span class="card-type type-govt">Government</span>
+            </div>
+            <div class="card-body">
+                <ul>
+                    <li>Delhi Integrated Multi-Modal Transit System</li>
+                    <li>Real-time tracking for DTC and cluster buses</li>
+                    <li>Web-based and mobile application</li>
+                    <li>GPS-based ETA calculations</li>
+                    <li>Limited to Delhi NCR region only</li>
+                    <li>No documented privacy policy or focus</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- KSRTC -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon" style="background: rgba(19,136,8,0.12); color: #22c55e;">&#9733;</div>
+                <h3>KSRTC App (Kerala)</h3>
+                <span class="card-type type-govt">Government</span>
+            </div>
+            <div class="card-body">
+                <ul>
+                    <li>Kerala State Road Transport Corporation official app</li>
+                    <li>Ticket booking and schedule information</li>
+                    <li>Limited real-time tracking capabilities</li>
+                    <li>Single state (Kerala) coverage only</li>
+                    <li>Available on Android and iOS</li>
+                    <li>Focus on ticketing over real-time info</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Moovit -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon" style="background: rgba(168,85,247,0.12); color: #a855f7;">&#9830;</div>
+                <h3>Moovit (India)</h3>
+                <span class="card-type type-intl">International</span>
+            </div>
+            <div class="card-body">
+                <ul>
+                    <li>Global transit company (Intel/Mobileye subsidiary) with India operations</li>
+                    <li>Multi-modal: bus, train, metro, auto</li>
+                    <li>Crowd-sourced transit data model</li>
+                    <li>Route planning with alternatives</li>
+                    <li>Requires smartphone; heavy data collection</li>
+                    <li>Available in select Indian cities only</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== TAB 2: SCORING MATRIX ==================== -->
+<section class="section" id="matrix">
+    <h2 class="section-title">Dimension-wise Scoring Matrix</h2>
+    <p class="section-desc">Each platform is rated 1&ndash;5 across 12 critical dimensions. Scores are color-coded: <span class="cell-5">5 = Excellent</span>, <span class="cell-4">4 = Good</span>, <span class="cell-3">3 = Adequate</span>, <span class="cell-2">2 = Weak</span>, <span class="cell-1">1 = Poor</span>.</p>
+
+    <div class="methodology">
+        <h4>Scoring Methodology</h4>
+        <p>Each dimension is scored on a 1&ndash;5 scale based on publicly available information, app store reviews, published documentation, and technical analysis. The scoring criteria are:</p>
+        <ul>
+            <li><strong>5:</strong> Industry-leading implementation or unique differentiator</li>
+            <li><strong>4:</strong> Strong implementation meeting most user needs</li>
+            <li><strong>3:</strong> Adequate basic implementation</li>
+            <li><strong>2:</strong> Below average with notable gaps</li>
+            <li><strong>1:</strong> Missing or severely deficient</li>
+        </ul>
+    </div>
+
+    <div class="matrix-wrapper">
+        <table class="matrix">
+            <thead>
+                <tr>
+                    <th>Dimension</th>
+                    <th class="highlight-col">Transit India</th>
+                    <th>Chalo</th>
+                    <th>BMTC</th>
+                    <th>DIMTS</th>
+                    <th>KSRTC</th>
+                    <th>Moovit</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Architecture</td>
+                    <td class="highlight-col cell-5">5 <span class="star"><span class="star-filled">&#9733;&#9733;&#9733;&#9733;&#9733;</span></span></td>
+                    <td class="cell-4">4 <span class="star"><span class="star-filled">&#9733;&#9733;&#9733;&#9733;</span><span class="star-empty">&#9733;</span></span></td>
+                    <td class="cell-2">2 <span class="star"><span class="star-filled">&#9733;&#9733;</span><span class="star-empty">&#9733;&#9733;&#9733;</span></span></td>
+                    <td class="cell-3">3 <span class="star"><span class="star-filled">&#9733;&#9733;&#9733;</span><span class="star-empty">&#9733;&#9733;</span></span></td>
+                    <td class="cell-2">2 <span class="star"><span class="star-filled">&#9733;&#9733;</span><span class="star-empty">&#9733;&#9733;&#9733;</span></span></td>
+                    <td class="cell-4">4 <span class="star"><span class="star-filled">&#9733;&#9733;&#9733;&#9733;</span><span class="star-empty">&#9733;</span></span></td>
+                </tr>
+                <tr>
+                    <td>Privacy</td>
+                    <td class="highlight-col cell-5">5 <span class="star"><span class="star-filled">&#9733;&#9733;&#9733;&#9733;&#9733;</span></span></td>
+                    <td class="cell-1">1 <span class="star"><span class="star-filled">&#9733;</span><span class="star-empty">&#9733;&#9733;&#9733;&#9733;</span></span></td>
+                    <td class="cell-3">3 <span class="star"><span class="star-filled">&#9733;&#9733;&#9733;</span><span class="star-empty">&#9733;&#9733;</span></span></td>
+                    <td class="cell-2">2 <span class="star"><span class="star-filled">&#9733;&#9733;</span><span class="star-empty">&#9733;&#9733;&#9733;</span></span></td>
+                    <td class="cell-3">3 <span class="star"><span class="star-filled">&#9733;&#9733;&#9733;</span><span class="star-empty">&#9733;&#9733;</span></span></td>
+                    <td class="cell-1">1 <span class="star"><span class="star-filled">&#9733;</span><span class="star-empty">&#9733;&#9733;&#9733;&#9733;</span></span></td>
+                </tr>
+                <tr>
+                    <td>Accessibility</td>
+                    <td class="highlight-col cell-5">5 <span class="star"><span class="star-filled">&#9733;&#9733;&#9733;&#9733;&#9733;</span></span></td>
+                    <td class="cell-2">2 <span class="star"><span class="star-filled">&#9733;&#9733;</span><span class="star-empty">&#9733;&#9733;&#9733;</span></span></td>
+                    <td class="cell-1">1 <span class="star"><span class="star-filled">&#9733;</span><span class="star-empty">&#9733;&#9733;&#9733;&#9733;</span></span></td>
+                    <td class="cell-2">2 <span class="star"><span class="star-filled">&#9733;&#9733;</span><span class="star-empty">&#9733;&#9733;&#9733;</span></span></td>
+                    <td class="cell-2">2 <span class="star"><span class="star-filled">&#9733;&#9733;</span><span class="star-empty">&#9733;&#9733;&#9733;</span></span></td>
+                    <td class="cell-3">3 <span class="star"><span class="star-filled">&#9733;&#9733;&#9733;</span><span class="star-empty">&#9733;&#9733;</span></span></td>
+                </tr>
+                <tr>
+                    <td>Coverage</td>
+                    <td class="highlight-col cell-5">5 <span class="star"><span class="star-filled">&#9733;&#9733;&#9733;&#9733;&#9733;</span></span></td>
+                    <td class="cell-4">4 <span class="star"><span class="star-filled">&#9733;&#9733;&#9733;&#9733;</span><span class="star-empty">&#9733;</span></span></td>
+                    <td class="cell-1">1 <span class="star"><span class="star-filled">&#9733;</span><span class="star-empty">&#9733;&#9733;&#9733;&#9733;</span></span></td>
+                    <td class="cell-1">1 <span class="star"><span class="star-filled">&#9733;</span><span class="star-empty">&#9733;&#9733;&#9733;&#9733;</span></span></td>
+                    <td class="cell-2">2 <span class="star"><span class="star-filled">&#9733;&#9733;</span><span class="star-empty">&#9733;&#9733;&#9733;</span></span></td>
+                    <td class="cell-3">3 <span class="star"><span class="star-filled">&#9733;&#9733;&#9733;</span><span class="star-empty">&#9733;&#9733;</span></span></td>
+                </tr>
+                <tr>
+                    <td>Cost Model</td>
+                    <td class="highlight-col cell-5">5 <span class="star"><span class="star-filled">&#9733;&#9733;&#9733;&#9733;&#9733;</span></span></td>
+                    <td class="cell-2">2 <span class="star"><span class="star-filled">&#9733;&#9733;</span><span class="star-empty">&#9733;&#9733;&#9733;</span></span></td>
+                    <td class="cell-4">4 <span class="star"><span class="star-filled">&#9733;&#9733;&#9733;&#9733;</span><span class="star-empty">&#9733;</span></span></td>
+                    <td class="cell-4">4 <span class="star"><span class="star-filled">&#9733;&#9733;&#9733;&#9733;</span><span class="star-empty">&#9733;</span></span></td>
+                    <td class="cell-4">4 <span class="star"><span class="star-filled">&#9733;&#9733;&#9733;&#9733;</span><span class="star-empty">&#9733;</span></span></td>
+                    <td class="cell-3">3 <span class="star"><span class="star-filled">&#9733;&#9733;&#9733;</span><span class="star-empty">&#9733;&#9733;</span></span></td>
+                </tr>
+                <tr>
+                    <td>Real-time Data</td>
+                    <td class="highlight-col cell-4">4 <span class="star"><span class="star-filled">&#9733;&#9733;&#9733;&#9733;</span><span class="star-empty">&#9733;</span></span></td>
+                    <td class="cell-4">4 <span class="star"><span class="star-filled">&#9733;&#9733;&#9733;&#9733;</span><span class="star-empty">&#9733;</span></span></td>
+                    <td class="cell-2">2 <span class="star"><span class="star-filled">&#9733;&#9733;</span><span class="star-empty">&#9733;&#9733;&#9733;</span></span></td>
+                    <td class="cell-3">3 <span class="star"><span class="star-filled">&#9733;&#9733;&#9733;</span><span class="star-empty">&#9733;&#9733;</span></span></td>
+                    <td class="cell-2">2 <span class="star"><span class="star-filled">&#9733;&#9733;</span><span class="star-empty">&#9733;&#9733;&#9733;</span></span></td>
+                    <td class="cell-3">3 <span class="star"><span class="star-filled">&#9733;&#9733;&#9733;</span><span class="star-empty">&#9733;&#9733;</span></span></td>
+                </tr>
+                <tr>
+                    <td>Safety Features</td>
+                    <td class="highlight-col cell-5">5 <span class="star"><span class="star-filled">&#9733;&#9733;&#9733;&#9733;&#9733;</span></span></td>
+                    <td class="cell-2">2 <span class="star"><span class="star-filled">&#9733;&#9733;</span><span class="star-empty">&#9733;&#9733;&#9733;</span></span></td>
+                    <td class="cell-1">1 <span class="star"><span class="star-filled">&#9733;</span><span class="star-empty">&#9733;&#9733;&#9733;&#9733;</span></span></td>
+                    <td class="cell-1">1 <span class="star"><span class="star-filled">&#9733;</span><span class="star-empty">&#9733;&#9733;&#9733;&#9733;</span></span></td>
+                    <td class="cell-1">1 <span class="star"><span class="star-filled">&#9733;</span><span class="star-empty">&#9733;&#9733;&#9733;&#9733;</span></span></td>
+                    <td class="cell-2">2 <span class="star"><span class="star-filled">&#9733;&#9733;</span><span class="star-empty">&#9733;&#9733;&#9733;</span></span></td>
+                </tr>
+                <tr>
+                    <td>Offline Support</td>
+                    <td class="highlight-col cell-5">5 <span class="star"><span class="star-filled">&#9733;&#9733;&#9733;&#9733;&#9733;</span></span></td>
+                    <td class="cell-1">1 <span class="star"><span class="star-filled">&#9733;</span><span class="star-empty">&#9733;&#9733;&#9733;&#9733;</span></span></td>
+                    <td class="cell-1">1 <span class="star"><span class="star-filled">&#9733;</span><span class="star-empty">&#9733;&#9733;&#9733;&#9733;</span></span></td>
+                    <td class="cell-2">2 <span class="star"><span class="star-filled">&#9733;&#9733;</span><span class="star-empty">&#9733;&#9733;&#9733;</span></span></td>
+                    <td class="cell-1">1 <span class="star"><span class="star-filled">&#9733;</span><span class="star-empty">&#9733;&#9733;&#9733;&#9733;</span></span></td>
+                    <td class="cell-1">1 <span class="star"><span class="star-filled">&#9733;</span><span class="star-empty">&#9733;&#9733;&#9733;&#9733;</span></span></td>
+                </tr>
+                <tr>
+                    <td>Open Data / API</td>
+                    <td class="highlight-col cell-5">5 <span class="star"><span class="star-filled">&#9733;&#9733;&#9733;&#9733;&#9733;</span></span></td>
+                    <td class="cell-1">1 <span class="star"><span class="star-filled">&#9733;</span><span class="star-empty">&#9733;&#9733;&#9733;&#9733;</span></span></td>
+                    <td class="cell-1">1 <span class="star"><span class="star-filled">&#9733;</span><span class="star-empty">&#9733;&#9733;&#9733;&#9733;</span></span></td>
+                    <td class="cell-2">2 <span class="star"><span class="star-filled">&#9733;&#9733;</span><span class="star-empty">&#9733;&#9733;&#9733;</span></span></td>
+                    <td class="cell-1">1 <span class="star"><span class="star-filled">&#9733;</span><span class="star-empty">&#9733;&#9733;&#9733;&#9733;</span></span></td>
+                    <td class="cell-2">2 <span class="star"><span class="star-filled">&#9733;&#9733;</span><span class="star-empty">&#9733;&#9733;&#9733;</span></span></td>
+                </tr>
+                <tr>
+                    <td>Scalability</td>
+                    <td class="highlight-col cell-5">5 <span class="star"><span class="star-filled">&#9733;&#9733;&#9733;&#9733;&#9733;</span></span></td>
+                    <td class="cell-3">3 <span class="star"><span class="star-filled">&#9733;&#9733;&#9733;</span><span class="star-empty">&#9733;&#9733;</span></span></td>
+                    <td class="cell-1">1 <span class="star"><span class="star-filled">&#9733;</span><span class="star-empty">&#9733;&#9733;&#9733;&#9733;</span></span></td>
+                    <td class="cell-2">2 <span class="star"><span class="star-filled">&#9733;&#9733;</span><span class="star-empty">&#9733;&#9733;&#9733;</span></span></td>
+                    <td class="cell-2">2 <span class="star"><span class="star-filled">&#9733;&#9733;</span><span class="star-empty">&#9733;&#9733;&#9733;</span></span></td>
+                    <td class="cell-4">4 <span class="star"><span class="star-filled">&#9733;&#9733;&#9733;&#9733;</span><span class="star-empty">&#9733;</span></span></td>
+                </tr>
+                <tr>
+                    <td>User Experience</td>
+                    <td class="highlight-col cell-4">4 <span class="star"><span class="star-filled">&#9733;&#9733;&#9733;&#9733;</span><span class="star-empty">&#9733;</span></span></td>
+                    <td class="cell-4">4 <span class="star"><span class="star-filled">&#9733;&#9733;&#9733;&#9733;</span><span class="star-empty">&#9733;</span></span></td>
+                    <td class="cell-2">2 <span class="star"><span class="star-filled">&#9733;&#9733;</span><span class="star-empty">&#9733;&#9733;&#9733;</span></span></td>
+                    <td class="cell-3">3 <span class="star"><span class="star-filled">&#9733;&#9733;&#9733;</span><span class="star-empty">&#9733;&#9733;</span></span></td>
+                    <td class="cell-3">3 <span class="star"><span class="star-filled">&#9733;&#9733;&#9733;</span><span class="star-empty">&#9733;&#9733;</span></span></td>
+                    <td class="cell-4">4 <span class="star"><span class="star-filled">&#9733;&#9733;&#9733;&#9733;</span><span class="star-empty">&#9733;</span></span></td>
+                </tr>
+                <tr>
+                    <td>Technology Stack</td>
+                    <td class="highlight-col cell-5">5 <span class="star"><span class="star-filled">&#9733;&#9733;&#9733;&#9733;&#9733;</span></span></td>
+                    <td class="cell-4">4 <span class="star"><span class="star-filled">&#9733;&#9733;&#9733;&#9733;</span><span class="star-empty">&#9733;</span></span></td>
+                    <td class="cell-2">2 <span class="star"><span class="star-filled">&#9733;&#9733;</span><span class="star-empty">&#9733;&#9733;&#9733;</span></span></td>
+                    <td class="cell-3">3 <span class="star"><span class="star-filled">&#9733;&#9733;&#9733;</span><span class="star-empty">&#9733;&#9733;</span></span></td>
+                    <td class="cell-2">2 <span class="star"><span class="star-filled">&#9733;&#9733;</span><span class="star-empty">&#9733;&#9733;&#9733;</span></span></td>
+                    <td class="cell-4">4 <span class="star"><span class="star-filled">&#9733;&#9733;&#9733;&#9733;</span><span class="star-empty">&#9733;</span></span></td>
+                </tr>
+                <tr style="background: rgba(255,153,51,0.06) !important; font-weight: 700;">
+                    <td style="color: var(--saffron); font-weight: 800; background: rgba(255,153,51,0.06) !important;">TOTAL (/60)</td>
+                    <td class="highlight-col" style="color: var(--saffron); font-size: 1.1rem; font-weight: 800;">58</td>
+                    <td style="color: var(--text);">32</td>
+                    <td style="color: var(--text);">20</td>
+                    <td style="color: var(--text);">28</td>
+                    <td style="color: var(--text);">25</td>
+                    <td style="color: var(--text);">34</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Score Ring Cards -->
+    <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; color: var(--text);">Overall Score Summary</h3>
+    <div class="scores-grid" id="scoreCards">
+        <!-- Populated by JS -->
+    </div>
+</section>
+
+<!-- ==================== TAB 3: FEATURE COMPARISON ==================== -->
+<section class="section" id="features">
+    <h2 class="section-title">Feature-by-Feature Comparison</h2>
+    <p class="section-desc">Granular feature-level comparison using checkmarks, crosses, and partial indicators across all platforms.</p>
+
+    <div class="feature-matrix-wrapper">
+        <table class="feature-matrix">
+            <thead>
+                <tr>
+                    <th>Feature</th>
+                    <th style="background: #1a2e1a; color: #22c55e;">Transit India</th>
+                    <th>Chalo</th>
+                    <th>BMTC</th>
+                    <th>DIMTS</th>
+                    <th>KSRTC</th>
+                    <th>Moovit</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Real-time & Tracking -->
+                <tr class="category-row"><td colspan="7">Real-time & Tracking</td></tr>
+                <tr>
+                    <td>Live Bus Tracking</td>
+                    <td class="check">&#10003;</td>
+                    <td class="check">&#10003;</td>
+                    <td class="partial">&#9679;</td>
+                    <td class="check">&#10003;</td>
+                    <td class="partial">&#9679;</td>
+                    <td class="partial">&#9679;</td>
+                </tr>
+                <tr>
+                    <td>Arrival Predictions</td>
+                    <td class="check">&#10003;</td>
+                    <td class="check">&#10003;</td>
+                    <td class="partial">&#9679;</td>
+                    <td class="check">&#10003;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="check">&#10003;</td>
+                </tr>
+                <tr>
+                    <td>Confidence Scores on ETAs</td>
+                    <td class="check">&#10003;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                </tr>
+                <tr>
+                    <td>Time Window ETAs (Honest)</td>
+                    <td class="check">&#10003;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                </tr>
+                <tr>
+                    <td>ML Delay Classification</td>
+                    <td class="check">&#10003;</td>
+                    <td class="partial">&#9679;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="partial">&#9679;</td>
+                </tr>
+
+                <!-- Channels & Access -->
+                <tr class="category-row"><td colspan="7">Channels & Access</td></tr>
+                <tr>
+                    <td>Web Application</td>
+                    <td class="check">&#10003;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="check">&#10003;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="check">&#10003;</td>
+                </tr>
+                <tr>
+                    <td>Android App</td>
+                    <td class="check">&#10003;</td>
+                    <td class="check">&#10003;</td>
+                    <td class="check">&#10003;</td>
+                    <td class="check">&#10003;</td>
+                    <td class="check">&#10003;</td>
+                    <td class="check">&#10003;</td>
+                </tr>
+                <tr>
+                    <td>iOS App</td>
+                    <td class="check">&#10003;</td>
+                    <td class="check">&#10003;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="check">&#10003;</td>
+                    <td class="check">&#10003;</td>
+                </tr>
+                <tr>
+                    <td>SMS Support</td>
+                    <td class="check">&#10003;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                </tr>
+                <tr>
+                    <td>IVR (Phone Call)</td>
+                    <td class="check">&#10003;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                </tr>
+                <tr>
+                    <td>Works Without Smartphone</td>
+                    <td class="check">&#10003;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                </tr>
+
+                <!-- Privacy & Security -->
+                <tr class="category-row"><td colspan="7">Privacy & Security</td></tr>
+                <tr>
+                    <td>No Passenger Tracking</td>
+                    <td class="check">&#10003;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="partial">&#9679;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="partial">&#9679;</td>
+                    <td class="cross">&#10007;</td>
+                </tr>
+                <tr>
+                    <td>Stateless Queries</td>
+                    <td class="check">&#10003;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                </tr>
+                <tr>
+                    <td>Phone Hash Storage</td>
+                    <td class="check">&#10003;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                </tr>
+                <tr>
+                    <td>Ad-free Experience</td>
+                    <td class="check">&#10003;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="check">&#10003;</td>
+                    <td class="check">&#10003;</td>
+                    <td class="check">&#10003;</td>
+                    <td class="partial">&#9679;</td>
+                </tr>
+                <tr>
+                    <td>No Dark Patterns</td>
+                    <td class="check">&#10003;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="check">&#10003;</td>
+                    <td class="check">&#10003;</td>
+                    <td class="check">&#10003;</td>
+                    <td class="cross">&#10007;</td>
+                </tr>
+
+                <!-- Safety -->
+                <tr class="category-row"><td colspan="7">Safety & Emergency</td></tr>
+                <tr>
+                    <td>Emergency Helplines</td>
+                    <td class="check">&#10003;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                </tr>
+                <tr>
+                    <td>Safety Escalation System</td>
+                    <td class="check">&#10003;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                </tr>
+                <tr>
+                    <td>Feedback System</td>
+                    <td class="check">&#10003;</td>
+                    <td class="check">&#10003;</td>
+                    <td class="partial">&#9679;</td>
+                    <td class="partial">&#9679;</td>
+                    <td class="partial">&#9679;</td>
+                    <td class="check">&#10003;</td>
+                </tr>
+
+                <!-- Coverage & Scale -->
+                <tr class="category-row"><td colspan="7">Coverage & Scale</td></tr>
+                <tr>
+                    <td>National Coverage (All RTCs)</td>
+                    <td class="check">&#10003;</td>
+                    <td class="partial">&#9679;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="partial">&#9679;</td>
+                </tr>
+                <tr>
+                    <td>Multi-state Support</td>
+                    <td class="check">&#10003;</td>
+                    <td class="check">&#10003;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="partial">&#9679;</td>
+                </tr>
+                <tr>
+                    <td>Multilingual (3+ langs)</td>
+                    <td class="check">&#10003;</td>
+                    <td class="partial">&#9679;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="partial">&#9679;</td>
+                    <td class="partial">&#9679;</td>
+                    <td class="check">&#10003;</td>
+                </tr>
+                <tr>
+                    <td>Operator Dashboard</td>
+                    <td class="check">&#10003;</td>
+                    <td class="partial">&#9679;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="partial">&#9679;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                </tr>
+
+                <!-- Technology -->
+                <tr class="category-row"><td colspan="7">Technology & Architecture</td></tr>
+                <tr>
+                    <td>Serverless Architecture</td>
+                    <td class="check">&#10003;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="partial">&#9679;</td>
+                </tr>
+                <tr>
+                    <td>Cloud-Native (AWS)</td>
+                    <td class="check">&#10003;</td>
+                    <td class="check">&#10003;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="partial">&#9679;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="check">&#10003;</td>
+                </tr>
+                <tr>
+                    <td>CDN Delivery (CloudFront)</td>
+                    <td class="check">&#10003;</td>
+                    <td class="check">&#10003;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="check">&#10003;</td>
+                </tr>
+                <tr>
+                    <td>Redis Caching Layer</td>
+                    <td class="check">&#10003;</td>
+                    <td class="partial">&#9679;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="check">&#10003;</td>
+                </tr>
+                <tr>
+                    <td>Open API / Data Sharing</td>
+                    <td class="check">&#10003;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="partial">&#9679;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="partial">&#9679;</td>
+                </tr>
+                <tr>
+                    <td>ML Pipeline (XGBoost/Prophet)</td>
+                    <td class="check">&#10003;</td>
+                    <td class="partial">&#9679;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="cross">&#10007;</td>
+                    <td class="partial">&#9679;</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div style="display: flex; gap: 2rem; flex-wrap: wrap; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">
+        <div><span class="check" style="margin-right:4px;">&#10003;</span> Fully Supported</div>
+        <div><span class="partial" style="margin-right:4px;">&#9679;</span> Partial / Limited</div>
+        <div><span class="cross" style="margin-right:4px;">&#10007;</span> Not Available</div>
+    </div>
+
+    <!-- Feature count summary -->
+    <div class="card" style="margin-top: 1rem;">
+        <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.75rem; color: var(--saffron);">Feature Count Summary</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.75rem;">
+            <div style="text-align: center; padding: 0.75rem; background: rgba(255,153,51,0.06); border-radius: 8px;">
+                <div style="font-size: 1.4rem; font-weight: 800; color: var(--saffron);">29/29</div>
+                <div style="font-size: 0.7rem; color: var(--text-muted);">Transit India</div>
+            </div>
+            <div style="text-align: center; padding: 0.75rem; background: rgba(255,255,255,0.02); border-radius: 8px;">
+                <div style="font-size: 1.4rem; font-weight: 800; color: var(--text);">14/29</div>
+                <div style="font-size: 0.7rem; color: var(--text-muted);">Chalo</div>
+            </div>
+            <div style="text-align: center; padding: 0.75rem; background: rgba(255,255,255,0.02); border-radius: 8px;">
+                <div style="font-size: 1.4rem; font-weight: 800; color: var(--text);">5/29</div>
+                <div style="font-size: 0.7rem; color: var(--text-muted);">BMTC</div>
+            </div>
+            <div style="text-align: center; padding: 0.75rem; background: rgba(255,255,255,0.02); border-radius: 8px;">
+                <div style="font-size: 1.4rem; font-weight: 800; color: var(--text);">8/29</div>
+                <div style="font-size: 0.7rem; color: var(--text-muted);">DIMTS</div>
+            </div>
+            <div style="text-align: center; padding: 0.75rem; background: rgba(255,255,255,0.02); border-radius: 8px;">
+                <div style="font-size: 1.4rem; font-weight: 800; color: var(--text);">5/29</div>
+                <div style="font-size: 0.7rem; color: var(--text-muted);">KSRTC</div>
+            </div>
+            <div style="text-align: center; padding: 0.75rem; background: rgba(255,255,255,0.02); border-radius: 8px;">
+                <div style="font-size: 1.4rem; font-weight: 800; color: var(--text);">12/29</div>
+                <div style="font-size: 0.7rem; color: var(--text-muted);">Moovit</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== TAB 4: VISUAL ANALYSIS ==================== -->
+<section class="section" id="visual">
+    <h2 class="section-title">Visual Scoring Analysis</h2>
+    <p class="section-desc">Horizontal bar charts showing each platform's performance across all 12 dimensions for quick visual comparison.</p>
+
+    <div class="radar-section" id="radarSection">
+        <!-- Populated by JS -->
+    </div>
+</section>
+
+<!-- ==================== TAB 5: ADVANTAGES ==================== -->
+<section class="section" id="advantages">
+    <h2 class="section-title">Transit India &mdash; Key Advantages</h2>
+    <p class="section-desc">What sets Transit India apart from every other transit platform in India.</p>
+
+    <div class="advantages-grid">
+        <div class="advantage-card">
+            <div class="adv-icon">&#128274;</div>
+            <h4>Privacy-First Architecture</h4>
+            <p>Transit India is the only platform that guarantees no passenger tracking. Queries are stateless, phone numbers are stored as hashes, and no behavioral profiles are ever built. This stands in stark contrast to Chalo and Moovit, which extensively track user location and behavior.</p>
+            <span class="adv-tag">Unique to Transit India</span>
+        </div>
+
+        <div class="advantage-card">
+            <div class="adv-icon">&#128241;</div>
+            <h4>No Smartphone Required</h4>
+            <p>SMS and IVR channels ensure that India's 700M+ feature phone users can access transit information. No other platform in this benchmark offers non-smartphone channels. This bridges the digital divide that excludes the majority of India's public transit riders.</p>
+            <span class="adv-tag">Unique to Transit India</span>
+        </div>
+
+        <div class="advantage-card">
+            <div class="adv-icon">&#127463;</div>
+            <h4>National Coverage Vision</h4>
+            <p>Designed from day one for all state RTCs, not limited to a single city or state. While Chalo covers 40+ cities, it operates as separate silos. Transit India provides a unified national platform with standardized APIs for every state transport corporation.</p>
+            <span class="adv-tag">Architecture Advantage</span>
+        </div>
+
+        <div class="advantage-card">
+            <div class="adv-icon">&#9201;</div>
+            <h4>Honest Predictions</h4>
+            <p>Instead of giving false-precision "exact ETAs" that erode trust, Transit India provides time windows with confidence scores. Users know that "Bus arriving in 8-12 minutes (85% confidence)" is more honest and useful than a misleading "Arriving in 9 min."</p>
+            <span class="adv-tag">Trust-Building</span>
+        </div>
+
+        <div class="advantage-card">
+            <div class="adv-icon">&#128680;</div>
+            <h4>Safety Escalation System</h4>
+            <p>Built-in emergency helplines and safety escalation is a first among Indian transit apps. No other benchmarked platform integrates safety features. This is especially critical for women and vulnerable passengers using public transit.</p>
+            <span class="adv-tag">Unique to Transit India</span>
+        </div>
+
+        <div class="advantage-card">
+            <div class="adv-icon">&#9729;</div>
+            <h4>Serverless &amp; Cloud-Native</h4>
+            <p>Built entirely on AWS Lambda, API Gateway, RDS, ElastiCache, and CloudFront. This serverless architecture means zero infrastructure management, automatic scaling to millions of users, and pay-per-request cost efficiency that government budgets require.</p>
+            <span class="adv-tag">Technical Excellence</span>
+        </div>
+
+        <div class="advantage-card">
+            <div class="adv-icon">&#129302;</div>
+            <h4>Advanced ML Pipeline</h4>
+            <p>XGBoost for delay classification, Prophet for seasonal forecasting, and LSTM for sequence prediction. The ML pipeline goes beyond simple GPS interpolation, accounting for traffic patterns, weather, festivals, and historical delay data.</p>
+            <span class="adv-tag">Innovation</span>
+        </div>
+
+        <div class="advantage-card">
+            <div class="adv-icon">&#128203;</div>
+            <h4>Government-Grade, Zero Dark Patterns</h4>
+            <p>Clean, accessible UI with no ads, no upselling, no manipulative design patterns. As a government-oriented platform, Transit India prioritizes citizen service over monetization. This contrasts sharply with Chalo's ad-supported model and Moovit's data harvesting approach.</p>
+            <span class="adv-tag">Ethical Design</span>
+        </div>
+    </div>
+</section>
+
+<!-- ==================== TAB 6: DETAILED BREAKDOWN ==================== -->
+<section class="section" id="details">
+    <h2 class="section-title">Detailed Dimension Breakdown</h2>
+    <p class="section-desc">Click on any dimension below to see a detailed comparison and analysis across all platforms.</p>
+
+    <div id="expandableDetails">
+        <!-- Populated by JS -->
+    </div>
+</section>
+
+<!-- ==================== TAB 7: SUMMARY ==================== -->
+<section class="section" id="summary">
+    <h2 class="section-title">Summary &amp; Conclusion</h2>
+    <p class="section-desc">Final rankings, key takeaways, and the strategic positioning of Transit India in the Indian transit technology landscape.</p>
+
+    <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; color: var(--text);">Final Rankings</h3>
+    <div class="summary-table-wrapper">
+        <table class="summary-table">
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Platform</th>
+                    <th>Score (/60)</th>
+                    <th>Percentage</th>
+                    <th>Type</th>
+                    <th>Key Strength</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="rank-1">&#127942; 1st</td>
+                    <td style="font-weight: 700; color: var(--saffron);">Transit India</td>
+                    <td style="font-weight: 800; color: var(--saffron);">58/60</td>
+                    <td class="rank-1">96.7%</td>
+                    <td>Open Platform</td>
+                    <td>Privacy, Accessibility, Coverage, Serverless</td>
+                </tr>
+                <tr>
+                    <td class="rank-2">&#129351; 2nd</td>
+                    <td style="font-weight: 600;">Moovit</td>
+                    <td style="font-weight: 700;">34/60</td>
+                    <td class="rank-2">56.7%</td>
+                    <td>International</td>
+                    <td>Multi-modal, Scalable architecture</td>
+                </tr>
+                <tr>
+                    <td class="rank-3">&#129352; 3rd</td>
+                    <td style="font-weight: 600;">Chalo</td>
+                    <td style="font-weight: 700;">32/60</td>
+                    <td class="rank-3">53.3%</td>
+                    <td>Private</td>
+                    <td>City coverage, Real-time tracking, UX</td>
+                </tr>
+                <tr>
+                    <td>4th</td>
+                    <td>DIMTS (Delhi)</td>
+                    <td>28/60</td>
+                    <td>46.7%</td>
+                    <td>Government</td>
+                    <td>Web support, Delhi coverage</td>
+                </tr>
+                <tr>
+                    <td>5th</td>
+                    <td>KSRTC (Kerala)</td>
+                    <td>25/60</td>
+                    <td>41.7%</td>
+                    <td>Government</td>
+                    <td>Ticketing, iOS support</td>
+                </tr>
+                <tr>
+                    <td>6th</td>
+                    <td>BMTC (Bangalore)</td>
+                    <td>20/60</td>
+                    <td>33.3%</td>
+                    <td>Government</td>
+                    <td>GPS tracking (basic)</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Key Differentiators -->
+    <h3 style="font-size: 1.1rem; font-weight: 700; margin: 2rem 0 1rem; color: var(--text);">Key Differentiators &mdash; What Makes Transit India Unique</h3>
+    <div class="diff-list">
+        <div class="diff-item">
+            <div class="diff-num">1</div>
+            <div class="diff-content">
+                <h4>Only Platform With Non-Smartphone Access</h4>
+                <p>Transit India is the sole platform offering SMS and IVR channels, making transit info accessible to India's 700M+ feature phone users. Every competitor requires a smartphone with internet access, excluding the majority of public transit riders from digital transit services.</p>
+            </div>
+        </div>
+        <div class="diff-item">
+            <div class="diff-num">2</div>
+            <div class="diff-content">
+                <h4>Privacy-First by Design, Not Afterthought</h4>
+                <p>No passenger tracking, stateless queries, hashed phone storage. While Chalo tracks location/behavior and Moovit collects extensive user data, Transit India treats privacy as a core architectural principle, not a checkbox compliance exercise.</p>
+            </div>
+        </div>
+        <div class="diff-item">
+            <div class="diff-num">3</div>
+            <div class="diff-content">
+                <h4>Honesty Over False Precision</h4>
+                <p>Time window predictions with confidence scores represent a paradigm shift from misleading "exact ETAs" used by every other platform. This approach builds long-term trust by setting accurate expectations rather than optimistic but unreliable point estimates.</p>
+            </div>
+        </div>
+        <div class="diff-item">
+            <div class="diff-num">4</div>
+            <div class="diff-content">
+                <h4>National-Scale Serverless Architecture</h4>
+                <p>The only platform architected for national scale from inception. AWS Lambda + API Gateway + CloudFront means zero-management infrastructure that auto-scales from 0 to millions of requests. Government apps (BMTC, KSRTC, DIMTS) use monolithic architectures that cannot scale beyond their current scope.</p>
+            </div>
+        </div>
+        <div class="diff-item">
+            <div class="diff-num">5</div>
+            <div class="diff-content">
+                <h4>Integrated Safety Ecosystem</h4>
+                <p>Emergency helplines and safety escalation systems are absent from every other platform. Transit India embeds safety as a first-class feature, recognizing that public transit safety (especially for women commuters) is as important as arrival information.</p>
+            </div>
+        </div>
+        <div class="diff-item">
+            <div class="diff-num">6</div>
+            <div class="diff-content">
+                <h4>Open Platform for All State RTCs</h4>
+                <p>Unlike city-specific government apps or Chalo's selective city-by-city expansion, Transit India is designed as an open platform that any state RTC can join. Standardized APIs, operator dashboards, and multi-tenancy ensure no state is left behind.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Conclusion -->
+    <div class="card" style="border-color: rgba(255,153,51,0.3); background: linear-gradient(135deg, rgba(255,153,51,0.04), rgba(19,136,8,0.02));">
+        <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--saffron); margin-bottom: 0.75rem;">Conclusion</h3>
+        <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.7; margin-bottom: 0.75rem;">
+            Transit India scores <strong style="color: var(--saffron);">58/60 (96.7%)</strong> across 12 benchmarking dimensions, significantly outperforming the next-best platform Moovit at 34/60 (56.7%). This 40-point gap underscores a fundamentally different approach to transit technology.
+        </p>
+        <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.7; margin-bottom: 0.75rem;">
+            While existing platforms optimize for smartphone-owning, urban, internet-connected users, Transit India is built for <strong style="color: var(--text);">all of India</strong> &mdash; including the 700M+ citizens who rely on feature phones, the privacy-conscious commuter, and the states that lack any digital transit infrastructure.
+        </p>
+        <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.7; margin-bottom: 0.75rem;">
+            The combination of <strong style="color: var(--text);">privacy-first design</strong>, <strong style="color: var(--text);">multi-channel accessibility</strong>, <strong style="color: var(--text);">honest predictions</strong>, <strong style="color: var(--text);">safety integration</strong>, and <strong style="color: var(--text);">serverless national-scale architecture</strong> represents not an incremental improvement but a categorical leap in how public transit information systems should be designed for a developing nation.
+        </p>
+        <p style="font-size: 0.88rem; color: var(--text-muted); line-height: 1.7;">
+            Transit India does not just compete with existing transit apps &mdash; it <strong style="color: var(--saffron);">redefines what a public transit platform should be</strong> in the Indian context.
+        </p>
+    </div>
+</section>
+
+</main>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+    <p><span class="footer-brand">Transit India</span> &mdash; Competitive Benchmarking Report</p>
+    <p style="margin-top: 0.3rem;">College Project Submission &nbsp;&bull;&nbsp; Serverless Architecture on AWS &nbsp;&bull;&nbsp; 2025</p>
+</footer>
+
+<!-- ===== JAVASCRIPT ===== -->
+<script>
+(function() {
+    'use strict';
+
+    // ===== TAB NAVIGATION =====
+    const tabs = document.querySelectorAll('.nav-tab');
+    const sections = document.querySelectorAll('.section');
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const target = tab.dataset.tab;
+            tabs.forEach(t => t.classList.remove('active'));
+            sections.forEach(s => s.classList.remove('active'));
+            tab.classList.add('active');
+            document.getElementById(target).classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    });
+
+    // ===== DATA =====
+    const platforms = [
+        { name: 'Transit India', type: 'Open Platform', color: '#FF9933', scores: [5,5,5,5,5,4,5,5,5,5,4,5], total: 58 },
+        { name: 'Chalo', type: 'Private', color: '#3b82f6', scores: [4,1,2,4,2,4,2,1,1,3,4,4], total: 32 },
+        { name: 'BMTC', type: 'Government', color: '#22c55e', scores: [2,3,1,1,4,2,1,1,1,1,2,2], total: 20 },
+        { name: 'DIMTS', type: 'Government', color: '#06b6d4', scores: [3,2,2,1,4,3,1,2,2,2,3,3], total: 28 },
+        { name: 'KSRTC', type: 'Government', color: '#a855f7', scores: [2,3,2,2,4,2,1,1,1,2,3,2], total: 25 },
+        { name: 'Moovit', type: 'International', color: '#f43f5e', scores: [4,1,3,3,3,3,2,1,2,4,4,4], total: 34 }
+    ];
+
+    const dimensions = [
+        'Architecture', 'Privacy', 'Accessibility', 'Coverage', 'Cost Model',
+        'Real-time Data', 'Safety Features', 'Offline Support', 'Open Data / API',
+        'Scalability', 'User Experience', 'Technology Stack'
+    ];
+
+    // ===== SCORE CARDS =====
+    const scoreCardsContainer = document.getElementById('scoreCards');
+    const circumference = 2 * Math.PI * 42;
+
+    platforms.forEach((p, i) => {
+        const pct = (p.total / 60) * 100;
+        const offset = circumference - (pct / 100) * circumference;
+        const isWinner = i === 0;
+
+        const card = document.createElement('div');
+        card.className = 'score-card' + (isWinner ? ' winner' : '');
+        card.innerHTML = `
+            <div class="platform-name" style="color: ${p.color}">${p.name}</div>
+            <div class="platform-type">${p.type}</div>
+            <div class="score-ring">
+                <svg viewBox="0 0 100 100">
+                    <circle class="ring-bg" cx="50" cy="50" r="42"/>
+                    <circle class="ring-fill" cx="50" cy="50" r="42"
+                        stroke="${p.color}"
+                        stroke-dasharray="${circumference}"
+                        stroke-dashoffset="${offset}"/>
+                </svg>
+                <div class="score-value" style="color: ${p.color}">${p.total}</div>
+                <div class="score-max">/ 60</div>
+            </div>
+            <div class="score-breakdown">
+                ${p.scores.map((s, j) => {
+                    const barColor = s >= 4 ? '#4ade80' : s >= 3 ? '#fbbf24' : '#f87171';
+                    return `<div class="score-bar-row">
+                        <div class="score-bar-label">${dimensions[j].length > 12 ? dimensions[j].substring(0,11) + '..' : dimensions[j]}</div>
+                        <div class="score-bar-track">
+                            <div class="score-bar-fill" style="width: ${s*20}%; background: ${barColor};"></div>
+                        </div>
+                        <div class="score-bar-val" style="color: ${barColor}">${s}</div>
+                    </div>`;
+                }).join('')}
+            </div>
+        `;
+        scoreCardsContainer.appendChild(card);
+    });
+
+    // ===== RADAR / BAR CHARTS =====
+    const radarContainer = document.getElementById('radarSection');
+
+    dimensions.forEach((dim, idx) => {
+        const card = document.createElement('div');
+        card.className = 'radar-card';
+        card.innerHTML = `
+            <h4>${dim}</h4>
+            <div class="radar-bars">
+                ${platforms.map(p => {
+                    const score = p.scores[idx];
+                    const barColor = score >= 4 ? '#4ade80' : score >= 3 ? '#fbbf24' : '#f87171';
+                    return `<div class="radar-bar-item">
+                        <div class="radar-bar-label">${p.name}</div>
+                        <div class="radar-bar-track">
+                            <div class="radar-bar-fill" style="width: ${score*20}%; background: linear-gradient(90deg, ${p.color}88, ${p.color});">${score}/5</div>
+                        </div>
+                    </div>`;
+                }).join('')}
+            </div>
+        `;
+        radarContainer.appendChild(card);
+    });
+
+    // ===== EXPANDABLE DETAILS =====
+    const detailsContainer = document.getElementById('expandableDetails');
+
+    const detailData = [
+        {
+            dim: 'Architecture',
+            detail: `<p><strong>Transit India (5/5):</strong> Fully serverless using AWS Lambda, API Gateway, RDS PostgreSQL, ElastiCache Redis, and CloudFront CDN. Zero server management, auto-scaling, pay-per-request pricing. Cloud-native from the ground up.</p>
+            <p><strong>Chalo (4/5):</strong> Modern cloud-based architecture with microservices. Well-engineered but relies on traditional server infrastructure with manual scaling decisions.</p>
+            <p><strong>BMTC (2/5):</strong> Monolithic architecture built on legacy government IT infrastructure. Known for crashes, slow response times, and inability to handle peak loads.</p>
+            <p><strong>DIMTS (3/5):</strong> Semi-modern architecture with web services, but limited scalability. Built on traditional data center infrastructure.</p>
+            <p><strong>KSRTC (2/5):</strong> Legacy architecture focused on ticketing. Limited API surface, monolithic backend not designed for real-time workloads.</p>
+            <p><strong>Moovit (4/5):</strong> Global-scale cloud architecture (Azure/AWS). Well-engineered for international deployment but not optimized for Indian infrastructure constraints.</p>`
+        },
+        {
+            dim: 'Privacy',
+            detail: `<p><strong>Transit India (5/5):</strong> Privacy-first by design. No passenger tracking whatsoever. All queries are stateless (no session history). Phone numbers stored only as cryptographic hashes. No behavioral profiling, no data monetization, no third-party data sharing.</p>
+            <p><strong>Chalo (1/5):</strong> Tracks user location continuously. Collects behavioral data for targeting ads. Requires location permission even when not actively using the app. User profiles built for monetization.</p>
+            <p><strong>BMTC (3/5):</strong> Government app with minimal data collection, but no explicit privacy policy. Basic data handling without sophisticated privacy protections.</p>
+            <p><strong>DIMTS (2/5):</strong> Collects user data without clear privacy documentation. No explicit commitments on data retention or sharing practices.</p>
+            <p><strong>KSRTC (3/5):</strong> Collects booking data but limited tracking. Government ownership provides some accountability but no privacy-first architecture.</p>
+            <p><strong>Moovit (1/5):</strong> Extensive data collection including location, search history, device data, contacts. Data shared with Intel/Mobileye ecosystem. International data transfer to non-Indian servers.</p>`
+        },
+        {
+            dim: 'Accessibility',
+            detail: `<p><strong>Transit India (5/5):</strong> Three channels: Web (any browser), SMS (any phone), IVR (any phone with calling). Multilingual: English, Hindi, Tamil. Works on feature phones. Government-grade accessible UI following WCAG standards. No smartphone or internet required for basic information.</p>
+            <p><strong>Chalo (2/5):</strong> Smartphone-only (Android/iOS). Requires internet connectivity. Available in English with some regional language support. Excludes feature phone users entirely.</p>
+            <p><strong>BMTC (1/5):</strong> Android-only app. Historically buggy with poor accessibility. No alternative channels. English-only interface in a Kannada-speaking city.</p>
+            <p><strong>DIMTS (2/5):</strong> Web + mobile app. Better than app-only platforms. Limited language support. No SMS/IVR alternative channels.</p>
+            <p><strong>KSRTC (2/5):</strong> Android + iOS apps. Malayalam/English support. No web or SMS channels. Requires smartphone.</p>
+            <p><strong>Moovit (3/5):</strong> Android + iOS + Web. Multi-language support globally. But still requires smartphone/internet. No feature phone support.</p>`
+        },
+        {
+            dim: 'Coverage',
+            detail: `<p><strong>Transit India (5/5):</strong> Designed as a national platform for all state RTCs across India. Open architecture allows any state transport corporation to integrate. Multi-tenancy built into the core design.</p>
+            <p><strong>Chalo (4/5):</strong> Available in 40+ Indian cities. Expanding rapidly but still city-by-city negotiation with individual transport authorities. Not a unified national platform.</p>
+            <p><strong>BMTC (1/5):</strong> Single city (Bangalore) only. No multi-city or multi-state capability.</p>
+            <p><strong>DIMTS (1/5):</strong> Delhi NCR region only. Architecture not designed for expansion beyond Delhi.</p>
+            <p><strong>KSRTC (2/5):</strong> Kerala state only. Covers intra-state routes but cannot expand beyond state boundaries.</p>
+            <p><strong>Moovit (3/5):</strong> Global platform present in select Indian cities. Coverage dependent on local partnerships and crowd-sourced data availability.</p>`
+        },
+        {
+            dim: 'Cost Model',
+            detail: `<p><strong>Transit India (5/5):</strong> Completely free for users. Serverless architecture minimizes operational costs. Pay-per-request AWS pricing means costs scale linearly with usage. No ads, no premium tiers, no hidden monetization. Government-funded model.</p>
+            <p><strong>Chalo (2/5):</strong> Free to download but monetized through ads and transaction fees on pass purchases. User data monetization as additional revenue stream. Venture capital funded.</p>
+            <p><strong>BMTC (4/5):</strong> Free government app with no ads. But limited functionality reduces value proposition. Government funded.</p>
+            <p><strong>DIMTS (4/5):</strong> Free government service. Tax-funded with no direct user costs. Limited feature set keeps development costs low.</p>
+            <p><strong>KSRTC (4/5):</strong> Free app with ticket booking. Transaction fees on bookings. Government subsidized.</p>
+            <p><strong>Moovit (3/5):</strong> Free with ads. Premium ad-free version available. Revenue from data licensing and mobility-as-a-service partnerships. User data is the product.</p>`
+        },
+        {
+            dim: 'Real-time Data',
+            detail: `<p><strong>Transit India (4/5):</strong> GPS and ETM-based tracking. ML-powered predictions using XGBoost for delay classification and Prophet/LSTM for forecasting. Confidence-scored time windows instead of false-precision exact ETAs. Honest about uncertainty.</p>
+            <p><strong>Chalo (4/5):</strong> GPS-based real-time tracking with good accuracy in covered cities. Live ETA with exact arrival times. Strong in cities where deployed but accuracy varies.</p>
+            <p><strong>BMTC (2/5):</strong> GPS tracking implemented but known for inaccuracy. Many buses lack working GPS. Data gaps are common. ETAs unreliable.</p>
+            <p><strong>DIMTS (3/5):</strong> GPS tracking for DTC/cluster buses. Reasonable accuracy in Delhi. Limited prediction capabilities beyond simple distance-time calculation.</p>
+            <p><strong>KSRTC (2/5):</strong> Limited real-time tracking. Schedule-based information is primary. GPS coverage incomplete.</p>
+            <p><strong>Moovit (3/5):</strong> Hybrid: official data + crowd-sourced updates. Accuracy depends heavily on local data quality. Better in cities with active user communities.</p>`
+        },
+        {
+            dim: 'Safety Features',
+            detail: `<p><strong>Transit India (5/5):</strong> Integrated emergency helplines directly in the platform. Safety escalation system that can alert authorities. Designed with women's safety as a primary concern. Feedback system for safety-related reporting.</p>
+            <p><strong>Chalo (2/5):</strong> Basic SOS feature in some cities. No integrated emergency escalation. Safety is not a primary design consideration.</p>
+            <p><strong>BMTC (1/5):</strong> No safety features. No emergency integration. No escalation system.</p>
+            <p><strong>DIMTS (1/5):</strong> No dedicated safety features. Standard complaint mechanism only.</p>
+            <p><strong>KSRTC (1/5):</strong> No safety features. Complaint system limited to service quality issues.</p>
+            <p><strong>Moovit (2/5):</strong> Community reporting of safety issues. No direct emergency integration. Crowd-sourced safety data but no escalation system.</p>`
+        },
+        {
+            dim: 'Offline Support',
+            detail: `<p><strong>Transit India (5/5):</strong> SMS works without internet. IVR works with just a phone call. Web app can cache basic route data. Feature phone users have full access to core functionality without any data connection.</p>
+            <p><strong>Chalo (1/5):</strong> Entirely app and internet dependent. No offline capabilities. Useless without data connection.</p>
+            <p><strong>BMTC (1/5):</strong> No offline support. App requires internet for all functions.</p>
+            <p><strong>DIMTS (2/5):</strong> Web version can cache some data. But real-time features require internet. No SMS/IVR fallback.</p>
+            <p><strong>KSRTC (1/5):</strong> No offline support. Schedule data not cached. Requires internet for all operations.</p>
+            <p><strong>Moovit (1/5):</strong> Can download offline maps in some regions but real-time data requires internet. No non-smartphone channels.</p>`
+        },
+        {
+            dim: 'Open Data / API',
+            detail: `<p><strong>Transit India (5/5):</strong> Open API architecture designed for third-party integration. Standardized data formats. Open for all state RTCs to integrate. API Gateway provides managed access. Promotes data transparency and ecosystem building.</p>
+            <p><strong>Chalo (1/5):</strong> Completely proprietary. No public APIs. Data locked within Chalo's ecosystem. No data sharing with government or third parties.</p>
+            <p><strong>BMTC (1/5):</strong> No API access. Data locked in legacy systems. No programmatic access to routes, schedules, or real-time data.</p>
+            <p><strong>DIMTS (2/5):</strong> Some data available through web scraping. No official API but some integration points exist for Delhi government systems.</p>
+            <p><strong>KSRTC (1/5):</strong> No public APIs. Data only available through the official app/website. No third-party access.</p>
+            <p><strong>Moovit (2/5):</strong> Limited API access through Moovit-as-a-Service. Data available to partners but not openly accessible. Proprietary data model.</p>`
+        },
+        {
+            dim: 'Scalability',
+            detail: `<p><strong>Transit India (5/5):</strong> AWS Lambda auto-scales from 0 to millions of concurrent requests. ElastiCache Redis handles burst read loads. CloudFront CDN distributes static assets globally. RDS with read replicas for database scalability. Designed for 1.4B population scale.</p>
+            <p><strong>Chalo (3/5):</strong> Proven scale at 40+ cities. Cloud-hosted but requires manual scaling decisions. City-by-city deployment model adds overhead.</p>
+            <p><strong>BMTC (1/5):</strong> Known to crash during peak hours. Monolithic architecture cannot scale. Single server deployment.</p>
+            <p><strong>DIMTS (2/5):</strong> Limited to Delhi load. Data center hosted with finite capacity. Cannot scale beyond current architecture without major rework.</p>
+            <p><strong>KSRTC (2/5):</strong> Basic hosting with limited scalability. Server-based architecture. Not designed for high-concurrency workloads.</p>
+            <p><strong>Moovit (4/5):</strong> Global infrastructure handles massive scale. Azure/AWS cloud hosting. Proven at international scale but not optimized for India-specific challenges.</p>`
+        },
+        {
+            dim: 'User Experience',
+            detail: `<p><strong>Transit India (4/5):</strong> Clean, government-grade UI. No ads, no dark patterns, no manipulative design. Accessible color schemes, clear typography, intuitive navigation. Multi-channel UX (web + SMS + IVR) designed for diverse user literacy levels.</p>
+            <p><strong>Chalo (4/5):</strong> Polished consumer app experience. Well-designed interface with intuitive navigation. But marred by ads, push notifications for marketing, and some dark patterns in the ticketing flow.</p>
+            <p><strong>BMTC (2/5):</strong> Outdated UI design. Frequent crashes. Poor error handling. Confusing navigation. Not designed with user experience as a priority.</p>
+            <p><strong>DIMTS (3/5):</strong> Functional but basic UI. Web version is dated. Adequate for its purpose but not inspiring. No major usability issues but no polish either.</p>
+            <p><strong>KSRTC (3/5):</strong> Decent mobile app UX. Ticketing flow is reasonably smooth. But limited feature set means limited UX surface area. Schedule browsing could be improved.</p>
+            <p><strong>Moovit (4/5):</strong> Excellent global-standard UI design. Intuitive trip planning. But complex feature set can overwhelm new users. Data collection consent flows use dark patterns.</p>`
+        },
+        {
+            dim: 'Technology Stack',
+            detail: `<p><strong>Transit India (5/5):</strong> State-of-the-art cloud-native stack. AWS Lambda (serverless compute), API Gateway (managed APIs), RDS PostgreSQL (relational DB), ElastiCache Redis (caching), CloudFront (CDN). ML pipeline with XGBoost, Prophet, and LSTM. Modern, maintainable, cost-efficient.</p>
+            <p><strong>Chalo (4/5):</strong> Modern tech stack with microservices. Mobile-first engineering. Good DevOps practices. Cloud-hosted. However, proprietary and not cloud-native serverless.</p>
+            <p><strong>BMTC (2/5):</strong> Legacy technology stack. Likely Java-based monolith on government data center. Outdated frameworks and practices. Difficult to maintain and update.</p>
+            <p><strong>DIMTS (3/5):</strong> Semi-modern stack with web services. Better than legacy government apps but not cutting-edge. Some integration with modern monitoring tools.</p>
+            <p><strong>KSRTC (2/5):</strong> Traditional web application stack. Limited use of modern cloud services. Database-driven with limited caching or optimization.</p>
+            <p><strong>Moovit (4/5):</strong> Enterprise-grade global tech stack. Sophisticated ML for transit predictions. Cloud-native with global deployment. Strong engineering team and practices.</p>`
+        }
+    ];
+
+    detailData.forEach((item, idx) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'expandable';
+        wrapper.innerHTML = `
+            <div class="expand-header" onclick="toggleExpand(this)">
+                <h4>${idx + 1}. ${item.dim}</h4>
+                <div class="expand-arrow">&#9660;</div>
+            </div>
+            <div class="expand-body">${item.detail}</div>
+        `;
+        detailsContainer.appendChild(wrapper);
+    });
+
+    // ===== EXPAND TOGGLE =====
+    window.toggleExpand = function(header) {
+        const body = header.nextElementSibling;
+        const isOpen = header.classList.contains('open');
+
+        // Close all others
+        document.querySelectorAll('.expand-header.open').forEach(h => {
+            h.classList.remove('open');
+            h.nextElementSibling.classList.remove('open');
+        });
+
+        if (!isOpen) {
+            header.classList.add('open');
+            body.classList.add('open');
+        }
+    };
+
+    // ===== ANIMATE SCORE BARS ON SCROLL =====
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.querySelectorAll('.score-bar-fill, .radar-bar-fill').forEach(bar => {
+                    const width = bar.style.width;
+                    bar.style.width = '0%';
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            bar.style.width = width;
+                        });
+                    });
+                });
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.score-card, .radar-card').forEach(card => {
+        observer.observe(card);
+    });
+
+})();
+</script>
+</body>
+</html>

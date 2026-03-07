@@ -1,0 +1,1842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transit India — AWS Cost Estimation (Production Scale)</title>
+    <style>
+        /* ===== RESET & BASE ===== */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* ===== VARIABLES ===== */
+        :root {
+            --navy: #0B1F3A;
+            --saffron: #FF9933;
+            --emerald: #138808;
+            --dark-bg: #0f172a;
+            --card-bg: #1e293b;
+            --card-border: #334155;
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent-orange: #f97316;
+            --accent-blue: #3b82f6;
+            --accent-green: #22c55e;
+            --accent-red: #ef4444;
+            --accent-purple: #a855f7;
+        }
+
+        /* ===== HEADER ===== */
+        .page-header {
+            background: linear-gradient(135deg, var(--navy) 0%, #0f172a 50%, #0a1628 100%);
+            border-bottom: 1px solid var(--card-border);
+            padding: 2.5rem 2rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--saffron), #ffffff, var(--emerald));
+        }
+        .page-header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--saffron), #fbbf24, var(--saffron));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.4rem;
+        }
+        .page-header .subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+        .page-header .meta-line {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+        .badge-row {
+            display: flex;
+            justify-content: center;
+            gap: 0.6rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        .badge-orange { background: #7c2d12; color: #fdba74; }
+        .badge-blue   { background: #1e3a5f; color: #7dd3fc; }
+        .badge-green  { background: #14532d; color: #86efac; }
+        .badge-purple { background: #3b0764; color: #d8b4fe; }
+        .badge-red    { background: #7f1d1d; color: #fca5a5; }
+
+        /* ===== NAV ===== */
+        .nav-bar {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--card-border);
+            padding: 0.75rem 2rem;
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .nav-bar a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.4rem 1rem;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        .nav-bar a:hover {
+            color: var(--saffron);
+            background: rgba(255, 153, 51, 0.1);
+        }
+
+        /* ===== CONTAINER ===== */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* ===== SECTION ===== */
+        .section {
+            margin-bottom: 3rem;
+        }
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--saffron);
+            margin-bottom: 0.4rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .section-title .icon {
+            font-size: 1.3rem;
+            width: 36px; height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            background: rgba(249, 115, 22, 0.15);
+        }
+        .section-desc {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* ===== EXECUTIVE SUMMARY ===== */
+        .exec-summary {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .exec-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1.8rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .exec-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+        }
+        .exec-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+        }
+        .exec-card.tier1::before { background: linear-gradient(90deg, var(--accent-blue), #60a5fa); }
+        .exec-card.tier2::before { background: linear-gradient(90deg, var(--saffron), #fbbf24); }
+        .exec-card.tier3::before { background: linear-gradient(90deg, var(--emerald), #4ade80); }
+        .exec-card .tier-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.3rem;
+        }
+        .exec-card.tier1 .tier-label { color: #60a5fa; }
+        .exec-card.tier2 .tier-label { color: var(--saffron); }
+        .exec-card.tier3 .tier-label { color: #4ade80; }
+        .exec-card .tier-name {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+        .exec-card .cost-amount {
+            font-size: 2.4rem;
+            font-weight: 800;
+            margin-bottom: 0.2rem;
+        }
+        .exec-card.tier1 .cost-amount { color: #60a5fa; }
+        .exec-card.tier2 .cost-amount { color: var(--saffron); }
+        .exec-card.tier3 .cost-amount { color: #4ade80; }
+        .exec-card .cost-period {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+        .exec-card .annual {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--card-border);
+        }
+        .exec-card .annual strong {
+            color: var(--text-primary);
+        }
+        .exec-card .cost-per-user {
+            display: inline-block;
+            margin-top: 0.75rem;
+            padding: 0.3rem 0.8rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .exec-card.tier1 .cost-per-user { background: rgba(96,165,250,0.15); color: #93bbfd; }
+        .exec-card.tier2 .cost-per-user { background: rgba(255,153,51,0.15); color: #ffb366; }
+        .exec-card.tier3 .cost-per-user { background: rgba(74,222,128,0.15); color: #86efac; }
+
+        /* ===== TIER DETAIL CARD ===== */
+        .tier-detail {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+        .tier-detail-header {
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .tier-detail.t1 .tier-detail-header { background: linear-gradient(135deg, rgba(59,130,246,0.12), rgba(59,130,246,0.03)); border-bottom: 1px solid rgba(59,130,246,0.2); }
+        .tier-detail.t2 .tier-detail-header { background: linear-gradient(135deg, rgba(255,153,51,0.12), rgba(255,153,51,0.03)); border-bottom: 1px solid rgba(255,153,51,0.2); }
+        .tier-detail.t3 .tier-detail-header { background: linear-gradient(135deg, rgba(19,136,8,0.12), rgba(19,136,8,0.03)); border-bottom: 1px solid rgba(19,136,8,0.2); }
+        .tier-detail-header h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+        .tier-detail.t1 .tier-detail-header h3 { color: #60a5fa; }
+        .tier-detail.t2 .tier-detail-header h3 { color: var(--saffron); }
+        .tier-detail.t3 .tier-detail-header h3 { color: #4ade80; }
+        .tier-detail-header .total-badge {
+            font-size: 1.6rem;
+            font-weight: 800;
+            padding: 0.4rem 1.2rem;
+            border-radius: 12px;
+        }
+        .tier-detail.t1 .total-badge { background: rgba(59,130,246,0.15); color: #60a5fa; }
+        .tier-detail.t2 .total-badge { background: rgba(255,153,51,0.15); color: var(--saffron); }
+        .tier-detail.t3 .total-badge { background: rgba(74,222,128,0.15); color: #4ade80; }
+        .tier-specs {
+            display: flex;
+            gap: 1rem;
+            padding: 0 2rem;
+            padding-top: 1rem;
+            flex-wrap: wrap;
+        }
+        .spec-chip {
+            background: rgba(100,116,139,0.15);
+            color: var(--text-secondary);
+            padding: 0.25rem 0.7rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+        }
+        .tier-detail-body {
+            padding: 1.5rem 2rem 2rem;
+        }
+
+        /* ===== LINE ITEM TABLE ===== */
+        .cost-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        .cost-table thead th {
+            text-align: left;
+            padding: 0.6rem 0.8rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--card-border);
+        }
+        .cost-table thead th:last-child,
+        .cost-table tbody td:last-child { text-align: right; }
+        .cost-table tbody tr { border-bottom: 1px solid rgba(51,65,85,0.5); }
+        .cost-table tbody tr:last-child { border-bottom: none; }
+        .cost-table tbody td {
+            padding: 0.65rem 0.8rem;
+            color: var(--text-secondary);
+        }
+        .cost-table tbody td:first-child {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        .cost-table tbody td:last-child {
+            font-weight: 700;
+            font-family: 'SF Mono', 'Consolas', monospace;
+        }
+        .cost-table .subtotal-row td {
+            border-top: 2px solid var(--card-border);
+            font-weight: 700 !important;
+            color: var(--text-primary) !important;
+            padding-top: 0.8rem;
+            font-size: 0.95rem;
+        }
+        .cost-table .category-row td {
+            padding-top: 1rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted) !important;
+            border-bottom: none;
+        }
+
+        /* ===== BAR CHART ===== */
+        .chart-section {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        .chart-section h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+        }
+        .bar-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+        .bar-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+        .bar-group-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+        .bar-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .bar-label {
+            width: 65px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            flex-shrink: 0;
+        }
+        .bar-track {
+            flex: 1;
+            height: 28px;
+            background: rgba(51,65,85,0.3);
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+        .bar-fill {
+            height: 100%;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            padding-left: 0.6rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #fff;
+            transition: width 1s ease;
+            min-width: 60px;
+        }
+        .bar-fill.blue { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+        .bar-fill.orange { background: linear-gradient(90deg, #ea580c, var(--saffron)); }
+        .bar-fill.green { background: linear-gradient(90deg, var(--emerald), #22c55e); }
+        .bar-value {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            flex-shrink: 0;
+            width: 80px;
+            text-align: right;
+        }
+
+        /* ===== STACKED BAR ===== */
+        .stacked-chart { margin-top: 2rem; }
+        .stacked-row {
+            margin-bottom: 1.5rem;
+        }
+        .stacked-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.4rem;
+        }
+        .stacked-label span:first-child {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .stacked-label span:last-child {
+            font-size: 0.85rem;
+            font-weight: 700;
+            font-family: 'SF Mono', 'Consolas', monospace;
+        }
+        .stacked-track {
+            height: 32px;
+            background: rgba(51,65,85,0.2);
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+        }
+        .stacked-seg {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6rem;
+            font-weight: 700;
+            color: rgba(255,255,255,0.9);
+            overflow: hidden;
+            white-space: nowrap;
+            transition: width 1s ease;
+        }
+        .seg-compute   { background: #3b82f6; }
+        .seg-database  { background: #8b5cf6; }
+        .seg-cache     { background: #06b6d4; }
+        .seg-network   { background: #f97316; }
+        .seg-storage   { background: #22c55e; }
+        .seg-ml        { background: #ec4899; }
+        .seg-security  { background: #ef4444; }
+        .seg-other     { background: #64748b; }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            justify-content: center;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+        .legend-dot {
+            width: 12px; height: 12px;
+            border-radius: 3px;
+        }
+
+        /* ===== COMPARISON TABLE ===== */
+        .comparison-table-wrapper {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+        }
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            min-width: 700px;
+        }
+        .comparison-table thead th {
+            padding: 1rem;
+            text-align: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            background: var(--card-bg);
+            border-bottom: 2px solid var(--card-border);
+        }
+        .comparison-table thead th:first-child {
+            text-align: left;
+            color: var(--text-muted);
+        }
+        .comparison-table thead th:nth-child(2) { color: #60a5fa; }
+        .comparison-table thead th:nth-child(3) { color: var(--saffron); }
+        .comparison-table thead th:nth-child(4) { color: #4ade80; }
+        .comparison-table tbody tr {
+            border-bottom: 1px solid rgba(51,65,85,0.4);
+        }
+        .comparison-table tbody tr:nth-child(even) {
+            background: rgba(30,41,59,0.5);
+        }
+        .comparison-table tbody tr:hover {
+            background: rgba(59,130,246,0.05);
+        }
+        .comparison-table td {
+            padding: 0.7rem 1rem;
+            color: var(--text-secondary);
+        }
+        .comparison-table td:first-child {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .comparison-table td:not(:first-child) {
+            text-align: center;
+            font-family: 'SF Mono', 'Consolas', monospace;
+            font-size: 0.8rem;
+        }
+        .comparison-table .highlight-row {
+            background: rgba(255,153,51,0.05) !important;
+        }
+        .comparison-table .highlight-row td {
+            font-weight: 700 !important;
+            color: var(--text-primary) !important;
+            font-size: 0.9rem;
+        }
+        .comparison-table .highlight-row td:nth-child(2) { color: #60a5fa !important; }
+        .comparison-table .highlight-row td:nth-child(3) { color: var(--saffron) !important; }
+        .comparison-table .highlight-row td:nth-child(4) { color: #4ade80 !important; }
+
+        /* ===== OPTIMIZATION CARDS ===== */
+        .opt-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.25rem;
+        }
+        .opt-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: transform 0.2s;
+        }
+        .opt-card:hover { transform: translateY(-2px); }
+        .opt-card h4 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        .opt-card p {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.8rem;
+            line-height: 1.5;
+        }
+        .savings-badge {
+            display: inline-block;
+            padding: 0.2rem 0.7rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            background: rgba(34,197,94,0.12);
+            color: #4ade80;
+        }
+        .opt-card .opt-icon {
+            width: 36px; height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            margin-bottom: 0.8rem;
+            background: rgba(249,115,22,0.1);
+        }
+
+        /* ===== ASSUMPTIONS ===== */
+        .assumptions-list {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 0.6rem;
+        }
+        .assumptions-list li {
+            padding: 0.5rem 0.8rem;
+            background: rgba(51,65,85,0.2);
+            border-radius: 6px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            border-left: 3px solid var(--text-muted);
+        }
+
+        /* ===== FOOTER ===== */
+        .page-footer {
+            text-align: center;
+            padding: 2rem;
+            border-top: 1px solid var(--card-border);
+            margin-top: 2rem;
+        }
+        .page-footer p {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+        .footer-flag {
+            display: inline-block;
+            height: 3px;
+            width: 120px;
+            background: linear-gradient(90deg, var(--saffron) 33%, #fff 33% 66%, var(--emerald) 66%);
+            border-radius: 2px;
+            margin-bottom: 1rem;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .exec-summary { grid-template-columns: 1fr; }
+            .page-header h1 { font-size: 1.5rem; }
+            .container { padding: 1rem; }
+            .tier-detail-header { flex-direction: column; text-align: center; }
+            .opt-grid { grid-template-columns: 1fr; }
+            .tier-specs { justify-content: center; }
+            .bar-row { flex-direction: column; align-items: flex-start; }
+            .bar-label { width: auto; }
+            .bar-value { width: auto; text-align: left; }
+        }
+
+        /* ===== ANIMATE ON SCROLL ===== */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ===== COST PER USER VISUAL ===== */
+        .cpu-row {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .cpu-item {
+            text-align: center;
+        }
+        .cpu-circle {
+            width: 80px; height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: 800;
+            margin: 0 auto 0.5rem;
+            font-family: 'SF Mono', 'Consolas', monospace;
+        }
+        .cpu-item.t1 .cpu-circle { background: rgba(59,130,246,0.15); color: #60a5fa; border: 2px solid rgba(59,130,246,0.3); }
+        .cpu-item.t2 .cpu-circle { background: rgba(255,153,51,0.15); color: var(--saffron); border: 2px solid rgba(255,153,51,0.3); }
+        .cpu-item.t3 .cpu-circle { background: rgba(74,222,128,0.15); color: #4ade80; border: 2px solid rgba(74,222,128,0.3); }
+        .cpu-item label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: block;
+        }
+
+        /* ===== INR TOGGLE ===== */
+        .currency-toggle {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+        .currency-btn {
+            padding: 0.5rem 1.2rem;
+            border-radius: 8px;
+            border: 1px solid var(--card-border);
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .currency-btn.active {
+            background: rgba(249,115,22,0.15);
+            color: var(--saffron);
+            border-color: rgba(249,115,22,0.3);
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="page-header">
+    <h1>Transit India &mdash; AWS Cost Estimation</h1>
+    <p class="subtitle">Production-Scale National Deployment &middot; ap-south-1 (Mumbai Region)</p>
+    <p class="meta-line">College Project Submission &middot; Cloud Infrastructure Cost Analysis &middot; 2025</p>
+    <div class="badge-row">
+        <span class="badge badge-orange">AWS Cloud</span>
+        <span class="badge badge-blue">Serverless</span>
+        <span class="badge badge-green">Multi-AZ</span>
+        <span class="badge badge-purple">ML-Ready</span>
+        <span class="badge badge-red">Production Grade</span>
+    </div>
+</header>
+
+<!-- ===== NAV ===== -->
+<nav class="nav-bar">
+    <a href="#summary">Summary</a>
+    <a href="#tier1">Tier 1 &mdash; Pilot</a>
+    <a href="#tier2">Tier 2 &mdash; Regional</a>
+    <a href="#tier3">Tier 3 &mdash; National</a>
+    <a href="#comparison">Comparison</a>
+    <a href="#charts">Visual Analysis</a>
+    <a href="#optimization">Optimization</a>
+    <a href="#assumptions">Assumptions</a>
+</nav>
+
+<div class="container">
+
+    <!-- ===== CURRENCY TOGGLE ===== -->
+    <div class="currency-toggle">
+        <button class="currency-btn active" onclick="setCurrency('usd')">USD ($)</button>
+        <button class="currency-btn" onclick="setCurrency('inr')">INR (&#8377;)</button>
+    </div>
+
+    <!-- =======================================================
+         SECTION: EXECUTIVE SUMMARY
+    ======================================================== -->
+    <section id="summary" class="section fade-in">
+        <h2 class="section-title"><span class="icon">$</span> Executive Summary</h2>
+        <p class="section-desc">Monthly AWS infrastructure costs across three deployment tiers for Transit India, from a single-state pilot to a full national rollout serving 500,000+ daily active users.</p>
+
+        <div class="exec-summary">
+            <!-- Tier 1 -->
+            <div class="exec-card tier1">
+                <div class="tier-label">Tier 1</div>
+                <div class="tier-name">Pilot (1 State &mdash; Tamil Nadu)</div>
+                <div class="cost-amount" data-usd="364.10">$364</div>
+                <div class="cost-period">per month</div>
+                <div class="annual">Annual: <strong data-usd="4369.20">$4,369</strong></div>
+                <div class="cost-per-user">$0.073 / user / month</div>
+            </div>
+            <!-- Tier 2 -->
+            <div class="exec-card tier2">
+                <div class="tier-label">Tier 2</div>
+                <div class="tier-name">Regional (5 States)</div>
+                <div class="cost-amount" data-usd="2938.60">$2,939</div>
+                <div class="cost-period">per month</div>
+                <div class="annual">Annual: <strong data-usd="35263.20">$35,263</strong></div>
+                <div class="cost-per-user">$0.059 / user / month</div>
+            </div>
+            <!-- Tier 3 -->
+            <div class="exec-card tier3">
+                <div class="tier-label">Tier 3</div>
+                <div class="tier-name">National (All India &mdash; 28 States + 8 UTs)</div>
+                <div class="cost-amount" data-usd="23523.40">$23,523</div>
+                <div class="cost-period">per month</div>
+                <div class="annual">Annual: <strong data-usd="282280.80">$282,281</strong></div>
+                <div class="cost-per-user">$0.047 / user / month</div>
+            </div>
+        </div>
+
+        <!-- Cost Per User Circles -->
+        <div class="chart-section">
+            <h3>Cost Efficiency &mdash; Cost Per Daily Active User</h3>
+            <div class="cpu-row">
+                <div class="cpu-item t1">
+                    <div class="cpu-circle" data-usd="0.073">$0.073</div>
+                    <label>Tier 1 &mdash; Pilot</label>
+                    <label style="color:#60a5fa; font-weight:600;">5,000 DAU</label>
+                </div>
+                <div class="cpu-item t2">
+                    <div class="cpu-circle" data-usd="0.059">$0.059</div>
+                    <label>Tier 2 &mdash; Regional</label>
+                    <label style="color:var(--saffron); font-weight:600;">50,000 DAU</label>
+                </div>
+                <div class="cpu-item t3">
+                    <div class="cpu-circle" data-usd="0.047">$0.047</div>
+                    <label>Tier 3 &mdash; National</label>
+                    <label style="color:#4ade80; font-weight:600;">500,000 DAU</label>
+                </div>
+            </div>
+            <p style="text-align:center; margin-top:1rem; font-size:0.8rem; color:var(--text-muted);">
+                Cost per user decreases by 36% from Pilot to National scale, demonstrating strong economies of scale.
+            </p>
+        </div>
+    </section>
+
+    <!-- =======================================================
+         SECTION: TIER 1 — PILOT
+    ======================================================== -->
+    <section id="tier1" class="section fade-in">
+        <h2 class="section-title"><span class="icon">1</span> Tier 1 &mdash; Pilot Deployment</h2>
+        <p class="section-desc">Single-state deployment covering Tamil Nadu with ~50 routes, ~100 stops, and 5,000 daily active users.</p>
+
+        <div class="tier-detail t1">
+            <div class="tier-detail-header">
+                <div>
+                    <h3>Tier 1: Pilot (Tamil Nadu)</h3>
+                    <div class="tier-specs" style="padding:0; margin-top:0.5rem;">
+                        <span class="spec-chip">5,000 DAU</span>
+                        <span class="spec-chip">50 Routes</span>
+                        <span class="spec-chip">100 Stops</span>
+                        <span class="spec-chip">Single AZ</span>
+                    </div>
+                </div>
+                <div class="total-badge" data-usd="364.10">$364.10/mo</div>
+            </div>
+            <div class="tier-detail-body">
+                <table class="cost-table">
+                    <thead>
+                        <tr>
+                            <th>Service</th>
+                            <th>Configuration</th>
+                            <th>Usage</th>
+                            <th>Monthly Cost</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="category-row"><td colspan="4">COMPUTE</td></tr>
+                        <tr>
+                            <td>AWS Lambda</td>
+                            <td>512 MB, Python 3.9</td>
+                            <td>500K invocations</td>
+                            <td data-usd="4.35">$4.35</td>
+                        </tr>
+                        <tr>
+                            <td>API Gateway</td>
+                            <td>REST API</td>
+                            <td>500K requests</td>
+                            <td data-usd="1.75">$1.75</td>
+                        </tr>
+                        <tr class="category-row"><td colspan="4">DATABASE &amp; CACHE</td></tr>
+                        <tr>
+                            <td>RDS PostgreSQL</td>
+                            <td>db.t3.small, Single-AZ</td>
+                            <td>On-demand</td>
+                            <td data-usd="30.00">$30.00</td>
+                        </tr>
+                        <tr>
+                            <td>ElastiCache Redis</td>
+                            <td>cache.t3.small</td>
+                            <td>On-demand</td>
+                            <td data-usd="25.00">$25.00</td>
+                        </tr>
+                        <tr class="category-row"><td colspan="4">STORAGE &amp; CDN</td></tr>
+                        <tr>
+                            <td>S3 Storage</td>
+                            <td>3 buckets</td>
+                            <td>10 GB</td>
+                            <td data-usd="0.25">$0.25</td>
+                        </tr>
+                        <tr>
+                            <td>S3 Data Transfer</td>
+                            <td>Outbound</td>
+                            <td>~5 GB</td>
+                            <td data-usd="0.45">$0.45</td>
+                        </tr>
+                        <tr>
+                            <td>CloudFront CDN</td>
+                            <td>India edge locations</td>
+                            <td>50 GB transfer</td>
+                            <td data-usd="7.00">$7.00</td>
+                        </tr>
+                        <tr class="category-row"><td colspan="4">NETWORKING</td></tr>
+                        <tr>
+                            <td>NAT Gateway</td>
+                            <td>Single AZ</td>
+                            <td>~10 GB processed</td>
+                            <td data-usd="45.60">$45.60</td>
+                        </tr>
+                        <tr>
+                            <td>VPC</td>
+                            <td>Standard</td>
+                            <td>&mdash;</td>
+                            <td data-usd="0.00">$0.00</td>
+                        </tr>
+                        <tr class="category-row"><td colspan="4">MESSAGING &amp; MONITORING</td></tr>
+                        <tr>
+                            <td>SNS (SMS)</td>
+                            <td>India transactional</td>
+                            <td>10K SMS</td>
+                            <td data-usd="200.00">$200.00</td>
+                        </tr>
+                        <tr>
+                            <td>CloudWatch</td>
+                            <td>Basic metrics + logs</td>
+                            <td>~15 metrics, 5 GB logs</td>
+                            <td data-usd="7.00">$7.00</td>
+                        </tr>
+                        <tr>
+                            <td>Route 53</td>
+                            <td>1 hosted zone</td>
+                            <td>~100K queries</td>
+                            <td data-usd="0.54">$0.54</td>
+                        </tr>
+                        <tr class="category-row"><td colspan="4">SECURITY &amp; BACKUP</td></tr>
+                        <tr>
+                            <td>AWS Backup</td>
+                            <td>RDS snapshots</td>
+                            <td>~10 GB</td>
+                            <td data-usd="0.50">$0.50</td>
+                        </tr>
+                        <tr>
+                            <td>IAM / Secrets Manager</td>
+                            <td>Baseline</td>
+                            <td>&mdash;</td>
+                            <td data-usd="0.40">$0.40</td>
+                        </tr>
+
+                        <!-- Free Tier Credits -->
+                        <tr class="category-row"><td colspan="4">FREE TIER CREDITS (FIRST 12 MONTHS)</td></tr>
+                        <tr>
+                            <td>Lambda Free Tier</td>
+                            <td>1M requests free</td>
+                            <td>&mdash;</td>
+                            <td style="color:#4ade80;">-$0.10</td>
+                        </tr>
+                        <tr>
+                            <td>S3 Free Tier</td>
+                            <td>5 GB free</td>
+                            <td>&mdash;</td>
+                            <td style="color:#4ade80;">-$0.13</td>
+                        </tr>
+                        <tr>
+                            <td>CloudWatch Free Tier</td>
+                            <td>10 metrics free</td>
+                            <td>&mdash;</td>
+                            <td style="color:#4ade80;">-$3.00</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="font-size:0.75rem; color:var(--text-muted)">Free tier estimate applied</td>
+                            <td></td>
+                            <td style="color:#4ade80; font-size:0.75rem;">-$3.23</td>
+                        </tr>
+
+                        <tr class="subtotal-row">
+                            <td colspan="3">TOTAL MONTHLY COST</td>
+                            <td data-usd="364.10">$364.10</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- =======================================================
+         SECTION: TIER 2 — REGIONAL
+    ======================================================== -->
+    <section id="tier2" class="section fade-in">
+        <h2 class="section-title"><span class="icon">2</span> Tier 2 &mdash; Regional Deployment</h2>
+        <p class="section-desc">Five-state expansion covering major regions with ~500 routes, ~1,000 stops, and 50,000 daily active users. Adds Multi-AZ database, cluster-mode cache, and SageMaker ML.</p>
+
+        <div class="tier-detail t2">
+            <div class="tier-detail-header">
+                <div>
+                    <h3>Tier 2: Regional (5 States)</h3>
+                    <div class="tier-specs" style="padding:0; margin-top:0.5rem;">
+                        <span class="spec-chip">50,000 DAU</span>
+                        <span class="spec-chip">500 Routes</span>
+                        <span class="spec-chip">1,000 Stops</span>
+                        <span class="spec-chip">Multi-AZ</span>
+                        <span class="spec-chip">ML Enabled</span>
+                    </div>
+                </div>
+                <div class="total-badge" data-usd="2938.60">$2,938.60/mo</div>
+            </div>
+            <div class="tier-detail-body">
+                <table class="cost-table">
+                    <thead>
+                        <tr>
+                            <th>Service</th>
+                            <th>Configuration</th>
+                            <th>Usage</th>
+                            <th>Monthly Cost</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="category-row"><td colspan="4">COMPUTE</td></tr>
+                        <tr>
+                            <td>AWS Lambda</td>
+                            <td>512 MB, Python 3.9</td>
+                            <td>5M invocations</td>
+                            <td data-usd="43.50">$43.50</td>
+                        </tr>
+                        <tr>
+                            <td>API Gateway</td>
+                            <td>REST API</td>
+                            <td>5M requests</td>
+                            <td data-usd="17.50">$17.50</td>
+                        </tr>
+                        <tr class="category-row"><td colspan="4">DATABASE &amp; CACHE</td></tr>
+                        <tr>
+                            <td>RDS PostgreSQL</td>
+                            <td>db.r6g.large, Multi-AZ</td>
+                            <td>On-demand</td>
+                            <td data-usd="360.00">$360.00</td>
+                        </tr>
+                        <tr>
+                            <td>ElastiCache Redis</td>
+                            <td>cache.r6g.large, cluster mode</td>
+                            <td>On-demand</td>
+                            <td data-usd="150.00">$150.00</td>
+                        </tr>
+                        <tr class="category-row"><td colspan="4">STORAGE &amp; CDN</td></tr>
+                        <tr>
+                            <td>S3 Storage</td>
+                            <td>3 buckets</td>
+                            <td>100 GB</td>
+                            <td data-usd="2.50">$2.50</td>
+                        </tr>
+                        <tr>
+                            <td>S3 Data Transfer</td>
+                            <td>Outbound</td>
+                            <td>~20 GB</td>
+                            <td data-usd="1.80">$1.80</td>
+                        </tr>
+                        <tr>
+                            <td>CloudFront CDN</td>
+                            <td>India edge locations</td>
+                            <td>500 GB transfer</td>
+                            <td data-usd="70.00">$70.00</td>
+                        </tr>
+                        <tr class="category-row"><td colspan="4">NETWORKING</td></tr>
+                        <tr>
+                            <td>NAT Gateway</td>
+                            <td>Multi-AZ (x2)</td>
+                            <td>~50 GB processed</td>
+                            <td data-usd="93.00">$93.00</td>
+                        </tr>
+                        <tr class="category-row"><td colspan="4">MESSAGING &amp; MONITORING</td></tr>
+                        <tr>
+                            <td>SNS (SMS)</td>
+                            <td>India transactional</td>
+                            <td>100K SMS</td>
+                            <td data-usd="2000.00">$2,000.00</td>
+                        </tr>
+                        <tr>
+                            <td>CloudWatch</td>
+                            <td>Enhanced metrics + logs</td>
+                            <td>~50 metrics, 20 GB logs</td>
+                            <td data-usd="25.00">$25.00</td>
+                        </tr>
+                        <tr>
+                            <td>Route 53</td>
+                            <td>1 hosted zone</td>
+                            <td>~500K queries</td>
+                            <td data-usd="0.70">$0.70</td>
+                        </tr>
+                        <tr class="category-row"><td colspan="4">ML / AI</td></tr>
+                        <tr>
+                            <td>SageMaker</td>
+                            <td>1x ml.t3.medium endpoint</td>
+                            <td>ETA prediction</td>
+                            <td data-usd="50.00">$50.00</td>
+                        </tr>
+                        <tr class="category-row"><td colspan="4">SECURITY &amp; BACKUP</td></tr>
+                        <tr>
+                            <td>WAF</td>
+                            <td>5 rules</td>
+                            <td>~5M requests</td>
+                            <td data-usd="13.00">$13.00</td>
+                        </tr>
+                        <tr>
+                            <td>AWS Backup</td>
+                            <td>RDS + S3</td>
+                            <td>~50 GB</td>
+                            <td data-usd="2.50">$2.50</td>
+                        </tr>
+                        <tr>
+                            <td>IAM / Secrets Manager</td>
+                            <td>Enhanced</td>
+                            <td>&mdash;</td>
+                            <td data-usd="1.60">$1.60</td>
+                        </tr>
+
+                        <tr class="subtotal-row">
+                            <td colspan="3">TOTAL MONTHLY COST</td>
+                            <td data-usd="2938.60">$2,938.60</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- =======================================================
+         SECTION: TIER 3 — NATIONAL
+    ======================================================== -->
+    <section id="tier3" class="section fade-in">
+        <h2 class="section-title"><span class="icon">3</span> Tier 3 &mdash; National Deployment</h2>
+        <p class="section-desc">Full national rollout covering all 28 states and 8 union territories with ~5,000 routes, ~10,000 stops, 500,000 daily active users, read replicas, multi-shard caching, and multiple ML endpoints.</p>
+
+        <div class="tier-detail t3">
+            <div class="tier-detail-header">
+                <div>
+                    <h3>Tier 3: National (All India &mdash; 28 States + 8 UTs)</h3>
+                    <div class="tier-specs" style="padding:0; margin-top:0.5rem;">
+                        <span class="spec-chip">500,000 DAU</span>
+                        <span class="spec-chip">5,000 Routes</span>
+                        <span class="spec-chip">10,000 Stops</span>
+                        <span class="spec-chip">Multi-AZ</span>
+                        <span class="spec-chip">Read Replicas</span>
+                        <span class="spec-chip">3 ML Endpoints</span>
+                    </div>
+                </div>
+                <div class="total-badge" data-usd="23523.40">$23,523.40/mo</div>
+            </div>
+            <div class="tier-detail-body">
+                <table class="cost-table">
+                    <thead>
+                        <tr>
+                            <th>Service</th>
+                            <th>Configuration</th>
+                            <th>Usage</th>
+                            <th>Monthly Cost</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="category-row"><td colspan="4">COMPUTE</td></tr>
+                        <tr>
+                            <td>AWS Lambda</td>
+                            <td>512 MB, Python 3.9</td>
+                            <td>50M invocations</td>
+                            <td data-usd="435.00">$435.00</td>
+                        </tr>
+                        <tr>
+                            <td>API Gateway</td>
+                            <td>REST API</td>
+                            <td>50M requests</td>
+                            <td data-usd="175.00">$175.00</td>
+                        </tr>
+                        <tr class="category-row"><td colspan="4">DATABASE &amp; CACHE</td></tr>
+                        <tr>
+                            <td>RDS PostgreSQL (Primary)</td>
+                            <td>db.r6g.2xlarge, Multi-AZ</td>
+                            <td>On-demand</td>
+                            <td data-usd="1440.00">$1,440.00</td>
+                        </tr>
+                        <tr>
+                            <td>RDS Read Replicas (x2)</td>
+                            <td>db.r6g.2xlarge</td>
+                            <td>2 replicas</td>
+                            <td data-usd="1440.00">$1,440.00</td>
+                        </tr>
+                        <tr>
+                            <td>ElastiCache Redis</td>
+                            <td>cache.r6g.xlarge, cluster mode, 3 shards</td>
+                            <td>On-demand</td>
+                            <td data-usd="900.00">$900.00</td>
+                        </tr>
+                        <tr class="category-row"><td colspan="4">STORAGE &amp; CDN</td></tr>
+                        <tr>
+                            <td>S3 Storage</td>
+                            <td>3 buckets</td>
+                            <td>1 TB (1,024 GB)</td>
+                            <td data-usd="25.60">$25.60</td>
+                        </tr>
+                        <tr>
+                            <td>S3 Data Transfer</td>
+                            <td>Outbound</td>
+                            <td>~100 GB</td>
+                            <td data-usd="9.00">$9.00</td>
+                        </tr>
+                        <tr>
+                            <td>CloudFront CDN</td>
+                            <td>India edge locations</td>
+                            <td>5 TB transfer</td>
+                            <td data-usd="700.00">$700.00</td>
+                        </tr>
+                        <tr class="category-row"><td colspan="4">NETWORKING</td></tr>
+                        <tr>
+                            <td>NAT Gateway</td>
+                            <td>Multi-AZ (x3)</td>
+                            <td>~300 GB processed</td>
+                            <td data-usd="153.00">$153.00</td>
+                        </tr>
+                        <tr class="category-row"><td colspan="4">MESSAGING &amp; MONITORING</td></tr>
+                        <tr>
+                            <td>SNS (SMS)</td>
+                            <td>India transactional</td>
+                            <td>1M SMS</td>
+                            <td data-usd="20000.00">$20,000.00</td>
+                        </tr>
+                        <tr>
+                            <td>CloudWatch</td>
+                            <td>Enhanced monitoring + alarms</td>
+                            <td>~150 metrics, 100 GB logs</td>
+                            <td data-usd="95.00">$95.00</td>
+                        </tr>
+                        <tr>
+                            <td>Route 53</td>
+                            <td>2 hosted zones, health checks</td>
+                            <td>~5M queries</td>
+                            <td data-usd="3.00">$3.00</td>
+                        </tr>
+                        <tr class="category-row"><td colspan="4">ML / AI</td></tr>
+                        <tr>
+                            <td>SageMaker</td>
+                            <td>3x ml.m5.large endpoints</td>
+                            <td>ETA, crowding, route optimization</td>
+                            <td data-usd="345.00">$345.00</td>
+                        </tr>
+                        <tr class="category-row"><td colspan="4">SECURITY &amp; BACKUP</td></tr>
+                        <tr>
+                            <td>WAF</td>
+                            <td>10 rules</td>
+                            <td>~50M requests</td>
+                            <td data-usd="45.00">$45.00</td>
+                        </tr>
+                        <tr>
+                            <td>AWS Shield Standard</td>
+                            <td>DDoS protection</td>
+                            <td>Included</td>
+                            <td data-usd="0.00">$0.00</td>
+                        </tr>
+                        <tr>
+                            <td>AWS Backup</td>
+                            <td>RDS + S3 + cross-region</td>
+                            <td>~500 GB</td>
+                            <td data-usd="25.00">$25.00</td>
+                        </tr>
+                        <tr>
+                            <td>IAM / Secrets Manager</td>
+                            <td>Production grade</td>
+                            <td>&mdash;</td>
+                            <td data-usd="4.80">$4.80</td>
+                        </tr>
+                        <tr class="category-row"><td colspan="4">DATA TRANSFER (INTER-REGION)</td></tr>
+                        <tr>
+                            <td>Cross-AZ Data Transfer</td>
+                            <td>Between AZs</td>
+                            <td>~200 GB</td>
+                            <td data-usd="4.00">$4.00</td>
+                        </tr>
+
+                        <!-- Free tier not applicable at this scale -->
+
+                        <tr class="subtotal-row">
+                            <td colspan="3">TOTAL MONTHLY COST</td>
+                            <td data-usd="23523.40" style="font-size:1.1rem;">$23,523.40</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- =======================================================
+         SECTION: VISUAL ANALYSIS
+    ======================================================== -->
+    <section id="charts" class="section fade-in">
+        <h2 class="section-title"><span class="icon">&#9632;</span> Visual Cost Analysis</h2>
+        <p class="section-desc">Comparative cost breakdowns across all three deployment tiers.</p>
+
+        <!-- Bar Chart: Total Monthly Cost -->
+        <div class="chart-section">
+            <h3>Total Monthly Cost by Tier</h3>
+            <div class="bar-chart">
+                <div class="bar-row">
+                    <span class="bar-label" style="color:#60a5fa;">Tier 1</span>
+                    <div class="bar-track">
+                        <div class="bar-fill blue" style="width: 1.55%;"><!-- 364/23523 --></div>
+                    </div>
+                    <span class="bar-value" data-usd="364.10">$364</span>
+                </div>
+                <div class="bar-row">
+                    <span class="bar-label" style="color:var(--saffron);">Tier 2</span>
+                    <div class="bar-track">
+                        <div class="bar-fill orange" style="width: 12.49%;"><!-- 2939/23523 --></div>
+                    </div>
+                    <span class="bar-value" data-usd="2938.60">$2,939</span>
+                </div>
+                <div class="bar-row">
+                    <span class="bar-label" style="color:#4ade80;">Tier 3</span>
+                    <div class="bar-track">
+                        <div class="bar-fill green" style="width: 100%;"><!-- baseline --></div>
+                    </div>
+                    <span class="bar-value" data-usd="23523.40">$23,523</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bar Chart: Service-by-Service Comparison -->
+        <div class="chart-section">
+            <h3>Service-Level Cost Comparison</h3>
+            <div class="bar-chart">
+
+                <div class="bar-group">
+                    <div class="bar-group-label">Lambda + API Gateway (Compute)</div>
+                    <div class="bar-row">
+                        <span class="bar-label" style="color:#60a5fa;">T1</span>
+                        <div class="bar-track"><div class="bar-fill blue" style="width: 1%;">$6</div></div>
+                        <span class="bar-value">$6.10</span>
+                    </div>
+                    <div class="bar-row">
+                        <span class="bar-label" style="color:var(--saffron);">T2</span>
+                        <div class="bar-track"><div class="bar-fill orange" style="width: 10%;">$61</div></div>
+                        <span class="bar-value">$61.00</span>
+                    </div>
+                    <div class="bar-row">
+                        <span class="bar-label" style="color:#4ade80;">T3</span>
+                        <div class="bar-track"><div class="bar-fill green" style="width: 100%;">$610</div></div>
+                        <span class="bar-value">$610.00</span>
+                    </div>
+                </div>
+
+                <div class="bar-group">
+                    <div class="bar-group-label">RDS PostgreSQL (Database)</div>
+                    <div class="bar-row">
+                        <span class="bar-label" style="color:#60a5fa;">T1</span>
+                        <div class="bar-track"><div class="bar-fill blue" style="width: 1.04%;">$30</div></div>
+                        <span class="bar-value">$30.00</span>
+                    </div>
+                    <div class="bar-row">
+                        <span class="bar-label" style="color:var(--saffron);">T2</span>
+                        <div class="bar-track"><div class="bar-fill orange" style="width: 12.5%;">$360</div></div>
+                        <span class="bar-value">$360.00</span>
+                    </div>
+                    <div class="bar-row">
+                        <span class="bar-label" style="color:#4ade80;">T3</span>
+                        <div class="bar-track"><div class="bar-fill green" style="width: 100%;">$2,880</div></div>
+                        <span class="bar-value">$2,880.00</span>
+                    </div>
+                </div>
+
+                <div class="bar-group">
+                    <div class="bar-group-label">ElastiCache Redis (Cache)</div>
+                    <div class="bar-row">
+                        <span class="bar-label" style="color:#60a5fa;">T1</span>
+                        <div class="bar-track"><div class="bar-fill blue" style="width: 2.78%;">$25</div></div>
+                        <span class="bar-value">$25.00</span>
+                    </div>
+                    <div class="bar-row">
+                        <span class="bar-label" style="color:var(--saffron);">T2</span>
+                        <div class="bar-track"><div class="bar-fill orange" style="width: 16.67%;">$150</div></div>
+                        <span class="bar-value">$150.00</span>
+                    </div>
+                    <div class="bar-row">
+                        <span class="bar-label" style="color:#4ade80;">T3</span>
+                        <div class="bar-track"><div class="bar-fill green" style="width: 100%;">$900</div></div>
+                        <span class="bar-value">$900.00</span>
+                    </div>
+                </div>
+
+                <div class="bar-group">
+                    <div class="bar-group-label">SNS SMS (Messaging)</div>
+                    <div class="bar-row">
+                        <span class="bar-label" style="color:#60a5fa;">T1</span>
+                        <div class="bar-track"><div class="bar-fill blue" style="width: 1%;">$200</div></div>
+                        <span class="bar-value">$200.00</span>
+                    </div>
+                    <div class="bar-row">
+                        <span class="bar-label" style="color:var(--saffron);">T2</span>
+                        <div class="bar-track"><div class="bar-fill orange" style="width: 10%;">$2,000</div></div>
+                        <span class="bar-value">$2,000.00</span>
+                    </div>
+                    <div class="bar-row">
+                        <span class="bar-label" style="color:#4ade80;">T3</span>
+                        <div class="bar-track"><div class="bar-fill green" style="width: 100%;">$20,000</div></div>
+                        <span class="bar-value">$20,000.00</span>
+                    </div>
+                </div>
+
+                <div class="bar-group">
+                    <div class="bar-group-label">CloudFront CDN (Content Delivery)</div>
+                    <div class="bar-row">
+                        <span class="bar-label" style="color:#60a5fa;">T1</span>
+                        <div class="bar-track"><div class="bar-fill blue" style="width: 1%;">$7</div></div>
+                        <span class="bar-value">$7.00</span>
+                    </div>
+                    <div class="bar-row">
+                        <span class="bar-label" style="color:var(--saffron);">T2</span>
+                        <div class="bar-track"><div class="bar-fill orange" style="width: 10%;">$70</div></div>
+                        <span class="bar-value">$70.00</span>
+                    </div>
+                    <div class="bar-row">
+                        <span class="bar-label" style="color:#4ade80;">T3</span>
+                        <div class="bar-track"><div class="bar-fill green" style="width: 100%;">$700</div></div>
+                        <span class="bar-value">$700.00</span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Stacked Bar: Cost Distribution -->
+        <div class="chart-section">
+            <h3>Cost Distribution by Category</h3>
+            <div class="stacked-chart">
+                <!-- Tier 1: Compute 6.10, DB 30, Cache 25, Network 45.6+7.45=53.05, Storage 0.70, ML 0, Security 0.90, SMS/Other 204.54 => ~364 -->
+                <div class="stacked-row">
+                    <div class="stacked-label">
+                        <span>Tier 1 &mdash; Pilot</span>
+                        <span data-usd="364.10">$364.10/mo</span>
+                    </div>
+                    <div class="stacked-track">
+                        <div class="stacked-seg seg-compute" style="width:1.7%;" title="Compute: $6.10"></div>
+                        <div class="stacked-seg seg-database" style="width:8.2%;" title="Database: $30.00">RDS</div>
+                        <div class="stacked-seg seg-cache" style="width:6.9%;" title="Cache: $25.00"></div>
+                        <div class="stacked-seg seg-network" style="width:14.5%;" title="Network: $52.60">Net</div>
+                        <div class="stacked-seg seg-storage" style="width:2.1%;" title="Storage + CDN: $7.70"></div>
+                        <div class="stacked-seg seg-other" style="width:66.6%;" title="SMS + Other: $242.70">SMS $200</div>
+                    </div>
+                </div>
+                <!-- Tier 2: Compute 61, DB 360, Cache 150, Network 93+70=163, Storage 4.30, ML 50, Security 16.10, SMS/Other 2027.30 => ~2939 -->
+                <div class="stacked-row">
+                    <div class="stacked-label">
+                        <span>Tier 2 &mdash; Regional</span>
+                        <span data-usd="2938.60">$2,938.60/mo</span>
+                    </div>
+                    <div class="stacked-track">
+                        <div class="stacked-seg seg-compute" style="width:2.1%;" title="Compute: $61.00"></div>
+                        <div class="stacked-seg seg-database" style="width:12.2%;" title="Database: $360.00">RDS</div>
+                        <div class="stacked-seg seg-cache" style="width:5.1%;" title="Cache: $150.00">Cache</div>
+                        <div class="stacked-seg seg-network" style="width:5.5%;" title="Network: $163.00">Net</div>
+                        <div class="stacked-seg seg-storage" style="width:2.5%;" title="Storage + CDN: $74.30">CDN</div>
+                        <div class="stacked-seg seg-ml" style="width:1.7%;" title="ML: $50.00"></div>
+                        <div class="stacked-seg seg-security" style="width:0.6%;" title="Security: $16.10"></div>
+                        <div class="stacked-seg seg-other" style="width:70.3%;" title="SMS + Other: $2,064.30">SMS $2,000</div>
+                    </div>
+                </div>
+                <!-- Tier 3: Compute 610, DB 2880, Cache 900, Network 853+4=857, Storage 734.60, ML 345, Security 74.80, SMS/Other 20102 => ~23524 -->
+                <div class="stacked-row">
+                    <div class="stacked-label">
+                        <span>Tier 3 &mdash; National</span>
+                        <span data-usd="23523.40">$23,523.40/mo</span>
+                    </div>
+                    <div class="stacked-track">
+                        <div class="stacked-seg seg-compute" style="width:2.6%;" title="Compute: $610.00"></div>
+                        <div class="stacked-seg seg-database" style="width:12.2%;" title="Database: $2,880.00">RDS</div>
+                        <div class="stacked-seg seg-cache" style="width:3.8%;" title="Cache: $900.00">Cache</div>
+                        <div class="stacked-seg seg-network" style="width:3.6%;" title="Network: $853.00">Net</div>
+                        <div class="stacked-seg seg-storage" style="width:3.1%;" title="Storage: $734.60">S3/CDN</div>
+                        <div class="stacked-seg seg-ml" style="width:1.5%;" title="ML: $345.00"></div>
+                        <div class="stacked-seg seg-security" style="width:0.3%;" title="Security: $74.80"></div>
+                        <div class="stacked-seg seg-other" style="width:72.9%;" title="SMS + Other: $20,126.00">SMS $20,000</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="legend">
+                <div class="legend-item"><div class="legend-dot" style="background:#3b82f6;"></div> Compute</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#8b5cf6;"></div> Database</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#06b6d4;"></div> Cache</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#f97316;"></div> Networking</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#22c55e;"></div> Storage/CDN</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#ec4899;"></div> ML/AI</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#ef4444;"></div> Security</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#64748b;"></div> SMS/Other</div>
+            </div>
+        </div>
+
+        <!-- Key Insight callout -->
+        <div class="chart-section" style="border-left: 4px solid var(--saffron);">
+            <h3 style="color:var(--saffron);">Key Insight: SMS is the Dominant Cost Driver</h3>
+            <p style="font-size:0.9rem; color:var(--text-secondary); line-height:1.7;">
+                Across all three tiers, <strong style="color:var(--text-primary);">AWS SNS SMS costs account for 55&ndash;85% of total infrastructure spend</strong>.
+                At national scale, SMS alone costs <strong style="color:#4ade80;">$20,000/month</strong> (85% of total).
+                This presents the single largest optimization opportunity&mdash;migrating to a hybrid SMS/Push Notification strategy
+                could reduce overall costs by <strong style="color:#4ade80;">50&ndash;60%</strong>.
+                Without SMS, the pure infrastructure cost at national scale would be approximately <strong style="color:var(--text-primary);">$3,523/month</strong>&mdash;remarkably
+                cost-effective for serving 500,000 daily users across all of India.
+            </p>
+        </div>
+    </section>
+
+    <!-- =======================================================
+         SECTION: COMPARISON TABLE
+    ======================================================== -->
+    <section id="comparison" class="section fade-in">
+        <h2 class="section-title"><span class="icon">&#8596;</span> Tier Comparison Matrix</h2>
+        <p class="section-desc">Side-by-side comparison of all three deployment tiers across infrastructure, performance, and cost dimensions.</p>
+
+        <div class="comparison-table-wrapper">
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Tier 1 &mdash; Pilot</th>
+                        <th>Tier 2 &mdash; Regional</th>
+                        <th>Tier 3 &mdash; National</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Coverage</td>
+                        <td>1 State (TN)</td>
+                        <td>5 States</td>
+                        <td>28 States + 8 UTs</td>
+                    </tr>
+                    <tr>
+                        <td>Daily Active Users</td>
+                        <td>5,000</td>
+                        <td>50,000</td>
+                        <td>500,000</td>
+                    </tr>
+                    <tr>
+                        <td>Routes / Stops</td>
+                        <td>50 / 100</td>
+                        <td>500 / 1,000</td>
+                        <td>5,000 / 10,000</td>
+                    </tr>
+                    <tr>
+                        <td>Lambda Invocations</td>
+                        <td>500K/mo</td>
+                        <td>5M/mo</td>
+                        <td>50M/mo</td>
+                    </tr>
+                    <tr>
+                        <td>API Requests</td>
+                        <td>500K/mo</td>
+                        <td>5M/mo</td>
+                        <td>50M/mo</td>
+                    </tr>
+                    <tr>
+                        <td>RDS Instance</td>
+                        <td>db.t3.small</td>
+                        <td>db.r6g.large</td>
+                        <td>db.r6g.2xlarge</td>
+                    </tr>
+                    <tr>
+                        <td>RDS HA</td>
+                        <td>Single-AZ</td>
+                        <td>Multi-AZ</td>
+                        <td>Multi-AZ + 2 Replicas</td>
+                    </tr>
+                    <tr>
+                        <td>ElastiCache</td>
+                        <td>t3.small</td>
+                        <td>r6g.large (cluster)</td>
+                        <td>r6g.xlarge (3 shards)</td>
+                    </tr>
+                    <tr>
+                        <td>S3 Storage</td>
+                        <td>10 GB</td>
+                        <td>100 GB</td>
+                        <td>1 TB</td>
+                    </tr>
+                    <tr>
+                        <td>CloudFront Transfer</td>
+                        <td>50 GB</td>
+                        <td>500 GB</td>
+                        <td>5 TB</td>
+                    </tr>
+                    <tr>
+                        <td>SMS Volume</td>
+                        <td>10K/mo</td>
+                        <td>100K/mo</td>
+                        <td>1M/mo</td>
+                    </tr>
+                    <tr>
+                        <td>SageMaker ML</td>
+                        <td>&mdash;</td>
+                        <td>1x ml.t3.medium</td>
+                        <td>3x ml.m5.large</td>
+                    </tr>
+                    <tr>
+                        <td>WAF</td>
+                        <td>&mdash;</td>
+                        <td>5 rules</td>
+                        <td>10 rules</td>
+                    </tr>
+                    <tr>
+                        <td>DDoS Protection</td>
+                        <td>&mdash;</td>
+                        <td>&mdash;</td>
+                        <td>AWS Shield Standard</td>
+                    </tr>
+                    <tr class="highlight-row">
+                        <td>Monthly Cost</td>
+                        <td data-usd="364.10">$364.10</td>
+                        <td data-usd="2938.60">$2,938.60</td>
+                        <td data-usd="23523.40">$23,523.40</td>
+                    </tr>
+                    <tr class="highlight-row">
+                        <td>Annual Cost</td>
+                        <td data-usd="4369.20">$4,369.20</td>
+                        <td data-usd="35263.20">$35,263.20</td>
+                        <td data-usd="282280.80">$282,280.80</td>
+                    </tr>
+                    <tr class="highlight-row">
+                        <td>Cost / User / Month</td>
+                        <td data-usd="0.073">$0.073</td>
+                        <td data-usd="0.059">$0.059</td>
+                        <td data-usd="0.047">$0.047</td>
+                    </tr>
+                    <tr>
+                        <td>Cost / User / Month (excl. SMS)</td>
+                        <td data-usd="0.033">$0.033</td>
+                        <td data-usd="0.019">$0.019</td>
+                        <td data-usd="0.007">$0.007</td>
+                    </tr>
+                    <tr>
+                        <td>Scale Factor vs Tier 1</td>
+                        <td>1x (baseline)</td>
+                        <td>8.1x cost, 10x users</td>
+                        <td>64.6x cost, 100x users</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- =======================================================
+         SECTION: COST OPTIMIZATION
+    ======================================================== -->
+    <section id="optimization" class="section fade-in">
+        <h2 class="section-title"><span class="icon">&#9660;</span> Cost Optimization Strategies</h2>
+        <p class="section-desc">Recommended strategies to reduce AWS costs while maintaining production-grade reliability and performance.</p>
+
+        <div class="opt-grid">
+            <div class="opt-card">
+                <div class="opt-icon" style="background:rgba(34,197,94,0.12);">&#9993;</div>
+                <h4>Hybrid SMS + Push Notifications</h4>
+                <p>Replace 70% of SMS notifications with Firebase Cloud Messaging (FCM) push notifications. Reserve SMS for OTP authentication and critical alerts only. FCM is free for unlimited messages.</p>
+                <span class="savings-badge">Save up to $14,000/mo at Tier 3</span>
+            </div>
+            <div class="opt-card">
+                <div class="opt-icon" style="background:rgba(59,130,246,0.12);">&#9201;</div>
+                <h4>Reserved Instances (1-year)</h4>
+                <p>Purchase 1-year Reserved Instances for RDS and ElastiCache. Provides up to 40% savings on database costs compared to on-demand pricing with no upfront payment.</p>
+                <span class="savings-badge">Save ~$1,500/mo at Tier 3</span>
+            </div>
+            <div class="opt-card">
+                <div class="opt-icon" style="background:rgba(168,85,247,0.12);">&#9881;</div>
+                <h4>Lambda Power Tuning</h4>
+                <p>Use AWS Lambda Power Tuning tool to find optimal memory configuration. Reducing from 512 MB to 256 MB for lightweight functions can cut Lambda costs by 40%.</p>
+                <span class="savings-badge">Save ~$175/mo at Tier 3</span>
+            </div>
+            <div class="opt-card">
+                <div class="opt-icon" style="background:rgba(6,182,212,0.12);">&#9730;</div>
+                <h4>S3 Intelligent Tiering</h4>
+                <p>Enable S3 Intelligent-Tiering for audit logs and ML training data buckets. Automatically moves infrequently accessed data to lower-cost storage classes.</p>
+                <span class="savings-badge">Save ~$8/mo at Tier 3</span>
+            </div>
+            <div class="opt-card">
+                <div class="opt-icon" style="background:rgba(249,115,22,0.12);">&#9889;</div>
+                <h4>CloudFront Caching Optimization</h4>
+                <p>Increase cache TTL for static assets (route maps, stop data) and implement aggressive browser caching. Target 95%+ cache hit ratio to reduce origin requests.</p>
+                <span class="savings-badge">Save ~$200/mo at Tier 3</span>
+            </div>
+            <div class="opt-card">
+                <div class="opt-icon" style="background:rgba(236,72,153,0.12);">&#9733;</div>
+                <h4>SageMaker Serverless Inference</h4>
+                <p>Switch from always-on SageMaker endpoints to Serverless Inference for ML models. Pay only when inference requests come in, ideal for variable traffic patterns.</p>
+                <span class="savings-badge">Save ~$150/mo at Tier 3</span>
+            </div>
+            <div class="opt-card">
+                <div class="opt-icon" style="background:rgba(239,68,68,0.12);">&#9635;</div>
+                <h4>NAT Gateway Optimization</h4>
+                <p>Use VPC endpoints for S3 and DynamoDB access to bypass NAT Gateway. Deploy Lambda in public subnets where possible. Consider NAT instances for dev environments.</p>
+                <span class="savings-badge">Save ~$80/mo at Tier 3</span>
+            </div>
+            <div class="opt-card">
+                <div class="opt-icon" style="background:rgba(100,116,139,0.12);">&#9041;</div>
+                <h4>API Gateway HTTP API Migration</h4>
+                <p>Migrate from REST API to HTTP API in API Gateway. HTTP APIs are up to 71% cheaper ($1.00 vs $3.50 per million) and support JWT authorization natively.</p>
+                <span class="savings-badge">Save ~$125/mo at Tier 3</span>
+            </div>
+        </div>
+
+        <!-- Optimized Cost Summary -->
+        <div class="chart-section" style="margin-top:2rem; border-left: 4px solid var(--accent-green);">
+            <h3 style="color:var(--accent-green);">Projected Optimized Costs (Tier 3)</h3>
+            <p style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:1.5rem;">
+                Applying all recommended optimization strategies to the national-scale deployment:
+            </p>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:1rem;">
+                <div style="text-align:center; padding:1rem; background:rgba(239,68,68,0.08); border-radius:10px;">
+                    <div style="font-size:0.7rem; text-transform:uppercase; color:var(--accent-red); font-weight:700; margin-bottom:0.3rem;">Before Optimization</div>
+                    <div style="font-size:1.8rem; font-weight:800; color:var(--accent-red);" data-usd="23523.40">$23,523</div>
+                    <div style="font-size:0.75rem; color:var(--text-muted);">per month</div>
+                </div>
+                <div style="text-align:center; padding:1rem; background:rgba(34,197,94,0.08); border-radius:10px;">
+                    <div style="font-size:0.7rem; text-transform:uppercase; color:var(--accent-green); font-weight:700; margin-bottom:0.3rem;">After Optimization</div>
+                    <div style="font-size:1.8rem; font-weight:800; color:var(--accent-green);" data-usd="7285.00">$7,285</div>
+                    <div style="font-size:0.75rem; color:var(--text-muted);">per month (est.)</div>
+                </div>
+                <div style="text-align:center; padding:1rem; background:rgba(255,153,51,0.08); border-radius:10px;">
+                    <div style="font-size:0.7rem; text-transform:uppercase; color:var(--saffron); font-weight:700; margin-bottom:0.3rem;">Annual Savings</div>
+                    <div style="font-size:1.8rem; font-weight:800; color:var(--saffron);" data-usd="194860.80">$194,861</div>
+                    <div style="font-size:0.75rem; color:var(--text-muted);">~69% reduction</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =======================================================
+         SECTION: ASSUMPTIONS
+    ======================================================== -->
+    <section id="assumptions" class="section fade-in">
+        <h2 class="section-title"><span class="icon">i</span> Assumptions &amp; Notes</h2>
+        <p class="section-desc">Key assumptions used in this cost estimation model.</p>
+
+        <ul class="assumptions-list">
+            <li>All prices are based on AWS ap-south-1 (Mumbai) region as of 2025 and are in USD.</li>
+            <li>Lambda compute time estimated at average 500ms per invocation at 512 MB memory.</li>
+            <li>RDS Multi-AZ doubles the instance cost; each read replica costs the same as the primary.</li>
+            <li>ElastiCache cluster mode with 3 shards means 3x the single-node cost for Tier 3.</li>
+            <li>S3 costs include storage + request charges; data transfer to CloudFront is free.</li>
+            <li>CloudFront pricing uses India-specific edge location rates ($0.14/GB for first 10 TB).</li>
+            <li>SNS SMS costs assume transactional SMS at $0.02 per message for India.</li>
+            <li>SageMaker costs assume 24/7 always-on endpoints for real-time inference.</li>
+            <li>NAT Gateway charged at $45/month base + $0.06 per GB of data processed.</li>
+            <li>WAF costs include $5/ACL + $1/rule + $0.60/million requests inspected.</li>
+            <li>AWS Free Tier benefits applied only to Tier 1 (first 12 months).</li>
+            <li>Data transfer between AZs charged at $0.02/GB (Tier 3 only).</li>
+            <li>Costs exclude domain registration, SSL certificates (ACM is free), and developer tooling.</li>
+            <li>No AWS Savings Plans or Enterprise Discount Program (EDP) pricing applied.</li>
+            <li>INR conversion uses approximate rate of 1 USD = 83 INR.</li>
+            <li>Monthly costs assume consistent usage; actual costs may vary with traffic patterns.</li>
+        </ul>
+    </section>
+
+</div>
+
+<!-- ===== FOOTER ===== -->
+<footer class="page-footer">
+    <div class="footer-flag"></div>
+    <p>Transit India &mdash; AWS Cloud Infrastructure Cost Estimation</p>
+    <p style="margin-top:0.3rem;">College Project Submission &middot; Cloud Computing &amp; DevOps</p>
+    <p style="margin-top:0.5rem; font-size:0.7rem;">
+        Prices sourced from AWS Pricing Calculator &middot; Region: ap-south-1 (Mumbai) &middot; All amounts in USD unless toggled
+    </p>
+</footer>
+
+<script>
+    // ===== SCROLL ANIMATION =====
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+    // ===== CURRENCY TOGGLE =====
+    const INR_RATE = 83;
+    let currentCurrency = 'usd';
+
+    function setCurrency(currency) {
+        currentCurrency = currency;
+
+        // Toggle active button
+        document.querySelectorAll('.currency-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelector(`.currency-btn[onclick="setCurrency('${currency}')"]`).classList.add('active');
+
+        // Update all elements with data-usd attribute
+        document.querySelectorAll('[data-usd]').forEach(el => {
+            const usdVal = parseFloat(el.getAttribute('data-usd'));
+            if (currency === 'inr') {
+                const inrVal = usdVal * INR_RATE;
+                if (inrVal >= 100000) {
+                    el.textContent = '\u20B9' + (inrVal / 100000).toFixed(2) + 'L';
+                } else if (inrVal >= 1000) {
+                    el.textContent = '\u20B9' + inrVal.toLocaleString('en-IN', { maximumFractionDigits: 0 });
+                } else if (inrVal >= 1) {
+                    el.textContent = '\u20B9' + inrVal.toFixed(0);
+                } else {
+                    el.textContent = '\u20B9' + inrVal.toFixed(2);
+                }
+            } else {
+                if (usdVal >= 10000) {
+                    el.textContent = '$' + usdVal.toLocaleString('en-US', { maximumFractionDigits: 0 });
+                } else if (usdVal >= 1) {
+                    el.textContent = '$' + usdVal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                } else {
+                    el.textContent = '$' + usdVal.toFixed(3);
+                }
+            }
+
+            // Handle elements that also have /mo suffix in total-badge
+            if (el.classList.contains('total-badge')) {
+                el.textContent += '/mo';
+            }
+        });
+
+        // Update cost-per-user badges
+        document.querySelectorAll('.cost-per-user').forEach(el => {
+            const parentCard = el.closest('.exec-card');
+            let usdCPU;
+            if (parentCard.classList.contains('tier1')) usdCPU = 0.073;
+            else if (parentCard.classList.contains('tier2')) usdCPU = 0.059;
+            else usdCPU = 0.047;
+
+            if (currency === 'inr') {
+                const inrCPU = usdCPU * INR_RATE;
+                el.textContent = '\u20B9' + inrCPU.toFixed(2) + ' / user / month';
+            } else {
+                el.textContent = '$' + usdCPU.toFixed(3) + ' / user / month';
+            }
+        });
+
+        // Update CPU circles
+        document.querySelectorAll('.cpu-circle').forEach(el => {
+            const usdVal = parseFloat(el.getAttribute('data-usd'));
+            if (currency === 'inr') {
+                el.textContent = '\u20B9' + (usdVal * INR_RATE).toFixed(2);
+            } else {
+                el.textContent = '$' + usdVal.toFixed(3);
+            }
+        });
+    }
+
+    // ===== NAV ACTIVE STATE =====
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-bar a');
+
+    window.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop - 100;
+            if (window.scrollY >= sectionTop) {
+                current = section.getAttribute('id');
+            }
+        });
+        navLinks.forEach(link => {
+            link.style.color = '';
+            link.style.background = '';
+            if (link.getAttribute('href') === '#' + current) {
+                link.style.color = 'var(--saffron)';
+                link.style.background = 'rgba(255,153,51,0.1)';
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

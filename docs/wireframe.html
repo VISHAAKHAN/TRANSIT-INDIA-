@@ -1,0 +1,2447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Transit India — UI Wireframes</title>
+    <style>
+        /* ===== RESET & BASE ===== */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --navy: #0B1F3A;
+            --navy-light: #0f172a;
+            --saffron: #FF9933;
+            --saffron-dark: #ea580c;
+            --emerald: #138808;
+            --bg-dark: #0f172a;
+            --bg-card: #f8fafc;
+            --border: #e2e8f0;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --red: #ef4444;
+            --blue: #3b82f6;
+            --purple: #8b5cf6;
+            --green: #22c55e;
+            --wire-bg: #f1f5f9;
+            --wire-border: #cbd5e1;
+            --wire-dash: #94a3b8;
+            --annotation: #f59e0b;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-dark);
+            color: #e2e8f0;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* ===== HEADER ===== */
+        .page-header {
+            background: linear-gradient(135deg, #0B1F3A 0%, #1e293b 50%, #0B1F3A 100%);
+            border-bottom: 3px solid var(--saffron);
+            padding: 32px 24px 28px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.5;
+        }
+        .page-header .badge {
+            display: inline-block;
+            background: var(--saffron);
+            color: var(--navy);
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            padding: 5px 16px;
+            border-radius: 20px;
+            margin-bottom: 16px;
+            position: relative;
+        }
+        .page-header h1 {
+            font-size: 36px;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            color: #fff;
+            margin-bottom: 8px;
+            position: relative;
+        }
+        .page-header h1 span { color: var(--saffron); }
+        .page-header p {
+            font-size: 14px;
+            color: #94a3b8;
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+        .page-header .meta {
+            margin-top: 16px;
+            font-size: 11px;
+            color: #64748b;
+            letter-spacing: 1px;
+            position: relative;
+        }
+        .tri-stripe {
+            display: flex;
+            height: 4px;
+            position: relative;
+        }
+        .tri-stripe div { flex: 1; }
+        .tri-stripe .s { background: var(--saffron); }
+        .tri-stripe .w { background: #fff; }
+        .tri-stripe .g { background: var(--emerald); }
+
+        /* ===== TAB NAVIGATION ===== */
+        .tab-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0;
+            background: #1e293b;
+            border-bottom: 1px solid #334155;
+            padding: 0 24px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .tab-nav button {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            padding: 14px 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+            position: relative;
+        }
+        .tab-nav button:hover { color: #e2e8f0; background: #334155; }
+        .tab-nav button.active {
+            color: var(--saffron);
+            border-bottom-color: var(--saffron);
+            background: rgba(255,153,51,0.05);
+        }
+        .tab-nav button .num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px; height: 18px;
+            background: #334155;
+            border-radius: 4px;
+            font-size: 10px;
+            margin-right: 6px;
+            color: #94a3b8;
+        }
+        .tab-nav button.active .num {
+            background: var(--saffron);
+            color: var(--navy);
+        }
+
+        /* ===== SCREEN CONTAINER ===== */
+        .screens-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 24px 80px;
+        }
+        .screen-panel {
+            display: none;
+        }
+        .screen-panel.active {
+            display: block;
+            animation: fadeUp 0.4s ease;
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== SCREEN HEADER ===== */
+        .screen-header {
+            margin-bottom: 32px;
+        }
+        .screen-header .component-label {
+            display: inline-block;
+            background: #334155;
+            color: var(--saffron);
+            font-size: 11px;
+            font-weight: 700;
+            font-family: 'Courier New', monospace;
+            padding: 4px 12px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+        .screen-header h2 {
+            font-size: 28px;
+            font-weight: 900;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+        .screen-header p {
+            font-size: 14px;
+            color: #94a3b8;
+            max-width: 700px;
+        }
+
+        /* ===== DEVICE FRAME ===== */
+        .device-frame {
+            background: #1e293b;
+            border: 2px solid #334155;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.05);
+            position: relative;
+        }
+        .device-frame.phone {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        .device-notch {
+            background: #1e293b;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid #334155;
+        }
+        .device-notch .notch-pill {
+            width: 100px;
+            height: 6px;
+            background: #334155;
+            border-radius: 10px;
+        }
+        .device-notch-desktop {
+            background: #1e293b;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            border-bottom: 1px solid #334155;
+            gap: 8px;
+        }
+        .device-notch-desktop .dot {
+            width: 12px; height: 12px;
+            border-radius: 50%;
+        }
+        .device-notch-desktop .dot.r { background: #ef4444; }
+        .device-notch-desktop .dot.y { background: #f59e0b; }
+        .device-notch-desktop .dot.g { background: #22c55e; }
+        .device-notch-desktop .url-bar {
+            flex: 1;
+            background: #0f172a;
+            border-radius: 6px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            margin-left: 8px;
+            font-size: 11px;
+            color: #64748b;
+            font-family: monospace;
+        }
+
+        .wire-content {
+            background: var(--wire-bg);
+            min-height: 400px;
+        }
+
+        /* ===== WIREFRAME ELEMENTS ===== */
+        .w-header {
+            background: var(--navy-light);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .w-header .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .w-header .logo-box {
+            width: 36px; height: 36px;
+            background: #fff;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 10px; font-weight: 900; color: var(--navy);
+        }
+        .w-header .logo-text {
+            color: #fff;
+            font-size: 16px;
+            font-weight: 800;
+        }
+        .w-header .logo-sub {
+            font-size: 9px;
+            color: #64748b;
+            letter-spacing: 1px;
+        }
+        .w-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .w-btn-sm {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 700;
+            border: 1px solid #475569;
+            background: #1e293b;
+            color: #94a3b8;
+            cursor: default;
+        }
+        .w-btn-saffron {
+            background: var(--saffron);
+            color: var(--navy);
+            border-color: var(--saffron);
+        }
+        .w-btn-red {
+            background: var(--red);
+            color: #fff;
+            border-color: var(--red);
+            width: 28px; height: 28px;
+            border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px;
+        }
+        .w-circle {
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .w-dark-toggle {
+            width: 28px; height: 28px;
+            border-radius: 6px;
+            background: #1e293b;
+            border: 1px solid #475569;
+            display: flex; align-items: center; justify-content: center;
+            color: #fbbf24;
+            font-size: 14px;
+        }
+
+        /* Wire nav tabs */
+        .w-nav-tabs {
+            display: flex;
+            background: #fff;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .w-nav-tabs .tab {
+            flex: 1;
+            padding: 10px 8px;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: #94a3b8;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            letter-spacing: 0.5px;
+        }
+        .w-nav-tabs .tab.active {
+            color: var(--saffron);
+            border-bottom-color: var(--saffron);
+        }
+
+        /* Search form */
+        .w-search-card {
+            background: #fff;
+            margin: 16px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+        }
+        .w-search-banner {
+            background: var(--saffron);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--navy);
+            font-weight: 800;
+            font-size: 14px;
+        }
+        .w-search-banner .icon {
+            font-size: 16px;
+        }
+        .w-form-body {
+            padding: 16px;
+        }
+        .w-field {
+            margin-bottom: 14px;
+        }
+        .w-field label {
+            display: block;
+            font-size: 10px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+        .w-input {
+            width: 100%;
+            border: 1.5px dashed #cbd5e1;
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 12px;
+            color: #94a3b8;
+            font-style: italic;
+        }
+        .w-select {
+            width: 100%;
+            border: 1.5px solid #e2e8f0;
+            background: #fff;
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 12px;
+            color: #64748b;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .w-select .arrow { color: #94a3b8; font-size: 10px; }
+        .w-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: default;
+            border: none;
+        }
+        .w-btn-primary {
+            background: var(--saffron);
+            color: #fff;
+        }
+        .w-btn-primary .live-badge {
+            background: var(--navy-light);
+            color: #fff;
+            font-size: 9px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            letter-spacing: 1px;
+        }
+
+        /* Result cards */
+        .w-results-header {
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .w-results-header h4 {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--navy-light);
+        }
+        .w-results-header span {
+            font-size: 10px;
+            font-weight: 700;
+            color: #94a3b8;
+            letter-spacing: 1px;
+        }
+        .w-route-card {
+            padding: 14px 16px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .w-route-card:last-child { border-bottom: none; }
+        .w-route-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+        .w-route-id {
+            font-size: 18px;
+            font-weight: 900;
+            color: var(--navy-light);
+        }
+        .w-badges { display: flex; gap: 4px; flex-wrap: wrap; }
+        .w-badge {
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .w-badge-green { background: var(--green); color: #fff; }
+        .w-badge-red { background: var(--red); color: #fff; }
+        .w-badge-green-dark { background: #15803d; color: #fff; }
+        .w-route-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .w-route-info-item {
+            text-align: center;
+        }
+        .w-route-info-item .lbl {
+            font-size: 9px;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+        .w-route-info-item .val {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--navy-light);
+            background: #f1f5f9;
+            padding: 6px 8px;
+            border-radius: 6px;
+        }
+
+        /* ===== ANNOTATIONS ===== */
+        .annotation {
+            position: absolute;
+            background: rgba(245, 158, 11, 0.12);
+            border: 1.5px solid var(--annotation);
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--annotation);
+            white-space: nowrap;
+            pointer-events: none;
+            z-index: 50;
+        }
+        .annotation::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 1.5px;
+            background: var(--annotation);
+        }
+        .annotation.left::before {
+            right: -21px;
+            top: 50%;
+        }
+        .annotation.right::before {
+            left: -21px;
+            top: 50%;
+        }
+        .annotation.bottom::before {
+            top: -11px;
+            left: 50%;
+            width: 1.5px;
+            height: 10px;
+        }
+        .annotation-inline {
+            display: inline-block;
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px dashed var(--annotation);
+            border-radius: 6px;
+            padding: 3px 8px;
+            font-size: 9px;
+            font-weight: 700;
+            color: var(--annotation);
+            margin: 4px 2px;
+        }
+
+        /* ===== ROUTE DETAILS WIREFRAME ===== */
+        .w-back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 0;
+            font-size: 12px;
+            font-weight: 700;
+            color: #64748b;
+            margin: 12px 16px;
+        }
+        .w-status-strip {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0 16px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        .w-status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .w-status-pill.on-time {
+            background: #dcfce7;
+            color: #15803d;
+        }
+        .w-status-pill.delayed {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+        .w-status-pill .dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        /* Timeline */
+        .w-timeline {
+            padding: 16px 16px 16px 40px;
+            position: relative;
+        }
+        .w-timeline::before {
+            content: '';
+            position: absolute;
+            left: 30px;
+            top: 20px;
+            bottom: 20px;
+            width: 2px;
+            background: #e2e8f0;
+        }
+        .w-timeline-stop {
+            position: relative;
+            padding: 8px 0 8px 24px;
+            font-size: 12px;
+        }
+        .w-timeline-stop::before {
+            content: '';
+            position: absolute;
+            left: -16px;
+            top: 12px;
+            width: 12px; height: 12px;
+            border-radius: 50%;
+            background: #fff;
+            border: 3px solid #cbd5e1;
+        }
+        .w-timeline-stop.active::before {
+            border-color: var(--saffron);
+            background: var(--saffron);
+            box-shadow: 0 0 0 4px rgba(255,153,51,0.2);
+        }
+        .w-timeline-stop.passed::before {
+            border-color: var(--emerald);
+            background: var(--emerald);
+        }
+        .w-timeline-stop .name {
+            font-weight: 700;
+            color: var(--navy-light);
+        }
+        .w-timeline-stop .coords {
+            font-size: 10px;
+            color: #94a3b8;
+            font-family: monospace;
+        }
+
+        /* ETA Section */
+        .w-eta-card {
+            background: #fff;
+            margin: 16px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            padding: 20px;
+        }
+        .w-eta-big {
+            font-size: 48px;
+            font-weight: 900;
+            color: var(--saffron);
+            line-height: 1;
+        }
+        .w-eta-unit {
+            font-size: 18px;
+            font-weight: 800;
+            color: #94a3b8;
+            margin-left: 6px;
+        }
+
+        /* Emergency Wireframe */
+        .w-helpline-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            padding: 0 16px 16px;
+        }
+        .w-helpline-card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px 12px;
+            text-align: center;
+        }
+        .w-helpline-icon {
+            width: 48px; height: 48px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 10px;
+            font-size: 20px;
+        }
+        .w-helpline-name {
+            font-size: 10px;
+            font-weight: 700;
+            color: #94a3b8;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+        .w-helpline-number {
+            font-size: 28px;
+            font-weight: 900;
+            color: var(--navy-light);
+            margin-bottom: 12px;
+        }
+        .w-helpline-btn {
+            width: 100%;
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border: none;
+        }
+
+        /* Escalation panel */
+        .w-escalation-card {
+            background: #fff;
+            margin: 0 16px 16px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+        }
+        .w-escalation-header {
+            background: var(--saffron);
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--navy);
+        }
+        .w-escalation-header .title {
+            font-size: 13px;
+            font-weight: 800;
+        }
+        .w-escalation-header .gps-badge {
+            background: var(--navy-light);
+            color: #fff;
+            font-size: 9px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            letter-spacing: 1px;
+        }
+        .w-category-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            padding: 16px;
+        }
+        .w-category-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            background: #fff;
+        }
+        .w-category-btn.selected {
+            border-color: var(--saffron);
+            background: #fff7ed;
+        }
+        .w-category-icon {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px;
+        }
+        .w-category-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--navy-light);
+        }
+
+        /* Login Wireframe */
+        .w-login-card {
+            background: #fff;
+            margin: 24px 16px;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            padding: 28px 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        }
+        .w-captcha-box {
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 14px;
+            background: #f8fafc;
+        }
+        .w-captcha-display {
+            background: #e2e8f0;
+            border-radius: 6px;
+            padding: 8px 16px;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            font-size: 22px;
+            font-weight: 700;
+            color: #64748b;
+            letter-spacing: 8px;
+            text-decoration: line-through;
+            font-style: italic;
+            margin-bottom: 10px;
+        }
+
+        /* OTP Wireframe */
+        .w-otp-boxes {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        .w-otp-box {
+            width: 44px; height: 52px;
+            border: 2px dashed #cbd5e1;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px;
+            font-weight: 900;
+            color: var(--navy-light);
+            background: #f8fafc;
+        }
+        .w-otp-box.filled {
+            border-style: solid;
+            border-color: var(--saffron);
+            background: #fff7ed;
+        }
+
+        /* Operator Dashboard */
+        .w-op-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 16px;
+            padding: 16px;
+        }
+        .w-route-list {
+            background: #fff;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+        }
+        .w-route-list-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            cursor: default;
+        }
+        .w-route-list-item:hover { background: #f8fafc; }
+        .w-route-list-item .route-icon {
+            width: 36px; height: 36px;
+            background: rgba(255,153,51,0.1);
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--saffron);
+            font-size: 16px;
+            margin-right: 12px;
+        }
+        .w-route-list-item .route-info {
+            flex: 1;
+        }
+        .w-route-list-item .route-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--navy-light);
+        }
+        .w-route-list-item .route-stops {
+            font-size: 10px;
+            color: #94a3b8;
+        }
+        .w-route-list-item .chevron {
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        /* Expanded route detail inside operator */
+        .w-route-expanded {
+            padding: 12px 16px;
+            border-top: 1px solid #e2e8f0;
+            background: #f8fafc;
+        }
+        .w-stops-flow {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 14px;
+        }
+        .w-stop-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            background: #e2e8f0;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 600;
+            color: #475569;
+        }
+        .w-stop-chip .num {
+            width: 16px; height: 16px;
+            border-radius: 50%;
+            background: rgba(255,153,51,0.2);
+            color: var(--saffron);
+            font-size: 9px;
+            font-weight: 800;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .w-activate-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .w-activate-row input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            font-size: 12px;
+            background: #fff;
+            color: #94a3b8;
+            font-style: italic;
+        }
+        .w-activate-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: #fff;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 800;
+            border: none;
+            white-space: nowrap;
+        }
+
+        /* Active trips panel */
+        .w-active-panel {
+            background: #fff;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+        }
+        .w-active-trip {
+            padding: 12px 14px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .w-active-trip:last-child { border-bottom: none; }
+        .w-active-trip-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        .w-running-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 8px;
+            background: #dcfce7;
+            color: #15803d;
+            border-radius: 20px;
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+        .w-deactivate-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 5px 10px;
+            background: #fee2e2;
+            color: #b91c1c;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 800;
+            border: none;
+        }
+
+        /* Feedback / Service Reporting */
+        .w-feedback-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin: 20px 0;
+        }
+        .w-feedback-circle {
+            width: 56px; height: 56px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px;
+            border: 2px solid #e2e8f0;
+            background: #f8fafc;
+            margin: 0 auto 8px;
+        }
+        .w-feedback-circle.selected-good {
+            background: var(--navy-light);
+            border-color: var(--navy-light);
+        }
+        .w-feedback-circle.selected-bad {
+            background: var(--red);
+            border-color: var(--red);
+        }
+        .w-concern-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin: 16px 0;
+        }
+        .w-concern-btn {
+            padding: 10px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: #475569;
+            background: #fff;
+        }
+        .w-concern-btn.selected {
+            border-color: var(--saffron);
+            background: #fff7ed;
+            color: var(--navy);
+        }
+
+        /* SMS Mockup */
+        .w-sms-container {
+            background: #e5e5ea;
+            padding: 16px;
+            border-radius: 0;
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .w-sms-bubble {
+            max-width: 75%;
+            padding: 10px 14px;
+            border-radius: 18px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        .w-sms-sent {
+            align-self: flex-end;
+            background: #0b93f6;
+            color: #fff;
+            border-bottom-right-radius: 4px;
+        }
+        .w-sms-received {
+            align-self: flex-start;
+            background: #fff;
+            color: #1c1c1e;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+        }
+        .w-sms-time {
+            text-align: center;
+            font-size: 11px;
+            color: #8e8e93;
+            font-weight: 600;
+        }
+        .w-sms-header {
+            background: #f2f2f7;
+            padding: 12px 16px;
+            text-align: center;
+            border-bottom: 1px solid #d1d1d6;
+        }
+        .w-sms-header .contact {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1c1c1e;
+        }
+        .w-sms-header .sub {
+            font-size: 11px;
+            color: #8e8e93;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .page-header h1 { font-size: 24px; }
+            .tab-nav button { padding: 12px 14px; font-size: 10px; }
+            .w-helpline-grid { grid-template-columns: 1fr; }
+            .w-op-grid { grid-template-columns: 1fr; }
+            .w-category-grid { grid-template-columns: 1fr; }
+            .w-concern-grid { grid-template-columns: 1fr 1fr; }
+            .w-route-info { grid-template-columns: 1fr; }
+            .device-frame.phone { max-width: 100%; }
+            .screens-container { padding: 20px 12px 60px; }
+        }
+
+        /* ===== LEGEND ===== */
+        .legend {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 32px;
+        }
+        .legend h3 {
+            font-size: 12px;
+            font-weight: 700;
+            color: #94a3b8;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 14px;
+        }
+        .legend-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #cbd5e1;
+        }
+        .legend-swatch {
+            width: 14px; height: 14px;
+            border-radius: 4px;
+        }
+
+        /* ===== INFO CARD ===== */
+        .info-note {
+            background: rgba(255,153,51,0.08);
+            border: 1px solid rgba(255,153,51,0.2);
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin-top: 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .info-note .icon {
+            color: var(--saffron);
+            font-size: 16px;
+            line-height: 1;
+            margin-top: 1px;
+        }
+        .info-note p {
+            font-size: 12px;
+            color: #94a3b8;
+            line-height: 1.6;
+        }
+
+        /* Map placeholder */
+        .w-map-placeholder {
+            background: #e2e8f0;
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            margin: 0 16px 16px;
+            height: 160px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            font-size: 12px;
+            font-weight: 700;
+            gap: 6px;
+        }
+        .w-map-placeholder .map-icon { font-size: 28px; opacity: 0.5; }
+
+        /* Warning bar */
+        .w-warning-bar {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 12px 16px;
+            margin: 0 16px 16px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .w-warning-bar.red {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+        .w-warning-bar .warn-icon { font-size: 16px; flex-shrink: 0; }
+
+        /* Next stop card */
+        .w-next-stop {
+            background: #fff7ed;
+            margin: 0 16px;
+            border-radius: 10px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .w-next-stop .icon-circle {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            background: var(--saffron);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff;
+            font-size: 16px;
+        }
+        .w-next-stop .lbl {
+            font-size: 9px;
+            font-weight: 700;
+            color: var(--saffron-dark);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .w-next-stop .val {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--navy-light);
+        }
+
+        /* SMS input bar */
+        .w-sms-input-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: #f2f2f7;
+            border-top: 1px solid #d1d1d6;
+        }
+        .w-sms-input {
+            flex: 1;
+            padding: 8px 12px;
+            border-radius: 20px;
+            border: 1px solid #d1d1d6;
+            background: #fff;
+            font-size: 13px;
+            color: #8e8e93;
+            font-style: italic;
+        }
+        .w-sms-send-btn {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: #0b93f6;
+            border: none;
+            color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px;
+        }
+
+        /* Legal strip */
+        .w-legal-strip {
+            background: #fee2e2;
+            border: 1px solid #fca5a5;
+            margin: 0 16px 16px;
+            border-radius: 8px;
+            padding: 10px 14px;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        .w-legal-strip .icon { color: var(--red); font-size: 16px; flex-shrink: 0; }
+        .w-legal-strip .text {
+            font-size: 10px;
+            font-weight: 700;
+            color: #991b1b;
+            line-height: 1.5;
+        }
+
+        /* section divider */
+        .w-section-title {
+            padding: 16px 16px 8px;
+            font-size: 16px;
+            font-weight: 900;
+            color: var(--navy-light);
+        }
+        .w-section-sub {
+            padding: 0 16px 12px;
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        /* Reporting header */
+        .w-report-header {
+            background: var(--navy-light);
+            padding: 14px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .w-report-header .left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .w-report-header .logo-sm {
+            width: 30px; height: 30px;
+            background: #fff;
+            border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px;
+        }
+        .w-report-header .title-area h3 {
+            color: #fff;
+            font-size: 14px;
+            font-weight: 800;
+        }
+        .w-report-header .title-area .sub {
+            font-size: 9px;
+            color: var(--saffron);
+            letter-spacing: 1.5px;
+            font-weight: 700;
+        }
+        .w-report-header .actions {
+            display: flex;
+            gap: 12px;
+            color: #94a3b8;
+            font-size: 16px;
+        }
+
+        /* Footer */
+        .page-footer {
+            text-align: center;
+            padding: 40px 24px;
+            color: #475569;
+            font-size: 12px;
+            border-top: 1px solid #1e293b;
+        }
+        .page-footer strong {
+            color: #94a3b8;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== HEADER ===== -->
+    <div class="tri-stripe"><div class="s"></div><div class="w"></div><div class="g"></div></div>
+    <header class="page-header">
+        <div class="badge">College Project Deliverable</div>
+        <h1>Transit India <span>— UI Wireframes</span></h1>
+        <p>Complete wireframe documentation of all key screens in the Transit India bus tracking platform. Built with React, FastAPI, and deployed on AWS.</p>
+        <div class="meta">TRANSIT-INDIA PROJECT &bull; WIREFRAME DOCUMENT &bull; 8 SCREENS &bull; MARCH 2026</div>
+    </header>
+    <div class="tri-stripe"><div class="s"></div><div class="w"></div><div class="g"></div></div>
+
+    <!-- ===== TAB NAVIGATION ===== -->
+    <nav class="tab-nav" id="tabNav">
+        <button class="active" onclick="showScreen(0, this)"><span class="num">1</span>Tracking Dashboard</button>
+        <button onclick="showScreen(1, this)"><span class="num">2</span>Route Details</button>
+        <button onclick="showScreen(2, this)"><span class="num">3</span>Emergency</button>
+        <button onclick="showScreen(3, this)"><span class="num">4</span>Operator Login</button>
+        <button onclick="showScreen(4, this)"><span class="num">5</span>OTP Verify</button>
+        <button onclick="showScreen(5, this)"><span class="num">6</span>Operator Dashboard</button>
+        <button onclick="showScreen(6, this)"><span class="num">7</span>Feedback &amp; Reporting</button>
+        <button onclick="showScreen(7, this)"><span class="num">8</span>SMS View</button>
+    </nav>
+
+    <!-- ===== SCREENS ===== -->
+    <div class="screens-container">
+
+        <!-- Legend -->
+        <div class="legend">
+            <h3>Wireframe Legend</h3>
+            <div class="legend-items">
+                <div class="legend-item"><div class="legend-swatch" style="background:#FF9933"></div>Saffron accent (CTAs, active states)</div>
+                <div class="legend-item"><div class="legend-swatch" style="background:#0B1F3A"></div>Navy (headers, primary text)</div>
+                <div class="legend-item"><div class="legend-swatch" style="background:#138808"></div>Emerald (success, on-time)</div>
+                <div class="legend-item"><div class="legend-swatch" style="border:2px dashed #cbd5e1; background:transparent"></div>Dashed = placeholder input</div>
+                <div class="legend-item"><div class="legend-swatch" style="background:#f59e0b"></div>Annotation callouts</div>
+            </div>
+        </div>
+
+        <!-- ========== SCREEN 1: TRACKING DASHBOARD ========== -->
+        <div class="screen-panel active" id="screen-0">
+            <div class="screen-header">
+                <div class="component-label">TrackingDashboard.jsx + Hero.jsx</div>
+                <h2>1. Landing Page / Tracking Dashboard</h2>
+                <p>The primary user-facing screen. Users select boarding/destination points, search for live bus status, and see active bus route cards with ETA and status badges.</p>
+            </div>
+
+            <div class="device-frame" style="position:relative">
+                <div class="device-notch-desktop">
+                    <div class="dot r"></div>
+                    <div class="dot y"></div>
+                    <div class="dot g"></div>
+                    <div class="url-bar">transitindia.vercel.app/</div>
+                </div>
+                <div class="wire-content">
+                    <!-- Header -->
+                    <div class="w-header" style="position:relative">
+                        <div class="logo-area">
+                            <div class="logo-box">TI</div>
+                            <div>
+                                <div class="logo-text">TransitIndia</div>
+                                <div class="logo-sub">GOVERNMENT OF INDIA</div>
+                            </div>
+                        </div>
+                        <div class="w-header-actions">
+                            <div class="w-btn-sm">Home</div>
+                            <div class="w-btn-sm w-btn-saffron">Operator Login</div>
+                            <div class="w-btn-sm">EN &#9662;</div>
+                            <div class="w-dark-toggle">&#9788;</div>
+                            <div class="w-btn-red">&#9888;</div>
+                            <div class="w-circle" style="background:#fed7aa; overflow:hidden">
+                                <span style="font-size:14px">&#128100;</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Annotations for header -->
+                    <div style="display:flex; flex-wrap:wrap; gap:4px; padding:4px 16px; background:#f8fafc; border-bottom:1px solid #e2e8f0;">
+                        <span class="annotation-inline">Logo + Brand</span>
+                        <span class="annotation-inline">Home Nav</span>
+                        <span class="annotation-inline">Operator Login CTA</span>
+                        <span class="annotation-inline">Language Toggle (EN/HI/TA)</span>
+                        <span class="annotation-inline">Dark Mode Toggle</span>
+                        <span class="annotation-inline">Emergency Button (Red)</span>
+                        <span class="annotation-inline">Profile Avatar</span>
+                    </div>
+
+                    <!-- Search Card -->
+                    <div class="w-search-card">
+                        <div class="w-search-banner">
+                            <span class="icon">&#128652;</span>
+                            Live Transit Radar
+                        </div>
+                        <div class="w-form-body">
+                            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;">
+                                <div class="w-field">
+                                    <label>&#9962; Route Number</label>
+                                    <div class="w-input">Search buses...</div>
+                                </div>
+                                <div class="w-field">
+                                    <label>&#128205; Boarding Point</label>
+                                    <div class="w-select">
+                                        <span>Select boarding point</span>
+                                        <span class="arrow">&#9662;</span>
+                                    </div>
+                                </div>
+                                <div class="w-field">
+                                    <label>&#128205; Destination Point</label>
+                                    <div class="w-select">
+                                        <span>Select destination point</span>
+                                        <span class="arrow">&#9662;</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="margin-top:8px;">
+                                <div class="w-btn w-btn-primary">
+                                    <span class="live-badge">LIVE</span>
+                                    Get Bus Status
+                                    <span>&#8594;</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="padding:0 16px 4px">
+                        <span class="annotation-inline">Dropdown populated from districtStops.js data per user's saved district</span>
+                    </div>
+
+                    <!-- Results Section -->
+                    <div style="margin:0 16px 16px; background:#fff; border-radius:12px; border:1px solid #e2e8f0; overflow:hidden;">
+                        <div class="w-results-header">
+                            <h4>&#128652; Live Status Results</h4>
+                            <span>4 BUSES ACTIVE</span>
+                        </div>
+                        <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr;">
+                            <!-- Card 1 -->
+                            <div class="w-route-card" style="border-right:1px solid #f1f5f9;">
+                                <div class="w-route-top">
+                                    <div class="w-route-id">1C-1X</div>
+                                    <div class="w-badges">
+                                        <span class="w-badge w-badge-green">ON TIME</span>
+                                        <span class="w-badge w-badge-green-dark">RUNNING</span>
+                                    </div>
+                                </div>
+                                <div class="w-route-info">
+                                    <div class="w-route-info-item">
+                                        <div class="lbl">Current Location</div>
+                                        <div class="val" style="background:#ffedcc; color:#9a4d00;">Gandhipuram</div>
+                                    </div>
+                                    <div class="w-route-info-item">
+                                        <div class="lbl">ETA</div>
+                                        <div class="val">5 - 10 min</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Card 2 -->
+                            <div class="w-route-card" style="border-right:1px solid #f1f5f9;">
+                                <div class="w-route-top">
+                                    <div class="w-route-id">S1-2X</div>
+                                    <div class="w-badges">
+                                        <span class="w-badge w-badge-red">DELAYED</span>
+                                        <span class="w-badge w-badge-green-dark">RUNNING</span>
+                                    </div>
+                                </div>
+                                <div class="w-route-info">
+                                    <div class="w-route-info-item">
+                                        <div class="lbl">Current Location</div>
+                                        <div class="val">Peelamedu</div>
+                                    </div>
+                                    <div class="w-route-info-item">
+                                        <div class="lbl">ETA</div>
+                                        <div class="val">10 - 15 min</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Card 3 -->
+                            <div class="w-route-card" style="border-right:1px solid #f1f5f9;">
+                                <div class="w-route-top">
+                                    <div class="w-route-id">70-3X</div>
+                                    <div class="w-badges">
+                                        <span class="w-badge w-badge-green">ON TIME</span>
+                                        <span class="w-badge w-badge-green-dark">RUNNING</span>
+                                    </div>
+                                </div>
+                                <div class="w-route-info">
+                                    <div class="w-route-info-item">
+                                        <div class="lbl">Current Location</div>
+                                        <div class="val">Ukkadam</div>
+                                    </div>
+                                    <div class="w-route-info-item">
+                                        <div class="lbl">ETA</div>
+                                        <div class="val">15 - 20 min</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Card 4 -->
+                            <div class="w-route-card">
+                                <div class="w-route-top">
+                                    <div class="w-route-id">11-4X</div>
+                                    <div class="w-badges">
+                                        <span class="w-badge w-badge-red">DELAYED</span>
+                                        <span class="w-badge w-badge-green-dark">RUNNING</span>
+                                    </div>
+                                </div>
+                                <div class="w-route-info">
+                                    <div class="w-route-info-item">
+                                        <div class="lbl">Current Location</div>
+                                        <div class="val">Railway Stn</div>
+                                    </div>
+                                    <div class="w-route-info-item">
+                                        <div class="lbl">ETA</div>
+                                        <div class="val">20 - 25 min</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="padding:0 16px 16px; display:flex; flex-wrap:wrap; gap:4px;">
+                        <span class="annotation-inline">Click any card to navigate to RouteDetails</span>
+                        <span class="annotation-inline">Cards use grid layout: 4-col desktop, 2-col tablet, 1-col mobile</span>
+                        <span class="annotation-inline">Orange bottom-border on hover</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-note">
+                <span class="icon">&#9432;</span>
+                <p>The TrackingDashboard auto-loads active buses via <code>api.getActiveBuses()</code> on mount. Search filters call <code>api.searchRoutes(boarding, destination, district)</code>. Session state (boarding, destination, routes) is persisted in sessionStorage to survive navigation.</p>
+            </div>
+        </div>
+
+        <!-- ========== SCREEN 2: ROUTE DETAILS ========== -->
+        <div class="screen-panel" id="screen-1">
+            <div class="screen-header">
+                <div class="component-label">RouteDetails.jsx + LiveMap.jsx</div>
+                <h2>2. Route Details Page</h2>
+                <p>Detailed view of a selected bus route showing live map, timeline of stops, large ETA display, SMS alert functionality, and action buttons for feedback/reporting.</p>
+            </div>
+
+            <div class="device-frame" style="position:relative">
+                <div class="device-notch-desktop">
+                    <div class="dot r"></div>
+                    <div class="dot y"></div>
+                    <div class="dot g"></div>
+                    <div class="url-bar">transitindia.vercel.app/#routeDetails</div>
+                </div>
+                <div class="wire-content">
+                    <!-- Header (same as tracking) -->
+                    <div class="w-header">
+                        <div class="logo-area">
+                            <div class="logo-box">TI</div>
+                            <div><div class="logo-text">TransitIndia</div><div class="logo-sub">GOVERNMENT OF INDIA</div></div>
+                        </div>
+                        <div class="w-header-actions">
+                            <div class="w-btn-sm">Home</div>
+                            <div class="w-btn-sm">EN &#9662;</div>
+                            <div class="w-dark-toggle">&#9788;</div>
+                            <div class="w-btn-red">&#9888;</div>
+                        </div>
+                    </div>
+
+                    <!-- Back Button -->
+                    <div class="w-back-btn">&#8592; Back to Search Results</div>
+
+                    <!-- Route Name -->
+                    <div style="padding:0 16px 6px; display:flex; align-items:center; gap:8px;">
+                        <span style="color:var(--saffron); font-size:18px;">&#128652;</span>
+                        <span style="font-size:16px; font-weight:900; color:var(--navy-light);">1C (Gandhipuram &rarr; Singanallur)</span>
+                    </div>
+
+                    <!-- Status Strip -->
+                    <div class="w-status-strip">
+                        <div class="w-status-pill on-time">
+                            <span class="dot"></span>
+                            On Time
+                        </div>
+                        <span style="font-size:11px; color:#94a3b8; font-weight:700;">&#10003; Trip confirmed at 10:00 AM</span>
+                    </div>
+
+                    <div style="padding:0 16px 4px;">
+                        <span class="annotation-inline">Status pill: green (On Time) or red (Delayed) with pulse animation</span>
+                    </div>
+
+                    <!-- Live Map Placeholder -->
+                    <div class="w-map-placeholder">
+                        <span class="map-icon">&#127758;</span>
+                        <span>LIVE MAP (Leaflet.js)</span>
+                        <span style="font-size:10px; color:#b0b0b0;">Bus position + stop markers rendered via LiveMap.jsx</span>
+                    </div>
+
+                    <div style="padding:0 16px 4px;">
+                        <span class="annotation-inline">Interactive Leaflet map with polyline route, stop markers, and bus icon</span>
+                    </div>
+
+                    <!-- ETA Card -->
+                    <div class="w-eta-card">
+                        <div style="display:grid; grid-template-columns: 7fr 5fr; gap:20px;">
+                            <!-- Left: ETA -->
+                            <div>
+                                <div style="font-size:10px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:2px; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+                                    <span style="width:24px;height:24px;border-radius:50%;background:var(--saffron);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;">&#9201;</span>
+                                    Estimated Arrival
+                                </div>
+                                <div style="margin-bottom:20px;">
+                                    <span class="w-eta-big">5 - 10</span>
+                                    <span class="w-eta-unit">min</span>
+                                </div>
+                                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">
+                                    <div>
+                                        <div style="font-size:9px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:1px;">From</div>
+                                        <div style="font-size:14px; font-weight:900; color:var(--navy-light);">Gandhipuram</div>
+                                    </div>
+                                    <div>
+                                        <div style="font-size:9px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:1px;">To</div>
+                                        <div style="font-size:14px; font-weight:900; color:var(--navy-light);">Singanallur</div>
+                                    </div>
+                                </div>
+
+                                <!-- Next Stop -->
+                                <div class="w-next-stop" style="margin:0;">
+                                    <div class="icon-circle">&#10148;</div>
+                                    <div>
+                                        <div class="lbl">Next Stop</div>
+                                        <div class="val">RS Puram Checkpost</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right: SMS + Actions -->
+                            <div style="background:#f8fafc; border-radius:12px; border:1px solid #e2e8f0; padding:16px;">
+                                <!-- SMS Alert -->
+                                <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+                                    <span style="width:28px;height:28px;border-radius:50%;background:var(--saffron);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;">&#9742;</span>
+                                    <div>
+                                        <div style="font-size:12px; font-weight:900; color:var(--navy-light);">Get SMS Alert</div>
+                                        <div style="font-size:9px; color:#94a3b8; font-weight:700;">Receive ETA on your phone</div>
+                                    </div>
+                                </div>
+                                <div style="display:flex; gap:6px; margin-bottom:12px;">
+                                    <div style="display:flex; flex:1;">
+                                        <span style="background:#f1f5f9; border:1px solid #e2e8f0; padding:7px 8px; border-radius:8px 0 0 8px; font-size:11px; font-weight:700; color:#64748b;">+91</span>
+                                        <div class="w-input" style="border-radius:0 8px 8px 0; border-left:none; margin:0; flex:1;">Mobile number</div>
+                                    </div>
+                                    <div style="width:36px; height:36px; background:var(--saffron); border-radius:8px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:14px;">&#9993;</div>
+                                </div>
+
+                                <div style="padding:0 0 4px;">
+                                    <span class="annotation-inline">SNS SMS via api.notifyETA()</span>
+                                </div>
+
+                                <!-- Route Info -->
+                                <div style="background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:10px; display:grid; grid-template-columns:1fr 1fr; gap:8px; text-align:center; margin-bottom:14px;">
+                                    <div>
+                                        <div style="font-size:9px; font-weight:700; color:#94a3b8; letter-spacing:1px;">BUS ID</div>
+                                        <div style="font-size:12px; font-weight:900; color:var(--navy-light);">1C-1X</div>
+                                    </div>
+                                    <div>
+                                        <div style="font-size:9px; font-weight:700; color:#94a3b8; letter-spacing:1px;">SOURCE</div>
+                                        <div style="font-size:12px; font-weight:900; color:var(--navy-light);">GPS</div>
+                                    </div>
+                                </div>
+
+                                <!-- Action buttons -->
+                                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
+                                    <div style="padding:8px; background:#fff; border:1px solid #e2e8f0; border-radius:8px; text-align:center; font-size:11px; font-weight:700; color:var(--navy-light);">Feedback</div>
+                                    <div style="padding:8px; background:#fff; border:1px solid #e2e8f0; border-radius:8px; text-align:center; font-size:11px; font-weight:700; color:var(--navy-light);">Report Issue</div>
+                                </div>
+
+                                <div style="text-align:center; font-size:9px; font-weight:700; color:var(--green); text-transform:uppercase; letter-spacing:1.5px; display:flex; align-items:center; justify-content:center; gap:6px;">
+                                    <span style="width:6px;height:6px;border-radius:50%;background:var(--green);"></span>
+                                    Real-time GPS sync active
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-note">
+                <span class="icon">&#9432;</span>
+                <p>RouteDetails loads map data via <code>api.getRouteMapData(routeId)</code> which returns stop coordinates and live bus position. The LiveMap.jsx component renders a Leaflet map with polyline routing and animated bus marker. SMS alerts are sent via AWS SNS through <code>api.notifyETA()</code>.</p>
+            </div>
+        </div>
+
+        <!-- ========== SCREEN 3: EMERGENCY DASHBOARD ========== -->
+        <div class="screen-panel" id="screen-2">
+            <div class="screen-header">
+                <div class="component-label">EmergencyDashboard.jsx</div>
+                <h2>3. Emergency Dashboard</h2>
+                <p>Safety-critical screen with one-tap emergency calling, incident category escalation panel, and legal warnings. Features countdown-to-dial modal and GPS-verified escalation submission.</p>
+            </div>
+
+            <div class="device-frame phone" style="position:relative">
+                <div class="device-notch"><div class="notch-pill"></div></div>
+                <div class="wire-content">
+                    <!-- Header -->
+                    <div class="w-header">
+                        <div class="logo-area">
+                            <div class="logo-box" style="width:28px;height:28px;font-size:8px;">TI</div>
+                            <div><div class="logo-text" style="font-size:13px;">TransitIndia</div></div>
+                        </div>
+                        <div class="w-header-actions">
+                            <div class="w-btn-red" style="width:24px;height:24px;font-size:10px;">&#9888;</div>
+                        </div>
+                    </div>
+
+                    <!-- Sub Navigation -->
+                    <div class="w-nav-tabs">
+                        <div class="tab">Home</div>
+                        <div class="tab">Tracking</div>
+                        <div class="tab active">&#128737; Safety</div>
+                        <div class="tab">Account</div>
+                    </div>
+
+                    <div style="padding:0 16px 4px; margin-top:8px;">
+                        <span class="annotation-inline">Sub-navigation highlights active Safety tab</span>
+                    </div>
+
+                    <!-- Section Header -->
+                    <div class="w-section-title">Emergency Support</div>
+                    <div class="w-section-sub">Your safety is our priority. Access immediate help and report incidents.</div>
+
+                    <!-- Escalation Panel -->
+                    <div class="w-escalation-card">
+                        <div class="w-escalation-header">
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <span>&#128652;</span>
+                                <div>
+                                    <div style="font-size:10px; font-weight:700; opacity:0.8;">ACTIVE TRANSIT SESSION</div>
+                                    <div class="title">Route 500A-1 <span style="opacity:0.7;">KA-01-F-1234</span></div>
+                                </div>
+                            </div>
+                            <div class="gps-badge">&#9679; LIVE GPS VERIFIED</div>
+                        </div>
+
+                        <div style="padding:16px 16px 8px;">
+                            <div style="font-size:15px; font-weight:800; color:var(--navy-light); margin-bottom:4px;">Verified Escalation Panel</div>
+                        </div>
+
+                        <div class="w-category-grid">
+                            <div class="w-category-btn">
+                                <div class="w-category-icon" style="background:#fee2e2; color:#dc2626;">&#128721;</div>
+                                <div class="w-category-label">Harassment</div>
+                            </div>
+                            <div class="w-category-btn selected">
+                                <div class="w-category-icon" style="background:var(--saffron); color:#fff;">&#9888;</div>
+                                <div class="w-category-label">Threat to Life</div>
+                                <span style="color:var(--saffron); font-size:14px; margin-left:auto;">&#10003;</span>
+                            </div>
+                            <div class="w-category-btn">
+                                <div class="w-category-icon" style="background:#fee2e2; color:#dc2626;">&#9876;</div>
+                                <div class="w-category-label">Fight in Bus</div>
+                            </div>
+                            <div class="w-category-btn">
+                                <div class="w-category-icon" style="background:#fee2e2; color:#dc2626;">&#128100;</div>
+                                <div class="w-category-label">Staff Misconduct</div>
+                            </div>
+                        </div>
+
+                        <div style="padding:0 16px 16px;">
+                            <div class="w-btn w-btn-primary" style="width:100%; justify-content:center; background:var(--navy-light); color:#fff; padding:14px; text-transform:uppercase; letter-spacing:2px; font-size:11px; border-radius:10px;">
+                                &#9993; REQUEST ESCALATION
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="padding:0 16px 4px;">
+                        <span class="annotation-inline">Escalation submitted via api.submitSafetyEscalation() with GPS coords</span>
+                    </div>
+
+                    <!-- Legal Warning -->
+                    <div class="w-legal-strip">
+                        <span class="icon">&#9888;</span>
+                        <div class="text">
+                            <strong>IMPORTANT LEGAL NOTICE:</strong> Misuse of these emergency services results in severe criminal penalties. All escalations are logged with verified GPS and device credentials.
+                        </div>
+                    </div>
+
+                    <!-- Emergency Contacts -->
+                    <div class="w-section-title" style="font-size:14px;">Emergency Contacts</div>
+
+                    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; padding:8px 16px 20px;">
+                        <!-- Police -->
+                        <div class="w-helpline-card">
+                            <div class="w-helpline-icon" style="background:#fee2e2; color:#dc2626;">&#128110;</div>
+                            <div class="w-helpline-name">Police</div>
+                            <div class="w-helpline-number">112</div>
+                            <div class="w-helpline-btn" style="background:#ef4444;">DIAL NOW</div>
+                        </div>
+                        <!-- Ambulance -->
+                        <div class="w-helpline-card">
+                            <div class="w-helpline-icon" style="background:#dbeafe; color:#2563eb;">&#10010;</div>
+                            <div class="w-helpline-name">Ambulance</div>
+                            <div class="w-helpline-number">108</div>
+                            <div class="w-helpline-btn" style="background:#3b82f6;">DIAL NOW</div>
+                        </div>
+                        <!-- Women Safety -->
+                        <div class="w-helpline-card">
+                            <div class="w-helpline-icon" style="background:#ede9fe; color:#7c3aed;">&#128694;</div>
+                            <div class="w-helpline-name">Women Safety</div>
+                            <div class="w-helpline-number">1091</div>
+                            <div class="w-helpline-btn" style="background:#8b5cf6;">DIAL NOW</div>
+                        </div>
+                    </div>
+
+                    <div style="padding:0 16px 16px; display:flex; flex-wrap:wrap; gap:4px;">
+                        <span class="annotation-inline">DIAL NOW triggers 5s countdown modal before tel: redirect</span>
+                        <span class="annotation-inline">User can dial immediately or cancel</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-note">
+                <span class="icon">&#9432;</span>
+                <p>The Emergency Dashboard uses a countdown-to-dial pattern for safety: pressing DIAL NOW shows a 5-second countdown with options to Dial Immediately or Cancel. Escalations are sent to the backend via <code>api.submitSafetyEscalation()</code> with the incident category and route ID. A success modal confirms logging.</p>
+            </div>
+        </div>
+
+        <!-- ========== SCREEN 4: OPERATOR LOGIN ========== -->
+        <div class="screen-panel" id="screen-3">
+            <div class="screen-header">
+                <div class="component-label">Login.jsx</div>
+                <h2>4. Operator Login</h2>
+                <p>Clean, minimal login screen for bus operators. Features phone number input with +91 prefix, visual CAPTCHA challenge with refresh button, terms acceptance checkbox, and OTP trigger.</p>
+            </div>
+
+            <div class="device-frame phone">
+                <div class="device-notch"><div class="notch-pill"></div></div>
+                <div class="wire-content">
+                    <div class="w-header">
+                        <div class="logo-area">
+                            <div class="logo-box" style="width:28px;height:28px;font-size:8px;">TI</div>
+                            <div><div class="logo-text" style="font-size:13px;">TransitIndia</div></div>
+                        </div>
+                        <div class="w-header-actions">
+                            <div class="w-btn-sm" style="font-size:9px;">EN &#9662;</div>
+                            <div class="w-dark-toggle" style="width:24px;height:24px;font-size:12px;">&#9788;</div>
+                        </div>
+                    </div>
+
+                    <div style="text-align:center; padding:20px 16px 4px;">
+                        <div style="font-size:11px; font-weight:700; color:#94a3b8; letter-spacing:2px; text-transform:uppercase;">Operator Login</div>
+                    </div>
+
+                    <div class="w-login-card">
+                        <div style="margin-bottom:20px;">
+                            <div style="font-size:22px; font-weight:900; color:var(--navy-light); margin-bottom:6px;">Sign in to manage bus routes and activate trips.</div>
+                            <div style="font-size:12px; color:#94a3b8;">Enter your 10-digit mobile number to receive a secure OTP.</div>
+                        </div>
+
+                        <!-- Mobile Number -->
+                        <div class="w-field">
+                            <label>Mobile Number</label>
+                            <div style="display:flex;">
+                                <span style="background:#f1f5f9; border:1px solid #e2e8f0; padding:10px 12px; border-radius:8px 0 0 8px; font-size:12px; font-weight:700; color:#64748b;">+91</span>
+                                <div class="w-input" style="border-radius:0 8px 8px 0; border-left:none; flex:1;">Enter 10-digit mobile number</div>
+                            </div>
+                        </div>
+
+                        <!-- CAPTCHA -->
+                        <div class="w-captcha-box" style="margin-bottom:16px;">
+                            <div style="display:flex; align-items:center; gap:6px; margin-bottom:10px;">
+                                <span style="color:var(--green); font-size:14px;">&#9745;</span>
+                                <span style="font-size:12px; font-weight:700; color:var(--navy-light);">Security Verification</span>
+                            </div>
+                            <div style="display:flex; gap:8px; margin-bottom:10px;">
+                                <div class="w-captcha-display" style="flex:1;">H K 9 2 Q</div>
+                                <div style="width:36px; height:36px; background:#fff; border:1px solid #e2e8f0; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#64748b; font-size:16px; cursor:default;">&#8635;</div>
+                            </div>
+                            <div class="w-input">Enter CAPTCHA</div>
+                        </div>
+
+                        <div style="padding:0 0 4px;">
+                            <span class="annotation-inline">CAPTCHA pool: 8 random alphanumeric strings, refresh button cycles</span>
+                        </div>
+
+                        <!-- Terms -->
+                        <div style="display:flex; align-items:flex-start; gap:8px; margin-bottom:18px;">
+                            <div style="width:16px; height:16px; border:2px solid #e2e8f0; border-radius:4px; margin-top:1px; flex-shrink:0;"></div>
+                            <span style="font-size:11px; color:#94a3b8;">I agree to the Terms of Service and Privacy Policy</span>
+                        </div>
+
+                        <!-- Submit -->
+                        <div class="w-btn w-btn-primary" style="width:100%; justify-content:center; padding:14px; text-transform:uppercase; letter-spacing:2px; font-size:11px; border-radius:10px;">
+                            SEND OTP <span>&#8594;</span>
+                        </div>
+
+                        <div style="text-align:center; margin-top:16px; padding-top:14px; border-top:1px solid #f1f5f9;">
+                            <span style="font-size:12px; color:#94a3b8;">Facing issues logging in? </span>
+                            <span style="font-size:12px; font-weight:700; color:var(--navy-light);">Contact Helpdesk</span>
+                        </div>
+                    </div>
+
+                    <div style="padding:0 16px 16px;">
+                        <span class="annotation-inline">OTP sent via AWS SNS using api.sendOTP(mobile)</span>
+                        <span class="annotation-inline">On success, navigates to OTP verification screen</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-note">
+                <span class="icon">&#9432;</span>
+                <p>CAPTCHA validation is client-side against a pool of 8 predefined strings (case-insensitive, whitespace-ignored). On successful validation, <code>api.sendOTP(mobile)</code> triggers AWS SNS to deliver a 6-digit OTP. If SMS delivery fails, a debug OTP is returned for testing.</p>
+            </div>
+        </div>
+
+        <!-- ========== SCREEN 5: OTP VERIFICATION ========== -->
+        <div class="screen-panel" id="screen-4">
+            <div class="screen-header">
+                <div class="component-label">OTP.jsx</div>
+                <h2>5. OTP Verification</h2>
+                <p>Six individual digit input boxes with auto-focus progression, masked phone display, resend OTP option, and gradient verify button. Redirects to Operator Dashboard on success.</p>
+            </div>
+
+            <div class="device-frame phone">
+                <div class="device-notch"><div class="notch-pill"></div></div>
+                <div class="wire-content">
+                    <div class="w-header">
+                        <div class="logo-area">
+                            <div class="logo-box" style="width:28px;height:28px;font-size:8px;">TI</div>
+                            <div><div class="logo-text" style="font-size:13px;">TransitIndia</div></div>
+                        </div>
+                        <div class="w-header-actions">
+                            <div class="w-btn-sm" style="font-size:9px;">EN &#9662;</div>
+                        </div>
+                    </div>
+
+                    <div style="padding:24px 16px;">
+                        <div style="background:#fff; border-radius:16px; border:1px solid #e2e8f0; padding:28px 20px; text-align:center; box-shadow:0 4px 20px rgba(0,0,0,0.06); position:relative;">
+                            <!-- Back button -->
+                            <div style="position:absolute; top:16px; left:16px; color:#94a3b8; font-size:18px;">&#8592;</div>
+
+                            <div style="font-size:24px; font-weight:900; color:var(--navy-light); text-transform:uppercase; margin-bottom:4px;">OTP Verification</div>
+                            <div style="font-size:12px; color:#94a3b8; margin-bottom:6px;">Enter the 6-digit code sent to your registered mobile number</div>
+                            <div style="font-size:11px; color:#b0b0b0; margin-bottom:8px;">Sent to +91 9876****90</div>
+
+                            <!-- Orange divider -->
+                            <div style="width:48px; height:3px; background:var(--saffron); border-radius:10px; margin:0 auto 8px;"></div>
+
+                            <!-- Debug OTP box -->
+                            <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; padding:10px; margin-bottom:16px;">
+                                <div style="font-size:10px; color:#2563eb; font-weight:600;">SMS delivery unavailable. Your OTP:</div>
+                                <div style="font-size:22px; font-weight:900; color:#1d4ed8; letter-spacing:8px; margin-top:4px;">4 8 2 7 1 5</div>
+                            </div>
+
+                            <div style="padding:0 0 4px;">
+                                <span class="annotation-inline">Debug OTP shown when SMS delivery unavailable (dev/testing)</span>
+                            </div>
+
+                            <!-- OTP Boxes -->
+                            <div class="w-otp-boxes">
+                                <div class="w-otp-box filled">4</div>
+                                <div class="w-otp-box filled">8</div>
+                                <div class="w-otp-box filled">2</div>
+                                <div class="w-otp-box filled">7</div>
+                                <div class="w-otp-box">_</div>
+                                <div class="w-otp-box">_</div>
+                            </div>
+
+                            <div style="padding:0 0 4px;">
+                                <span class="annotation-inline">Auto-focus advances to next box on input</span>
+                                <span class="annotation-inline">Backspace returns to previous box</span>
+                            </div>
+
+                            <!-- Resend -->
+                            <div style="font-size:12px; color:#94a3b8; margin:14px 0;">
+                                Didn't receive the code?
+                                <span style="font-weight:700; color:var(--navy-light); cursor:default;"> Resend OTP</span>
+                            </div>
+
+                            <!-- Verify Button -->
+                            <div style="width:100%; padding:14px; background:linear-gradient(135deg, var(--saffron), #fb923c); color:#fff; font-weight:800; font-size:12px; text-transform:uppercase; letter-spacing:2px; border-radius:12px; text-align:center; box-shadow:0 4px 14px rgba(245,158,11,0.39);">
+                                VERIFY OTP SECURELY &#8594;
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-note">
+                <span class="icon">&#9432;</span>
+                <p>OTP verification calls <code>api.verifyOTP(phone, otpCode)</code>. On success, the response contains an auth token and operator ID which are stored in sessionStorage. The user is then navigated to the Operator Dashboard. Resend button triggers a new OTP via <code>api.sendOTP(phone)</code>.</p>
+            </div>
+        </div>
+
+        <!-- ========== SCREEN 6: OPERATOR DASHBOARD ========== -->
+        <div class="screen-panel" id="screen-5">
+            <div class="screen-header">
+                <div class="component-label">OperatorDashboard.jsx</div>
+                <h2>6. Operator Dashboard</h2>
+                <p>Admin-level interface for bus operators to view routes, inspect stop sequences, activate buses on routes, and manage running trips. Features a two-panel layout with route list and active trips sidebar.</p>
+            </div>
+
+            <div class="device-frame" style="position:relative">
+                <div class="device-notch-desktop">
+                    <div class="dot r"></div>
+                    <div class="dot y"></div>
+                    <div class="dot g"></div>
+                    <div class="url-bar">transitindia.vercel.app/#operatorDashboard</div>
+                </div>
+                <div class="wire-content">
+                    <!-- Header -->
+                    <div class="w-header">
+                        <div class="logo-area">
+                            <div class="logo-box">TI</div>
+                            <div><div class="logo-text">TransitIndia</div><div class="logo-sub">GOVERNMENT OF INDIA</div></div>
+                        </div>
+                        <div class="w-header-actions">
+                            <div class="w-btn-sm">Home</div>
+                            <div class="w-btn-sm w-btn-saffron">Dashboard</div>
+                            <div class="w-btn-sm">EN &#9662;</div>
+                            <div class="w-dark-toggle">&#9788;</div>
+                            <div class="w-btn-red">&#9888;</div>
+                        </div>
+                    </div>
+
+                    <!-- Dashboard Header -->
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 16px 8px;">
+                        <div>
+                            <div style="font-size:18px; font-weight:900; color:var(--navy-light); text-transform:uppercase; letter-spacing:1px;">Operator Dashboard</div>
+                            <div style="font-size:11px; color:#94a3b8;">Select a route, enter bus number, and activate</div>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:6px; padding:6px 12px; background:#f1f5f9; border-radius:8px; font-size:11px; color:#64748b; font-weight:600;">
+                            &#8635; <span>Refresh</span>
+                        </div>
+                    </div>
+
+                    <!-- Two-Panel Layout -->
+                    <div class="w-op-grid">
+                        <!-- Left: Route List -->
+                        <div>
+                            <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
+                                <span style="color:var(--saffron); font-size:16px;">&#128205;</span>
+                                <span style="font-size:14px; font-weight:800; color:var(--navy-light);">Coimbatore Routes (5)</span>
+                            </div>
+
+                            <div class="w-route-list">
+                                <!-- Route 1 (Expanded) -->
+                                <div>
+                                    <div class="w-route-list-item" style="background:#f8fafc;">
+                                        <div style="display:flex; align-items:center;">
+                                            <div class="route-icon">&#128652;</div>
+                                            <div class="route-info">
+                                                <div class="route-name">Gandhipuram - Singanallur</div>
+                                                <div class="route-stops">8 stops</div>
+                                            </div>
+                                        </div>
+                                        <div class="chevron">&#9660;</div>
+                                    </div>
+                                    <!-- Expanded content -->
+                                    <div class="w-route-expanded">
+                                        <div style="font-size:10px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">Stop Sequence</div>
+                                        <div class="w-stops-flow">
+                                            <div class="w-stop-chip"><span class="num">1</span>Gandhipuram</div>
+                                            <div class="w-stop-chip"><span class="num">2</span>RS Puram</div>
+                                            <div class="w-stop-chip"><span class="num">3</span>Town Hall</div>
+                                            <div class="w-stop-chip"><span class="num">4</span>Ukkadam</div>
+                                            <div class="w-stop-chip"><span class="num">5</span>Nanjundapuram</div>
+                                            <div class="w-stop-chip"><span class="num">6</span>Race Course</div>
+                                            <div class="w-stop-chip"><span class="num">7</span>Singanallur Jn</div>
+                                            <div class="w-stop-chip"><span class="num">8</span>Singanallur BS</div>
+                                        </div>
+                                        <div class="w-activate-row">
+                                            <input value="Bus number (e.g. 42A)" readonly />
+                                            <div class="w-activate-btn">&#9211; Activate Bus</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Route 2 -->
+                                <div class="w-route-list-item">
+                                    <div style="display:flex; align-items:center;">
+                                        <div class="route-icon">&#128652;</div>
+                                        <div class="route-info">
+                                            <div class="route-name">Ukkadam - Marudhamalai</div>
+                                            <div class="route-stops">6 stops</div>
+                                        </div>
+                                    </div>
+                                    <div class="chevron">&#9654;</div>
+                                </div>
+                                <!-- Route 3 -->
+                                <div class="w-route-list-item">
+                                    <div style="display:flex; align-items:center;">
+                                        <div class="route-icon">&#128652;</div>
+                                        <div class="route-info">
+                                            <div class="route-name">Railway Station - Saravanampatti</div>
+                                            <div class="route-stops">10 stops</div>
+                                        </div>
+                                    </div>
+                                    <div class="chevron">&#9654;</div>
+                                </div>
+                                <!-- Route 4 -->
+                                <div class="w-route-list-item">
+                                    <div style="display:flex; align-items:center;">
+                                        <div class="route-icon">&#128652;</div>
+                                        <div class="route-info">
+                                            <div class="route-name">Peelamedu - Thudiyalur</div>
+                                            <div class="route-stops">7 stops</div>
+                                        </div>
+                                    </div>
+                                    <div class="chevron">&#9654;</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right: Active Buses -->
+                        <div>
+                            <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
+                                <span style="color:var(--green); font-size:16px;">&#128652;</span>
+                                <span style="font-size:14px; font-weight:800; color:var(--navy-light);">Active Buses (2)</span>
+                            </div>
+
+                            <div class="w-active-panel">
+                                <!-- Active Trip 1 -->
+                                <div class="w-active-trip">
+                                    <div class="w-active-trip-header">
+                                        <div>
+                                            <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+                                                <span class="w-running-badge">&#9679; RUNNING</span>
+                                                <span style="font-size:13px; font-weight:900; color:var(--navy-light);">TN-42-A-1234</span>
+                                            </div>
+                                            <div style="font-size:11px; color:#94a3b8;">Gandhipuram - Singanallur</div>
+                                            <div style="font-size:10px; color:#b0b0b0; margin-top:2px;">Since 08:30 AM</div>
+                                        </div>
+                                        <div class="w-deactivate-btn">&#9211; Deactivate</div>
+                                    </div>
+                                </div>
+                                <!-- Active Trip 2 -->
+                                <div class="w-active-trip">
+                                    <div class="w-active-trip-header">
+                                        <div>
+                                            <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+                                                <span class="w-running-badge">&#9679; RUNNING</span>
+                                                <span style="font-size:13px; font-weight:900; color:var(--navy-light);">TN-42-B-5678</span>
+                                            </div>
+                                            <div style="font-size:11px; color:#94a3b8;">Ukkadam - Marudhamalai</div>
+                                            <div style="font-size:10px; color:#b0b0b0; margin-top:2px;">Since 09:15 AM</div>
+                                        </div>
+                                        <div class="w-deactivate-btn">&#9211; Deactivate</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="padding:0 16px 16px; display:flex; flex-wrap:wrap; gap:4px;">
+                        <span class="annotation-inline">Routes fetched via api.getOperatorRoutes()</span>
+                        <span class="annotation-inline">Stop detail via api.getRouteDetail(routeId)</span>
+                        <span class="annotation-inline">Activate via api.activateTrip()</span>
+                        <span class="annotation-inline">Active trips via api.getActiveTrips(operatorId)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-note">
+                <span class="icon">&#9432;</span>
+                <p>The Operator Dashboard uses a two-column layout: left panel shows all available routes (clickable to expand stop sequences), right panel shows currently active trips. Activating a trip calls <code>api.activateTrip(routeId, busNumber, operatorId)</code>. Deactivation calls <code>api.deactivateTrip(tripId)</code> and refreshes the active trips list.</p>
+            </div>
+        </div>
+
+        <!-- ========== SCREEN 7: FEEDBACK & REPORTING ========== -->
+        <div class="screen-panel" id="screen-6">
+            <div class="screen-header">
+                <div class="component-label">ServiceReporting.jsx</div>
+                <h2>7. Feedback / Service Reporting</h2>
+                <p>Dual-purpose screen combining trip satisfaction feedback (Satisfied/Unsatisfied) with a formal service concern reporting form. Includes incident type selector, additional details textarea, and legal disclaimers.</p>
+            </div>
+
+            <div class="device-frame phone" style="position:relative">
+                <div class="device-notch"><div class="notch-pill"></div></div>
+                <div class="wire-content">
+                    <!-- Reporting-specific header (full-width, no Hero) -->
+                    <div class="w-report-header">
+                        <div class="left">
+                            <div class="logo-sm">&#128652;</div>
+                            <div class="title-area">
+                                <h3>Service Reporting & Trip Feedback</h3>
+                                <div class="sub">GOVERNMENT TRANSPORT DEPARTMENT</div>
+                            </div>
+                        </div>
+                        <div class="actions">
+                            <span>&#128276;</span>
+                            <span>&#127968;</span>
+                        </div>
+                    </div>
+
+                    <div style="padding:0 16px 4px; margin-top:8px;">
+                        <span class="annotation-inline">This screen has its own header (no Hero.jsx) since currentPage === 'service-reporting'</span>
+                    </div>
+
+                    <!-- Trip Feedback Section -->
+                    <div style="margin:12px 16px; background:#fff; border-radius:12px; border:1px solid #e2e8f0; overflow:hidden;">
+                        <div style="background:#fff7ed; padding:12px 16px; border-bottom:1px solid #e2e8f0; display:flex; align-items:center; gap:8px;">
+                            <span style="color:var(--navy-light); font-size:16px;">&#128172;</span>
+                            <span style="font-size:14px; font-weight:800; color:var(--navy-light);">Trip Feedback</span>
+                        </div>
+                        <div style="padding:16px; text-align:center;">
+                            <div style="font-size:12px; color:#64748b; margin-bottom:16px; max-width:300px; margin-left:auto; margin-right:auto;">Your feedback is vital for continuous service improvement and maintaining high standards of public transport.</div>
+
+                            <div class="w-feedback-buttons">
+                                <div style="text-align:center;">
+                                    <div class="w-feedback-circle selected-good" style="color:#fff;">&#128077;</div>
+                                    <div style="font-size:11px; font-weight:700; color:var(--navy-light);">Satisfied</div>
+                                </div>
+                                <div style="text-align:center;">
+                                    <div class="w-feedback-circle">&#128078;</div>
+                                    <div style="font-size:11px; font-weight:700; color:#94a3b8;">Unsatisfied</div>
+                                </div>
+                            </div>
+
+                            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:10px; font-size:10px; color:#94a3b8; font-style:italic; text-align:left;">
+                                <strong style="font-style:normal;">LEGAL DISCLAIMER</strong><br />
+                                Feedback provided is recorded for quality assurance purposes. Personal data is handled according to the National Data Protection Policy.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="padding:0 16px 4px;">
+                        <span class="annotation-inline">Feedback type: 'Satisfactory' or 'Needs Improvement' sent via api.submitFeedback()</span>
+                    </div>
+
+                    <!-- Reporting Service Section -->
+                    <div style="margin:0 16px 16px; background:#fff; border-radius:12px; border:1px solid #e2e8f0; overflow:hidden;">
+                        <div style="background:var(--navy-light); padding:12px 16px; display:flex; align-items:center; gap:8px; color:#fff;">
+                            <span style="color:var(--saffron);">&#9888;</span>
+                            <span style="font-size:14px; font-weight:800;">Reporting Service</span>
+                        </div>
+                        <div style="padding:16px;">
+                            <!-- Route search -->
+                            <div class="w-field">
+                                <label>Ask for Bus Route / Route Number</label>
+                                <div style="display:flex; align-items:center; gap:0;">
+                                    <span style="background:#f8fafc; border:1px solid #e2e8f0; border-right:none; padding:10px; border-radius:8px 0 0 8px; color:#94a3b8; font-size:14px;">&#128269;</span>
+                                    <div class="w-input" style="border-radius:0 8px 8px 0; border-left:none; flex:1;">500A-1</div>
+                                </div>
+                            </div>
+
+                            <!-- Concern Type -->
+                            <div class="w-field">
+                                <label>Type of Concern</label>
+                                <div class="w-concern-grid">
+                                    <div class="w-concern-btn selected">&#9889; Rash Driving</div>
+                                    <div class="w-concern-btn">&#128100; Misconduct</div>
+                                    <div class="w-concern-btn">&#128101; Overcrowding</div>
+                                </div>
+                            </div>
+
+                            <!-- Additional Details -->
+                            <div class="w-field">
+                                <label>Additional Details (Optional)</label>
+                                <div class="w-input" style="height:80px; border-style:dashed;">Describe the incident in brief...</div>
+                            </div>
+
+                            <!-- Warning -->
+                            <div style="background:#fff7ed; border-left:3px solid var(--saffron); padding:10px 12px; border-radius:0 8px 8px 0; margin-bottom:14px; display:flex; align-items:flex-start; gap:8px;">
+                                <span style="color:var(--saffron); font-size:14px; flex-shrink:0;">&#9432;</span>
+                                <span style="font-size:10px; font-weight:700; color:#9a3412;">IMPORTANT: All reports are logged for pattern-based analysis and are subject to review by relevant transport authorities.</span>
+                            </div>
+
+                            <!-- Submit -->
+                            <div style="width:100%; padding:14px; background:#f25e22; color:#fff; font-weight:800; font-size:12px; border-radius:10px; text-align:center;">
+                                &#9993; Submit Report
+                            </div>
+
+                            <!-- Legal warning -->
+                            <div style="background:#fee2e2; border:1px solid #fca5a5; border-radius:8px; padding:10px; margin-top:12px; display:flex; align-items:flex-start; gap:8px;">
+                                <span style="color:var(--red); font-size:14px; flex-shrink:0;">&#9888;</span>
+                                <span style="font-size:10px; font-weight:700; color:#991b1b;">WARNING: Misuse of this service results in severe crime under suitable sections of the Penal Code.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-note">
+                <span class="icon">&#9432;</span>
+                <p>ServiceReporting.jsx renders its own header (bypassing Hero.jsx). The feedback section sends satisfaction data via <code>api.submitFeedback(route, feedbackType, 'Web')</code>. The reporting section lets users flag Rash Driving, Misconduct, or Overcrowding with optional text details. A success modal with government branding confirms submission.</p>
+            </div>
+        </div>
+
+        <!-- ========== SCREEN 8: SMS VIEW ========== -->
+        <div class="screen-panel" id="screen-7">
+            <div class="screen-header">
+                <div class="component-label">Conceptual SMS Interface (via AWS SNS)</div>
+                <h2>8. Mobile SMS View</h2>
+                <p>Conceptual mockup showing how users interact with Transit India via SMS. Users text a bus route query and receive a formatted status response. Powered by AWS SNS integration from the RouteDetails screen.</p>
+            </div>
+
+            <div class="device-frame phone">
+                <div class="device-notch"><div class="notch-pill"></div></div>
+                <div class="wire-content" style="background:#e5e5ea; min-height:auto;">
+                    <!-- SMS Header -->
+                    <div class="w-sms-header">
+                        <div class="contact">Transit India</div>
+                        <div class="sub">SMS &bull; +91-TRANSIT</div>
+                    </div>
+
+                    <!-- SMS Conversation -->
+                    <div class="w-sms-container">
+                        <div class="w-sms-time">Today 10:42 AM</div>
+
+                        <!-- User sends -->
+                        <div class="w-sms-bubble w-sms-sent">
+                            BUS 42B Adyar
+                        </div>
+
+                        <!-- System replies -->
+                        <div class="w-sms-bubble w-sms-received">
+                            <div style="font-weight:700; margin-bottom:6px; color:#1c1c1e;">TRANSIT INDIA</div>
+                            <div style="font-size:12px; line-height:1.6;">
+                                <div style="margin-bottom:6px; padding-bottom:6px; border-bottom:1px solid #f0f0f0;">
+                                    &#128652; <strong>Bus 42B</strong> - Adyar Route
+                                </div>
+                                <div>&#9989; Status: <strong style="color:#16a34a;">RUNNING (On Time)</strong></div>
+                                <div>&#128205; Current: <strong>Thiruvanmiyur</strong></div>
+                                <div>&#9201; ETA to Adyar: <strong>8-12 min</strong></div>
+                                <div>&#128652; Type: Ordinary</div>
+                                <div style="margin-top:6px; padding-top:6px; border-top:1px solid #f0f0f0; font-size:11px; color:#8e8e93;">
+                                    Last updated: 10:42 AM<br />
+                                    Source: GPS Verified
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="w-sms-time">10:43 AM</div>
+
+                        <!-- User sends another query -->
+                        <div class="w-sms-bubble w-sms-sent">
+                            BUS 1C Gandhipuram
+                        </div>
+
+                        <!-- System replies -->
+                        <div class="w-sms-bubble w-sms-received">
+                            <div style="font-weight:700; margin-bottom:6px; color:#1c1c1e;">TRANSIT INDIA</div>
+                            <div style="font-size:12px; line-height:1.6;">
+                                <div style="margin-bottom:6px; padding-bottom:6px; border-bottom:1px solid #f0f0f0;">
+                                    &#128652; <strong>Bus 1C</strong> - Gandhipuram Route
+                                </div>
+                                <div>&#9888; Status: <strong style="color:#dc2626;">DELAYED</strong></div>
+                                <div>&#128205; Current: <strong>RS Puram</strong></div>
+                                <div>&#9201; ETA to Gandhipuram: <strong>15-20 min</strong></div>
+                                <div>&#128652; Type: City Bus</div>
+                                <div>&#9888; Delay: Traffic Congestion</div>
+                                <div style="margin-top:6px; padding-top:6px; border-top:1px solid #f0f0f0; font-size:11px; color:#8e8e93;">
+                                    Last updated: 10:43 AM<br />
+                                    Source: GPS Verified
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="w-sms-time" style="margin-top:8px;">
+                            <span style="background:#fff; padding:4px 12px; border-radius:12px; font-size:10px; color:#8e8e93;">
+                                SMS powered by AWS SNS
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Input bar -->
+                    <div class="w-sms-input-bar">
+                        <div class="w-sms-input">BUS [route] [stop name]</div>
+                        <div class="w-sms-send-btn">&#9652;</div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:16px;">
+                <span class="annotation-inline">User format: BUS [route_id] [stop_name]</span>
+                <span class="annotation-inline">Response includes: Status, Current Location, ETA, Bus Type, Delay Reason</span>
+                <span class="annotation-inline">Triggered from RouteDetails via api.notifyETA() through AWS SNS</span>
+            </div>
+
+            <div class="info-note">
+                <span class="icon">&#9432;</span>
+                <p>The SMS interface is triggered from the RouteDetails screen's "Get SMS Alert" feature. When a user enters their phone number and taps send, <code>api.notifyETA(phone, routeId, routeName, currentStop, destination, eta)</code> sends a formatted SMS via AWS SNS. This conceptual view shows the user-facing SMS conversation experience.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ===== FOOTER ===== -->
+    <div class="tri-stripe"><div class="s"></div><div class="w"></div><div class="g"></div></div>
+    <footer class="page-footer">
+        <p><strong>Transit India</strong> &mdash; UI Wireframe Document</p>
+        <p style="margin-top:4px;">College Project Submission &bull; React + FastAPI + AWS &bull; March 2026</p>
+        <p style="margin-top:8px; color:#334155; font-size:11px;">Components: Hero.jsx &bull; TrackingDashboard.jsx &bull; RouteDetails.jsx &bull; LiveMap.jsx &bull; EmergencyDashboard.jsx &bull; Login.jsx &bull; OTP.jsx &bull; OperatorDashboard.jsx &bull; ServiceReporting.jsx</p>
+    </footer>
+
+    <!-- ===== JAVASCRIPT ===== -->
+    <script>
+        function showScreen(index, btn) {
+            // Hide all screens
+            document.querySelectorAll('.screen-panel').forEach(p => p.classList.remove('active'));
+            // Show selected
+            document.getElementById('screen-' + index).classList.add('active');
+            // Update tabs
+            document.querySelectorAll('.tab-nav button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            // Scroll to top of screens container
+            document.querySelector('.screens-container').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            const tabs = document.querySelectorAll('.tab-nav button');
+            let currentIndex = -1;
+            tabs.forEach((tab, i) => { if (tab.classList.contains('active')) currentIndex = i; });
+
+            if (e.key === 'ArrowRight' && currentIndex < tabs.length - 1) {
+                showScreen(currentIndex + 1, tabs[currentIndex + 1]);
+            } else if (e.key === 'ArrowLeft' && currentIndex > 0) {
+                showScreen(currentIndex - 1, tabs[currentIndex - 1]);
+            }
+        });
+    </script>
+</body>
+</html>

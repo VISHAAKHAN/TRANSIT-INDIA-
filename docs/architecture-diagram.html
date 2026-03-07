@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transit India — Architecture Diagram</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #f97316, #fb923c, #fbbf24);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.25rem;
+        }
+        .header p {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+        .badge-row {
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-top: 0.75rem;
+            flex-wrap: wrap;
+        }
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+        }
+        .badge-orange { background: #7c2d12; color: #fdba74; }
+        .badge-blue { background: #1e3a5f; color: #7dd3fc; }
+        .badge-green { background: #14532d; color: #86efac; }
+        .badge-purple { background: #3b0764; color: #d8b4fe; }
+
+        .diagram-section {
+            background: #1e293b;
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid #334155;
+        }
+        .diagram-section h2 {
+            font-size: 1.1rem;
+            color: #f97316;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+        .mermaid {
+            display: flex;
+            justify-content: center;
+        }
+        .mermaid svg {
+            max-width: 100%;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.25rem;
+            margin-top: 2rem;
+        }
+        .info-card {
+            background: #1e293b;
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            border: 1px solid #334155;
+        }
+        .info-card h3 {
+            font-size: 0.85rem;
+            color: #f97316;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 0.75rem;
+        }
+        .info-card table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .info-card td {
+            padding: 0.3rem 0;
+            font-size: 0.8rem;
+        }
+        .info-card td:first-child {
+            color: #94a3b8;
+            width: 40%;
+        }
+        .info-card td:last-child {
+            color: #e2e8f0;
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 0.75rem;
+        }
+        .url-link {
+            color: #7dd3fc;
+            text-decoration: none;
+            word-break: break-all;
+        }
+        .url-link:hover { text-decoration: underline; }
+
+        .endpoint-list {
+            list-style: none;
+            padding: 0;
+        }
+        .endpoint-list li {
+            padding: 0.4rem 0;
+            font-size: 0.8rem;
+            border-bottom: 1px solid #334155;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .endpoint-list li:last-child { border-bottom: none; }
+        .method {
+            padding: 0.1rem 0.4rem;
+            border-radius: 0.25rem;
+            font-size: 0.65rem;
+            font-weight: 700;
+            font-family: monospace;
+            min-width: 2.5rem;
+            text-align: center;
+        }
+        .method-get { background: #14532d; color: #86efac; }
+        .method-post { background: #7c2d12; color: #fdba74; }
+        .ep-path { color: #e2e8f0; font-family: monospace; font-size: 0.75rem; }
+        .ep-desc { color: #94a3b8; font-size: 0.7rem; margin-left: auto; }
+
+        .footer {
+            text-align: center;
+            margin-top: 2rem;
+            color: #475569;
+            font-size: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>TransitIndia — System Architecture</h1>
+    <p>Real-time bus tracking platform for Coimbatore, Tamil Nadu</p>
+    <div class="badge-row">
+        <span class="badge badge-orange">AWS Lambda</span>
+        <span class="badge badge-blue">React + Vite</span>
+        <span class="badge badge-green">FastAPI</span>
+        <span class="badge badge-purple">ap-south-1</span>
+    </div>
+</div>
+
+<!-- Main Architecture Diagram -->
+<div class="diagram-section">
+    <h2>System Overview</h2>
+    <div class="mermaid">
+%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#f97316', 'primaryTextColor': '#fff', 'primaryBorderColor': '#fb923c', 'lineColor': '#64748b', 'secondaryColor': '#1e293b', 'tertiaryColor': '#334155', 'background': '#1e293b', 'mainBkg': '#1e293b', 'nodeBorder': '#f97316', 'clusterBkg': '#0f172a', 'clusterBorder': '#334155', 'titleColor': '#f97316', 'edgeLabelBackground': '#1e293b' }}}%%
+graph TB
+    subgraph USERS["👥 Users"]
+        C["🚌 Citizen<br/><i>No login needed</i>"]
+        O["🔧 Operator<br/><i>OTP login</i>"]
+    end
+
+    subgraph AMPLIFY["☁️ AWS Amplify — Frontend"]
+        direction TB
+        FE["React + Vite + Tailwind CSS"]
+        TD["Tracking Dashboard<br/><small>Search routes, view ETA</small>"]
+        OD["Operator Dashboard<br/><small>Activate/deactivate buses</small>"]
+        ED["Emergency Dashboard<br/><small>Safety escalation</small>"]
+        LP["Login + OTP Pages<br/><small>Operator authentication</small>"]
+    end
+
+    subgraph APIGW["🌐 AWS API Gateway"]
+        GW["REST API<br/><small>HTTPS endpoint</small>"]
+    end
+
+    subgraph LAMBDA["⚡ AWS Lambda — Backend"]
+        direction TB
+        FA["FastAPI + Mangum<br/><small>Python 3.9</small>"]
+
+        subgraph ROUTERS["API Routers"]
+            R1["auth.py<br/><small>OTP send/verify</small>"]
+            R2["routes.py<br/><small>Search, active buses</small>"]
+            R3["operator.py<br/><small>Trip management</small>"]
+            R4["safety.py<br/><small>Escalations</small>"]
+            R5["admin.py<br/><small>DB seeding</small>"]
+        end
+
+        subgraph DB["💾 SQLite Database"]
+            D1["Routes<br/><small>25 Coimbatore routes</small>"]
+            D2["Stops<br/><small>45 bus stops</small>"]
+            D3["Trips<br/><small>Active bus trips</small>"]
+            D4["Operators<br/><small>2 registered</small>"]
+            D5["OTP Records<br/><small>Auth tokens</small>"]
+        end
+    end
+
+    subgraph SNS["📱 AWS SNS"]
+        SMS["SMS OTP Delivery<br/><small>+91 Transactional</small>"]
+    end
+
+    C --> FE
+    O --> FE
+    FE --> TD
+    FE --> OD
+    FE --> ED
+    FE --> LP
+    TD --> GW
+    OD --> GW
+    ED --> GW
+    LP --> GW
+    GW --> FA
+    FA --> R1
+    FA --> R2
+    FA --> R3
+    FA --> R4
+    FA --> R5
+    R1 --> D5
+    R2 --> D1
+    R2 --> D3
+    R3 --> D3
+    R3 --> D1
+    R5 --> D1
+    R5 --> D2
+    R5 --> D4
+    R1 --> SMS
+
+    style USERS fill:#0f172a,stroke:#f97316,stroke-width:2px
+    style AMPLIFY fill:#0f172a,stroke:#7dd3fc,stroke-width:2px
+    style APIGW fill:#0f172a,stroke:#fbbf24,stroke-width:2px
+    style LAMBDA fill:#0f172a,stroke:#86efac,stroke-width:2px
+    style SNS fill:#0f172a,stroke:#d8b4fe,stroke-width:2px
+    style ROUTERS fill:#1e293b,stroke:#334155
+    style DB fill:#1e293b,stroke:#334155
+    </div>
+</div>
+
+<!-- Data Flow Diagrams -->
+<div class="diagram-section">
+    <h2>Citizen Flow — Bus Tracking</h2>
+    <div class="mermaid">
+%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#f97316', 'primaryTextColor': '#fff', 'lineColor': '#64748b', 'secondaryColor': '#1e293b', 'tertiaryColor': '#334155' }}}%%
+sequenceDiagram
+    participant P as 🚌 Citizen
+    participant FE as React Frontend
+    participant API as API Gateway
+    participant LM as Lambda (FastAPI)
+    participant DB as SQLite DB
+
+    P->>FE: Opens website
+    FE->>API: GET /routes/active-buses
+    API->>LM: Proxy request
+    LM->>DB: Query Trips (Running Today)
+    DB-->>LM: Active trips + routes
+    LM-->>API: Bus list with ETA
+    API-->>FE: JSON response
+    FE-->>P: Shows running buses
+
+    P->>FE: Search: Gandhipuram → Singanallur
+    FE->>API: GET /routes/search?from=...&to=...
+    API->>LM: Proxy request
+    LM->>DB: Match routes by stops
+    DB-->>LM: Matching routes + trips
+    LM-->>API: Results with ETA, confidence
+    API-->>FE: JSON response
+    FE-->>P: Bus cards with ETA & status
+    </div>
+</div>
+
+<div class="diagram-section">
+    <h2>Operator Flow — Bus Activation</h2>
+    <div class="mermaid">
+%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#f97316', 'primaryTextColor': '#fff', 'lineColor': '#64748b', 'secondaryColor': '#1e293b', 'tertiaryColor': '#334155' }}}%%
+sequenceDiagram
+    participant O as 🔧 Operator
+    participant FE as React Frontend
+    participant API as API Gateway
+    participant LM as Lambda (FastAPI)
+    participant DB as SQLite DB
+    participant SNS as AWS SNS
+
+    O->>FE: Click "Operator Login"
+    O->>FE: Enter phone: 9786763705
+    FE->>API: POST /auth/send-otp
+    API->>LM: Generate OTP
+    LM->>DB: Store OTP record
+    LM->>SNS: Send SMS (best effort)
+    LM-->>FE: {debug_otp: "123456"}
+    FE-->>O: Show OTP on screen
+
+    O->>FE: Enter OTP
+    FE->>API: POST /auth/verify-otp
+    API->>LM: Verify OTP
+    LM->>DB: Check OTP + Operator table
+    LM-->>FE: {role: "operator", token: "..."}
+    FE-->>O: Redirect to Operator Dashboard
+
+    O->>FE: Select route + enter bus number
+    FE->>API: POST /operator/trips/activate
+    API->>LM: Create trip
+    LM->>DB: INSERT Trip (Running Today)
+    LM-->>FE: {status: "activated"}
+    FE-->>O: Bus shown as active
+
+    Note over O,DB: Bus now appears in citizen search results
+    </div>
+</div>
+
+<!-- Info Cards -->
+<div class="info-grid">
+    <div class="info-card">
+        <h3>Deployment</h3>
+        <table>
+            <tr><td>Region</td><td>ap-south-1 (Mumbai)</td></tr>
+            <tr><td>Stack</td><td>transit-india-lite</td></tr>
+            <tr><td>Frontend</td><td><a class="url-link" href="https://main.d3v6tlty3cw385.amplifyapp.com" target="_blank">Amplify App</a></td></tr>
+            <tr><td>Backend</td><td><a class="url-link" href="https://5exebulf7j.execute-api.ap-south-1.amazonaws.com/Prod" target="_blank">API Gateway</a></td></tr>
+            <tr><td>IaC</td><td>SAM / CloudFormation</td></tr>
+            <tr><td>Database</td><td>SQLite (/tmp/transit.db)</td></tr>
+        </table>
+    </div>
+
+    <div class="info-card">
+        <h3>Tech Stack</h3>
+        <table>
+            <tr><td>Frontend</td><td>React 18 + Vite 5 + Tailwind</td></tr>
+            <tr><td>Backend</td><td>FastAPI + Mangum</td></tr>
+            <tr><td>Runtime</td><td>Python 3.9 (Lambda)</td></tr>
+            <tr><td>ORM</td><td>SQLAlchemy</td></tr>
+            <tr><td>SMS</td><td>AWS SNS (Transactional)</td></tr>
+            <tr><td>Hosting</td><td>Amplify + Lambda + API GW</td></tr>
+        </table>
+    </div>
+
+    <div class="info-card">
+        <h3>Database Models</h3>
+        <table>
+            <tr><td>Route</td><td>25 Coimbatore bus routes</td></tr>
+            <tr><td>Stop</td><td>45 bus stops with GPS</td></tr>
+            <tr><td>Trip</td><td>Active bus trips</td></tr>
+            <tr><td>Operator</td><td>2 registered operators</td></tr>
+            <tr><td>OTPRecord</td><td>Auth OTP tokens</td></tr>
+            <tr><td>Feedback</td><td>User feedback records</td></tr>
+        </table>
+    </div>
+
+    <div class="info-card">
+        <h3>Operator Phones</h3>
+        <table>
+            <tr><td>Operator 1</td><td>9786763705</td></tr>
+            <tr><td>Operator 2</td><td>9715051646</td></tr>
+            <tr><td>Auth</td><td>OTP (6-digit, 5min expiry)</td></tr>
+            <tr><td>Fallback</td><td>Debug OTP shown on screen</td></tr>
+        </table>
+    </div>
+</div>
+
+<!-- API Endpoints -->
+<div class="diagram-section">
+    <h2>API Endpoints</h2>
+    <ul class="endpoint-list">
+        <li><span class="method method-post">POST</span><span class="ep-path">/api/v1/auth/send-otp</span><span class="ep-desc">Send OTP to phone</span></li>
+        <li><span class="method method-post">POST</span><span class="ep-path">/api/v1/auth/verify-otp</span><span class="ep-desc">Verify OTP, return role</span></li>
+        <li><span class="method method-get">GET</span><span class="ep-path">/api/v1/routes/search</span><span class="ep-desc">Search routes by from/to stops</span></li>
+        <li><span class="method method-get">GET</span><span class="ep-path">/api/v1/routes/active-buses</span><span class="ep-desc">List all running buses</span></li>
+        <li><span class="method method-get">GET</span><span class="ep-path">/api/v1/stops</span><span class="ep-desc">List all stops</span></li>
+        <li><span class="method method-get">GET</span><span class="ep-path">/api/v1/operator/routes</span><span class="ep-desc">List operator routes</span></li>
+        <li><span class="method method-get">GET</span><span class="ep-path">/api/v1/operator/routes/{id}</span><span class="ep-desc">Route detail with stops</span></li>
+        <li><span class="method method-post">POST</span><span class="ep-path">/api/v1/operator/trips/activate</span><span class="ep-desc">Activate a bus trip</span></li>
+        <li><span class="method method-get">GET</span><span class="ep-path">/api/v1/operator/trips/active</span><span class="ep-desc">List active trips</span></li>
+        <li><span class="method method-post">POST</span><span class="ep-path">/api/v1/operator/trips/{id}/deactivate</span><span class="ep-desc">Deactivate a trip</span></li>
+        <li><span class="method method-post">POST</span><span class="ep-path">/api/v1/safety/escalate</span><span class="ep-desc">Report safety incident</span></li>
+        <li><span class="method method-post">POST</span><span class="ep-path">/api/v1/feedback</span><span class="ep-desc">Submit feedback</span></li>
+        <li><span class="method method-post">POST</span><span class="ep-path">/api/v1/admin/seed</span><span class="ep-desc">Seed database</span></li>
+    </ul>
+</div>
+
+<div class="footer">
+    TransitIndia — Government of India Initiative &nbsp;|&nbsp; AWS Region: ap-south-1 (Mumbai) &nbsp;|&nbsp; Stack: transit-india-lite
+</div>
+
+<script>
+    mermaid.initialize({
+        startOnLoad: true,
+        theme: 'dark',
+        securityLevel: 'loose',
+        flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' },
+        sequence: { useMaxWidth: true, mirrorActors: false, messageAlign: 'center' }
+    });
+</script>
+</body>
+</html>

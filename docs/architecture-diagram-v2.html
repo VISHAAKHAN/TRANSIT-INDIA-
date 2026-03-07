@@ -1,0 +1,1487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transit India - System Architecture v2</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --bg-card: #1a2540;
+            --navy: #0B1F3A;
+            --navy-light: #132d52;
+            --saffron: #FF9933;
+            --saffron-dark: #e6851f;
+            --saffron-glow: rgba(255, 153, 51, 0.15);
+            --emerald: #138808;
+            --emerald-light: #1aad0d;
+            --emerald-glow: rgba(19, 136, 8, 0.15);
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --blue: #3b82f6;
+            --blue-light: #60a5fa;
+            --blue-glow: rgba(59, 130, 246, 0.15);
+            --purple: #8b5cf6;
+            --purple-glow: rgba(139, 92, 246, 0.15);
+            --red: #ef4444;
+            --red-glow: rgba(239, 68, 68, 0.12);
+            --cyan: #06b6d4;
+            --cyan-glow: rgba(6, 182, 212, 0.12);
+            --amber: #f59e0b;
+            --pink: #ec4899;
+            --border-color: #2d3a52;
+            --border-glow: rgba(255, 153, 51, 0.3);
+            --radius: 12px;
+            --radius-lg: 16px;
+            --radius-sm: 8px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                radial-gradient(circle at 25% 25%, rgba(255, 153, 51, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(19, 136, 8, 0.03) 0%, transparent 50%),
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 3rem 2rem;
+            background: linear-gradient(180deg, rgba(11, 31, 58, 0.8) 0%, transparent 100%);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--saffron), #fff, var(--emerald));
+        }
+
+        .header-flag {
+            display: flex;
+            justify-content: center;
+            gap: 0;
+            margin-bottom: 1.5rem;
+        }
+
+        .flag-stripe { width: 60px; height: 4px; border-radius: 2px; }
+        .flag-saffron { background: var(--saffron); }
+        .flag-white { background: #ffffff; }
+        .flag-green { background: var(--emerald); }
+
+        .header h1 {
+            font-size: 2.8rem;
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, var(--saffron), #fbbf24, var(--saffron));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .header .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+            letter-spacing: 0.02em;
+        }
+
+        .header .region-badge {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.3rem 1rem;
+            border-radius: 9999px;
+            border: 1px solid var(--border-color);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .badge-row {
+            display: flex;
+            justify-content: center;
+            gap: 0.6rem;
+            margin-top: 1.25rem;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            padding: 0.3rem 0.85rem;
+            border-radius: 9999px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            border: 1px solid;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .badge:hover { transform: translateY(-1px); }
+        .badge-saffron { background: rgba(255,153,51,0.12); color: var(--saffron); border-color: rgba(255,153,51,0.3); }
+        .badge-blue { background: var(--blue-glow); color: var(--blue-light); border-color: rgba(59,130,246,0.3); }
+        .badge-green { background: var(--emerald-glow); color: var(--emerald-light); border-color: rgba(19,136,8,0.3); }
+        .badge-purple { background: var(--purple-glow); color: var(--purple); border-color: rgba(139,92,246,0.3); }
+        .badge-red { background: var(--red-glow); color: var(--red); border-color: rgba(239,68,68,0.3); }
+        .badge-cyan { background: var(--cyan-glow); color: var(--cyan); border-color: rgba(6,182,212,0.3); }
+
+        .legend-bar {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2.5rem;
+            padding: 1rem 2rem;
+            background: var(--bg-secondary);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .legend-line { width: 30px; height: 2px; border-radius: 1px; }
+        .legend-line.sync { background: var(--saffron); }
+        .legend-line.async { background: transparent; border-top: 2px dashed var(--blue-light); height: 0; }
+
+        .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .legend-dot.aws { background: var(--saffron); }
+        .legend-dot.app { background: var(--blue-light); }
+        .legend-dot.data-dot { background: var(--emerald-light); }
+        .legend-dot.ml { background: var(--purple); }
+        .legend-dot.ext { background: var(--cyan); }
+
+        .layer {
+            margin-bottom: 1.5rem;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            position: relative;
+        }
+
+        .layer:hover {
+            border-color: var(--border-glow);
+            box-shadow: 0 0 30px rgba(255, 153, 51, 0.05);
+        }
+
+        .layer-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.2s;
+        }
+
+        .layer-header:hover { background: rgba(255, 255, 255, 0.02); }
+
+        .layer-header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .layer-number {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            letter-spacing: 0.05em;
+            min-width: 55px;
+            text-align: center;
+        }
+
+        .layer-title { font-size: 1rem; font-weight: 700; color: var(--text-primary); }
+        .layer-desc { font-size: 0.75rem; color: var(--text-muted); margin-left: 0.5rem; }
+
+        .layer-toggle {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            transition: transform 0.3s;
+            font-weight: 300;
+        }
+
+        .layer.expanded .layer-toggle { transform: rotate(180deg); }
+
+        .layer-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s;
+        }
+
+        .layer.expanded .layer-content {
+            max-height: 4000px;
+            padding: 0 1.5rem 1.5rem;
+        }
+
+        .layer-users { background: linear-gradient(135deg, rgba(255,153,51,0.06) 0%, var(--bg-secondary) 100%); }
+        .layer-users .layer-number { background: rgba(255,153,51,0.15); color: var(--saffron); }
+        .layer-users .layer-header { border-bottom: 1px solid rgba(255,153,51,0.1); }
+
+        .layer-cdn { background: linear-gradient(135deg, rgba(6,182,212,0.06) 0%, var(--bg-secondary) 100%); }
+        .layer-cdn .layer-number { background: var(--cyan-glow); color: var(--cyan); }
+        .layer-cdn .layer-header { border-bottom: 1px solid rgba(6,182,212,0.1); }
+
+        .layer-api { background: linear-gradient(135deg, rgba(59,130,246,0.06) 0%, var(--bg-secondary) 100%); }
+        .layer-api .layer-number { background: var(--blue-glow); color: var(--blue-light); }
+        .layer-api .layer-header { border-bottom: 1px solid rgba(59,130,246,0.1); }
+
+        .layer-compute { background: linear-gradient(135deg, rgba(19,136,8,0.06) 0%, var(--bg-secondary) 100%); }
+        .layer-compute .layer-number { background: var(--emerald-glow); color: var(--emerald-light); }
+        .layer-compute .layer-header { border-bottom: 1px solid rgba(19,136,8,0.1); }
+
+        .layer-ml { background: linear-gradient(135deg, rgba(139,92,246,0.06) 0%, var(--bg-secondary) 100%); }
+        .layer-ml .layer-number { background: var(--purple-glow); color: var(--purple); }
+        .layer-ml .layer-header { border-bottom: 1px solid rgba(139,92,246,0.1); }
+
+        .layer-data { background: linear-gradient(135deg, rgba(245,158,11,0.06) 0%, var(--bg-secondary) 100%); }
+        .layer-data .layer-number { background: rgba(245,158,11,0.15); color: var(--amber); }
+        .layer-data .layer-header { border-bottom: 1px solid rgba(245,158,11,0.1); }
+
+        .layer-network { background: linear-gradient(135deg, rgba(236,72,153,0.06) 0%, var(--bg-secondary) 100%); }
+        .layer-network .layer-number { background: rgba(236,72,153,0.12); color: var(--pink); }
+        .layer-network .layer-header { border-bottom: 1px solid rgba(236,72,153,0.1); }
+
+        .layer-external { background: linear-gradient(135deg, rgba(6,182,212,0.06) 0%, var(--bg-secondary) 100%); }
+        .layer-external .layer-number { background: var(--cyan-glow); color: var(--cyan); }
+        .layer-external .layer-header { border-bottom: 1px solid rgba(6,182,212,0.1); }
+
+        .layer-monitoring { background: linear-gradient(135deg, rgba(239,68,68,0.06) 0%, var(--bg-secondary) 100%); }
+        .layer-monitoring .layer-number { background: var(--red-glow); color: var(--red); }
+        .layer-monitoring .layer-header { border-bottom: 1px solid rgba(239,68,68,0.1); }
+
+        .component-grid { display: grid; gap: 1rem; }
+        .grid-2 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+        .grid-3 { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+        .grid-4 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+
+        .service-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .service-box:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            border-color: var(--border-glow);
+        }
+
+        .service-box::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+        }
+
+        .service-box.aws::before { background: var(--saffron); }
+        .service-box.react::before { background: var(--blue-light); }
+        .service-box.db::before { background: var(--emerald-light); }
+        .service-box.ml-box::before { background: var(--purple); }
+        .service-box.ext::before { background: var(--cyan); }
+        .service-box.security::before { background: var(--red); }
+        .service-box.network::before { background: var(--pink); }
+
+        .service-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            margin-bottom: 0.75rem;
+        }
+
+        .icon-aws { background: rgba(255,153,51,0.15); color: var(--saffron); }
+        .icon-react { background: var(--blue-glow); color: var(--blue-light); }
+        .icon-db { background: var(--emerald-glow); color: var(--emerald-light); }
+        .icon-ml { background: var(--purple-glow); color: var(--purple); }
+        .icon-ext { background: var(--cyan-glow); color: var(--cyan); }
+        .icon-sec { background: var(--red-glow); color: var(--red); }
+        .icon-net { background: rgba(236,72,153,0.12); color: var(--pink); }
+
+        .service-name { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem; }
+        .service-type { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 0.5rem; }
+
+        .service-detail { font-size: 0.75rem; color: var(--text-secondary); line-height: 1.5; }
+        .service-detail code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.68rem;
+            background: rgba(255,255,255,0.06);
+            padding: 0.1rem 0.35rem;
+            border-radius: 4px;
+            color: var(--saffron);
+        }
+
+        .detail-list { list-style: none; padding: 0; margin-top: 0.5rem; }
+        .detail-list li {
+            font-size: 0.73rem;
+            color: var(--text-secondary);
+            padding: 0.2rem 0;
+            padding-left: 1rem;
+            position: relative;
+        }
+        .detail-list li::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0.55rem;
+            width: 5px; height: 5px;
+            border-radius: 50%;
+            background: var(--text-muted);
+        }
+        .detail-list li code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.68rem;
+            color: var(--saffron);
+            background: rgba(255,153,51,0.08);
+            padding: 0.05rem 0.3rem;
+            border-radius: 3px;
+        }
+
+        .flow-section { margin-top: 2.5rem; margin-bottom: 2rem; }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .section-title::before {
+            content: '';
+            width: 4px; height: 28px;
+            border-radius: 2px;
+            background: var(--saffron);
+        }
+
+        .flow-diagram {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            overflow-x: auto;
+        }
+
+        .flow-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .flow-title .flow-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            background: var(--saffron);
+            color: var(--navy);
+            font-size: 0.7rem;
+            font-weight: 800;
+        }
+
+        .flow-path {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .flow-node {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 0.6rem 1rem;
+            text-align: center;
+            min-width: 100px;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .flow-node:hover {
+            border-color: var(--saffron);
+            box-shadow: 0 0 15px rgba(255,153,51,0.1);
+            transform: translateY(-2px);
+        }
+
+        .flow-node-label { font-size: 0.75rem; font-weight: 600; color: var(--text-primary); }
+        .flow-node-sub { font-size: 0.6rem; color: var(--text-muted); margin-top: 0.15rem; }
+
+        .flow-arrow {
+            display: flex;
+            align-items: center;
+            padding: 0 0.3rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            position: relative;
+            min-width: 50px;
+            justify-content: center;
+        }
+
+        .flow-arrow-line { width: 100%; height: 2px; position: relative; }
+        .flow-arrow-line.sync { background: var(--saffron); }
+        .flow-arrow-line.async { background: transparent; border-top: 2px dashed var(--blue-light); }
+
+        .flow-arrow-line::after {
+            content: '';
+            position: absolute;
+            right: -1px; top: 50%;
+            transform: translateY(-50%);
+            width: 0; height: 0;
+            border-left: 6px solid var(--saffron);
+            border-top: 4px solid transparent;
+            border-bottom: 4px solid transparent;
+        }
+
+        .flow-arrow-line.async::after { border-left-color: var(--blue-light); }
+
+        .flow-arrow-label {
+            position: absolute;
+            top: -14px; left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.55rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        @keyframes flowPulse {
+            0% { left: -10px; opacity: 0; }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { left: calc(100% + 10px); opacity: 0; }
+        }
+
+        .flow-arrow-line .pulse {
+            position: absolute;
+            top: 50%; transform: translateY(-50%);
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--saffron);
+            animation: flowPulse 2.5s ease-in-out infinite;
+            box-shadow: 0 0 8px var(--saffron);
+        }
+
+        .flow-arrow-line.async .pulse {
+            background: var(--blue-light);
+            box-shadow: 0 0 8px var(--blue-light);
+        }
+
+        .flow-1 .pulse { animation-delay: 0s; }
+        .flow-2 .pulse { animation-delay: 0.3s; }
+        .flow-3 .pulse { animation-delay: 0.6s; }
+        .flow-4 .pulse { animation-delay: 0.9s; }
+        .flow-5 .pulse { animation-delay: 1.2s; }
+
+        .endpoint-table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 1rem; }
+        .endpoint-table th {
+            text-align: left; font-size: 0.65rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted);
+            padding: 0.6rem 0.8rem; border-bottom: 1px solid var(--border-color);
+        }
+        .endpoint-table td {
+            font-size: 0.75rem; padding: 0.55rem 0.8rem;
+            border-bottom: 1px solid rgba(255,255,255,0.03); color: var(--text-secondary);
+        }
+        .endpoint-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+        .method-badge {
+            display: inline-block; padding: 0.1rem 0.45rem; border-radius: 4px;
+            font-size: 0.6rem; font-weight: 700; font-family: 'JetBrains Mono', monospace;
+            min-width: 36px; text-align: center;
+        }
+        .method-get { background: rgba(19,136,8,0.15); color: var(--emerald-light); }
+        .method-post { background: rgba(255,153,51,0.15); color: var(--saffron); }
+
+        .ep-path { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--text-primary); }
+
+        .connector-vertical { width: 2px; height: 20px; margin: 0 auto; position: relative; }
+        .connector-vertical.sync { background: var(--saffron); }
+        .connector-vertical.async { border-left: 2px dashed var(--blue-light); background: transparent; }
+
+        @keyframes flowDown {
+            0% { top: -6px; opacity: 0; }
+            30% { opacity: 1; }
+            70% { opacity: 1; }
+            100% { top: calc(100% + 6px); opacity: 0; }
+        }
+
+        .connector-vertical .c-pulse {
+            position: absolute; left: 50%; transform: translateX(-50%);
+            width: 6px; height: 6px; border-radius: 50%;
+            background: var(--saffron);
+            animation: flowDown 2s ease-in-out infinite;
+            box-shadow: 0 0 6px var(--saffron);
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem; margin: 2rem 0;
+        }
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 1rem; text-align: center;
+            transition: all 0.3s;
+        }
+        .stat-card:hover { border-color: var(--border-glow); transform: translateY(-2px); }
+        .stat-value { font-size: 1.5rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
+        .stat-label { font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 0.25rem; }
+
+        .subnet-container { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .subnet-box { border-radius: var(--radius); padding: 1rem; border: 1px solid; }
+        .subnet-public { background: rgba(19,136,8,0.05); border-color: rgba(19,136,8,0.2); }
+        .subnet-private { background: rgba(239,68,68,0.04); border-color: rgba(239,68,68,0.15); }
+        .subnet-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.5rem; }
+        .subnet-public .subnet-label { color: var(--emerald-light); }
+        .subnet-private .subnet-label { color: var(--red); }
+        .subnet-items { list-style: none; padding: 0; }
+        .subnet-items li { font-size: 0.72rem; color: var(--text-secondary); padding: 0.2rem 0; }
+
+        .region-indicator { display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; }
+        .az-box {
+            flex: 1; min-width: 200px;
+            background: rgba(255,255,255,0.02);
+            border: 1px dashed var(--border-color);
+            border-radius: var(--radius);
+            padding: 1rem;
+        }
+        .az-label {
+            font-size: 0.65rem; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.08em;
+            color: var(--text-muted); margin-bottom: 0.75rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .sg-table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 0.75rem; font-size: 0.72rem; }
+        .sg-table th {
+            text-align: left; font-size: 0.6rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.06em;
+            color: var(--text-muted); padding: 0.4rem 0.6rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .sg-table td { padding: 0.35rem 0.6rem; color: var(--text-secondary); border-bottom: 1px solid rgba(255,255,255,0.02); }
+        .sg-table .sg-name { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: var(--pink); }
+
+        .db-schema-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem; margin-top: 0.75rem; }
+        .db-table-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 0.75rem; transition: border-color 0.2s;
+        }
+        .db-table-card:hover { border-color: rgba(245,158,11,0.3); }
+        .db-table-name { font-family: 'JetBrains Mono', monospace; font-size: 0.73rem; font-weight: 700; color: var(--amber); margin-bottom: 0.3rem; }
+        .db-table-rows { font-size: 0.65rem; color: var(--text-muted); }
+        .db-table-desc { font-size: 0.68rem; color: var(--text-secondary); margin-top: 0.2rem; }
+
+        .delay-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.5rem; }
+        .delay-tag { padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: 0.62rem; font-weight: 600; border: 1px solid; }
+        .delay-tag.traffic { background: rgba(239,68,68,0.1); color: #f87171; border-color: rgba(239,68,68,0.2); }
+        .delay-tag.weather { background: rgba(59,130,246,0.1); color: #93c5fd; border-color: rgba(59,130,246,0.2); }
+        .delay-tag.mechanical { background: rgba(245,158,11,0.1); color: #fbbf24; border-color: rgba(245,158,11,0.2); }
+        .delay-tag.deviation { background: rgba(139,92,246,0.1); color: #c4b5fd; border-color: rgba(139,92,246,0.2); }
+        .delay-tag.overload { background: rgba(236,72,153,0.1); color: #f9a8d4; border-color: rgba(236,72,153,0.2); }
+
+        .rate-badges { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem; }
+        .rate-badge {
+            display: flex; align-items: center; gap: 0.3rem;
+            padding: 0.25rem 0.6rem; border-radius: 6px;
+            font-size: 0.65rem; font-weight: 600;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+        .rate-badge .rate-val { font-family: 'JetBrains Mono', monospace; color: var(--saffron); }
+
+        .tech-stack-section {
+            margin-top: 3rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .tech-stack-section::before {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--saffron), var(--emerald));
+        }
+        .stack-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-top: 1.5rem; }
+        .stack-category { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 1.25rem; }
+        .stack-category-title {
+            font-size: 0.7rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.08em;
+            margin-bottom: 0.75rem; padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .stack-item { display: flex; align-items: center; gap: 0.6rem; padding: 0.35rem 0; font-size: 0.75rem; color: var(--text-secondary); }
+        .stack-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+        .stack-item .version { margin-left: auto; font-family: 'JetBrains Mono', monospace; font-size: 0.63rem; color: var(--text-muted); }
+
+        .controls-bar { display: flex; justify-content: flex-end; gap: 0.75rem; margin-bottom: 1rem; }
+        .ctrl-btn {
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm); padding: 0.4rem 1rem;
+            font-size: 0.7rem; color: var(--text-secondary);
+            cursor: pointer; font-family: 'Inter', sans-serif; transition: all 0.2s;
+        }
+        .ctrl-btn:hover { border-color: var(--saffron); color: var(--saffron); }
+
+        @keyframes borderGlow {
+            0%, 100% { border-color: var(--border-color); }
+            50% { border-color: var(--border-glow); }
+        }
+        .glow-border { animation: borderGlow 4s ease-in-out infinite; }
+
+        .section-label {
+            font-size: 0.8rem; font-weight: 700; color: var(--text-primary);
+            margin-bottom: 0.75rem; padding-left: 0.5rem;
+            border-left: 3px solid var(--emerald-light);
+        }
+
+        .footer { text-align: center; margin-top: 3rem; padding: 2rem; border-top: 1px solid var(--border-color); }
+        .footer p { font-size: 0.75rem; color: var(--text-muted); }
+        .footer .footer-brand { font-weight: 700; color: var(--saffron); }
+        .footer .footer-links { margin-top: 0.5rem; display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap; }
+        .footer .footer-links span { font-size: 0.68rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+
+        @media (max-width: 768px) {
+            .container { padding: 1rem; }
+            .header h1 { font-size: 1.8rem; }
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+            .flow-path { flex-direction: column; }
+            .flow-arrow { transform: rotate(90deg); min-width: auto; padding: 0.5rem 0; }
+            .legend-bar { gap: 1rem; }
+            .subnet-container { grid-template-columns: 1fr; }
+            .badge-row { gap: 0.4rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <header class="header">
+        <div class="header-flag">
+            <div class="flag-stripe flag-saffron"></div>
+            <div class="flag-stripe flag-white"></div>
+            <div class="flag-stripe flag-green"></div>
+        </div>
+        <h1>Transit India &mdash; System Architecture</h1>
+        <p class="subtitle">Serverless Cloud-Native Architecture on AWS</p>
+        <div class="region-badge">AWS Region: ap-south-1 (Mumbai) &bull; 2 AZs &bull; VPC: 10.0.0.0/16</div>
+        <div class="badge-row">
+            <span class="badge badge-green">FastAPI</span>
+            <span class="badge badge-blue">React 18</span>
+            <span class="badge badge-saffron">AWS Lambda</span>
+            <span class="badge badge-cyan">PostgreSQL 15</span>
+            <span class="badge badge-red">Redis</span>
+            <span class="badge badge-purple">CloudFront</span>
+        </div>
+    </header>
+
+    <div class="stats-row">
+        <div class="stat-card"><div class="stat-value" style="color: var(--saffron);">50</div><div class="stat-label">Bus Routes</div></div>
+        <div class="stat-card"><div class="stat-value" style="color: var(--emerald-light);">95+</div><div class="stat-label">Bus Stops</div></div>
+        <div class="stat-card"><div class="stat-value" style="color: var(--blue-light);">1,556</div><div class="stat-label">Weekly Trips</div></div>
+        <div class="stat-card"><div class="stat-value" style="color: var(--purple);">13</div><div class="stat-label">API Endpoints</div></div>
+        <div class="stat-card"><div class="stat-value" style="color: var(--cyan);">9</div><div class="stat-label">AWS Services</div></div>
+        <div class="stat-card"><div class="stat-value" style="color: var(--pink);">7</div><div class="stat-label">DB Tables</div></div>
+    </div>
+
+    <div class="legend-bar">
+        <div class="legend-item"><div class="legend-line sync"></div><span>Sync Request</span></div>
+        <div class="legend-item"><div class="legend-line async"></div><span>Async / Event</span></div>
+        <div class="legend-item"><div class="legend-dot aws"></div><span>AWS Service</span></div>
+        <div class="legend-item"><div class="legend-dot app"></div><span>Application</span></div>
+        <div class="legend-item"><div class="legend-dot data-dot"></div><span>Data Store</span></div>
+        <div class="legend-item"><div class="legend-dot ml"></div><span>ML / AI</span></div>
+        <div class="legend-item"><div class="legend-dot ext"></div><span>External</span></div>
+    </div>
+
+    <div class="controls-bar">
+        <button class="ctrl-btn" onclick="expandAll()">Expand All Layers</button>
+        <button class="ctrl-btn" onclick="collapseAll()">Collapse All Layers</button>
+    </div>
+
+    <!-- LAYER 1 -->
+    <div class="layer layer-users expanded" id="layer-1">
+        <div class="layer-header" onclick="toggleLayer('layer-1')">
+            <div class="layer-header-left">
+                <span class="layer-number">LAYER 1</span>
+                <span class="layer-title">User Interfaces</span>
+                <span class="layer-desc">Web, SMS, and IVR access channels</span>
+            </div>
+            <span class="layer-toggle">&#9660;</span>
+        </div>
+        <div class="layer-content">
+            <div class="component-grid grid-3">
+                <div class="service-box react">
+                    <div class="service-icon icon-react">WEB</div>
+                    <div class="service-name">Web Application</div>
+                    <div class="service-type">React 18 + Vite + TailwindCSS</div>
+                    <div class="service-detail">Single-page application serving all user roles. Built with React 18, bundled with Vite 5, styled with TailwindCSS.</div>
+                    <ul class="detail-list">
+                        <li><code>TrackingDashboard</code> &mdash; Passenger bus search and ETA</li>
+                        <li><code>EmergencyDashboard</code> &mdash; Safety info and helplines</li>
+                        <li><code>ServiceReporting</code> &mdash; Feedback and complaints</li>
+                        <li><code>OperatorDashboard</code> &mdash; Trip management</li>
+                        <li><code>Login</code> / <code>OTP</code> &mdash; Operator authentication</li>
+                        <li><code>RouteDetails</code> &mdash; Detailed route view with stops</li>
+                    </ul>
+                </div>
+                <div class="service-box ext">
+                    <div class="service-icon icon-ext">SMS</div>
+                    <div class="service-name">SMS Channel</div>
+                    <div class="service-type">Webhook-based SMS Parser</div>
+                    <div class="service-detail">Parses incoming SMS queries in natural format for feature-phone accessibility.</div>
+                    <ul class="detail-list">
+                        <li>Format: <code>BUS 42B Adyar</code></li>
+                        <li>Processes via <code>/api/v1/sms/webhook</code></li>
+                        <li>Response delivered via AWS SNS</li>
+                        <li>Rate limited: 10 requests/hour/phone</li>
+                    </ul>
+                </div>
+                <div class="service-box ext">
+                    <div class="service-icon icon-ext">IVR</div>
+                    <div class="service-name">IVR Channel</div>
+                    <div class="service-type">Voice-Based Interface (Framework Ready)</div>
+                    <div class="service-detail">Voice-based transit query system for non-smartphone users. Architecture designed, implementation planned.</div>
+                    <ul class="detail-list">
+                        <li>Rate limited: 5 calls/hour/phone</li>
+                        <li>Multilingual support planned (Tamil, English, Hindi)</li>
+                        <li>Amazon Connect integration ready</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="connector-vertical sync" style="height: 24px;"><div class="c-pulse"></div></div>
+
+    <!-- LAYER 2 -->
+    <div class="layer layer-cdn" id="layer-2">
+        <div class="layer-header" onclick="toggleLayer('layer-2')">
+            <div class="layer-header-left">
+                <span class="layer-number">LAYER 2</span>
+                <span class="layer-title">CDN and Distribution</span>
+                <span class="layer-desc">Global edge caching and static hosting</span>
+            </div>
+            <span class="layer-toggle">&#9660;</span>
+        </div>
+        <div class="layer-content">
+            <div class="component-grid grid-2">
+                <div class="service-box aws">
+                    <div class="service-icon icon-aws">CF</div>
+                    <div class="service-name">Amazon CloudFront</div>
+                    <div class="service-type">Global CDN and Edge Cache</div>
+                    <div class="service-detail">Content Delivery Network with 400+ edge locations worldwide. Caches static assets and proxies API requests.</div>
+                    <ul class="detail-list">
+                        <li>HTTPS termination with ACM certificates</li>
+                        <li>Origin: S3 bucket (static) + API Gateway (dynamic)</li>
+                        <li>Gzip/Brotli compression enabled</li>
+                        <li>Custom error pages for 4xx/5xx</li>
+                    </ul>
+                </div>
+                <div class="service-box aws">
+                    <div class="service-icon icon-aws">S3</div>
+                    <div class="service-name">S3 Static Website Hosting</div>
+                    <div class="service-type">Frontend Asset Origin</div>
+                    <div class="service-detail">Hosts the compiled React SPA build artifacts. Bucket configured with website hosting and OAI for CloudFront.</div>
+                    <ul class="detail-list">
+                        <li>Bucket: <code>transit-india-frontend-*</code></li>
+                        <li>Versioning enabled for rollbacks</li>
+                        <li>OAI (Origin Access Identity) configured</li>
+                        <li>Build output from <code>vite build</code></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="connector-vertical sync" style="height: 24px;"><div class="c-pulse" style="animation-delay: 0.3s;"></div></div>
+
+    <!-- LAYER 3 -->
+    <div class="layer layer-api" id="layer-3">
+        <div class="layer-header" onclick="toggleLayer('layer-3')">
+            <div class="layer-header-left">
+                <span class="layer-number">LAYER 3</span>
+                <span class="layer-title">API Layer</span>
+                <span class="layer-desc">Gateway, rate limiting, and security</span>
+            </div>
+            <span class="layer-toggle">&#9660;</span>
+        </div>
+        <div class="layer-content">
+            <div class="component-grid grid-3">
+                <div class="service-box aws">
+                    <div class="service-icon icon-aws">API</div>
+                    <div class="service-name">Amazon API Gateway</div>
+                    <div class="service-type">REST API &mdash; CORS Enabled</div>
+                    <div class="service-detail">Managed REST API gateway that routes all HTTP requests to the Lambda backend. Handles request validation and throttling.</div>
+                    <ul class="detail-list">
+                        <li>Stage: <code>Prod</code></li>
+                        <li>CORS: All origins (development)</li>
+                        <li>Binary media type passthrough</li>
+                        <li>CloudWatch access logging enabled</li>
+                    </ul>
+                </div>
+                <div class="service-box aws">
+                    <div class="service-icon icon-aws">RL</div>
+                    <div class="service-name">Rate Limiter</div>
+                    <div class="service-type">Redis-Backed Throttling</div>
+                    <div class="service-detail">Protects endpoints from abuse using sliding-window rate limiting with Redis counters.</div>
+                    <div class="rate-badges">
+                        <div class="rate-badge">SMS <span class="rate-val">10/hr/phone</span></div>
+                        <div class="rate-badge">IVR <span class="rate-val">5/hr/phone</span></div>
+                        <div class="rate-badge">Safety <span class="rate-val">3/day/phone</span></div>
+                    </div>
+                </div>
+                <div class="service-box security">
+                    <div class="service-icon icon-sec">WAF</div>
+                    <div class="service-name">AWS WAF</div>
+                    <div class="service-type">Web Application Firewall</div>
+                    <div class="service-detail">Protects API Gateway from common web exploits: SQL injection, XSS, and DDoS mitigation.</div>
+                    <ul class="detail-list">
+                        <li>AWS Managed Rules enabled</li>
+                        <li>IP reputation filtering</li>
+                        <li>Geographic restrictions (India focus)</li>
+                        <li>Request size limits enforced</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="connector-vertical sync" style="height: 24px;"><div class="c-pulse" style="animation-delay: 0.6s;"></div></div>
+
+    <!-- LAYER 4 -->
+    <div class="layer layer-compute expanded" id="layer-4">
+        <div class="layer-header" onclick="toggleLayer('layer-4')">
+            <div class="layer-header-left">
+                <span class="layer-number">LAYER 4</span>
+                <span class="layer-title">Compute (Serverless)</span>
+                <span class="layer-desc">Lambda function and FastAPI application</span>
+            </div>
+            <span class="layer-toggle">&#9660;</span>
+        </div>
+        <div class="layer-content">
+            <div class="component-grid grid-2" style="margin-bottom: 1.5rem;">
+                <div class="service-box aws glow-border">
+                    <div class="service-icon icon-aws">&#955;</div>
+                    <div class="service-name">AWS Lambda</div>
+                    <div class="service-type">transit-india-api</div>
+                    <div class="service-detail">Serverless compute function running the entire backend application. Zero infrastructure management.</div>
+                    <ul class="detail-list">
+                        <li>Runtime: <code>Python 3.9</code></li>
+                        <li>Memory: <code>512 MB</code></li>
+                        <li>Timeout: <code>30 seconds</code></li>
+                        <li>Handler: <code>Mangum</code> (ASGI adapter)</li>
+                        <li>Deployed via SAM / CloudFormation</li>
+                        <li>VPC-attached (private subnets)</li>
+                    </ul>
+                </div>
+                <div class="service-box react glow-border">
+                    <div class="service-icon icon-react">API</div>
+                    <div class="service-name">FastAPI Application</div>
+                    <div class="service-type">ASGI Web Framework</div>
+                    <div class="service-detail">High-performance async Python framework with automatic OpenAPI docs, Pydantic validation, and dependency injection.</div>
+                    <ul class="detail-list">
+                        <li>SQLAlchemy ORM with async sessions</li>
+                        <li>Pydantic v2 request/response models</li>
+                        <li>CORS middleware configured</li>
+                        <li>Structured JSON logging</li>
+                        <li>Health check endpoint</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 1.5rem;">
+                <div class="section-label">API Routers &mdash; 13 Endpoints</div>
+                <table class="endpoint-table">
+                    <thead><tr><th>Method</th><th>Endpoint</th><th>Router</th><th>Description</th></tr></thead>
+                    <tbody>
+                        <tr><td><span class="method-badge method-get">GET</span></td><td class="ep-path">/api/v1/routes/search</td><td style="color:var(--text-muted);font-size:0.68rem;">routes.py</td><td>Search routes by origin/destination stops</td></tr>
+                        <tr><td><span class="method-badge method-get">GET</span></td><td class="ep-path">/api/v1/query</td><td style="color:var(--text-muted);font-size:0.68rem;">query.py</td><td>Query bus status and ETA</td></tr>
+                        <tr><td><span class="method-badge method-get">GET</span></td><td class="ep-path">/api/v1/emergency/{bus}</td><td style="color:var(--text-muted);font-size:0.68rem;">emergency.py</td><td>Emergency information for a bus</td></tr>
+                        <tr><td><span class="method-badge method-post">POST</span></td><td class="ep-path">/api/v1/safety/escalate</td><td style="color:var(--text-muted);font-size:0.68rem;">safety.py</td><td>Report safety incident / escalation</td></tr>
+                        <tr><td><span class="method-badge method-post">POST</span></td><td class="ep-path">/api/v1/feedback</td><td style="color:var(--text-muted);font-size:0.68rem;">feedback.py</td><td>Submit trip feedback</td></tr>
+                        <tr><td><span class="method-badge method-post">POST</span></td><td class="ep-path">/api/v1/sms/webhook</td><td style="color:var(--text-muted);font-size:0.68rem;">sms.py</td><td>Process incoming SMS queries</td></tr>
+                        <tr><td><span class="method-badge method-post">POST</span></td><td class="ep-path">/api/v1/auth/send-otp</td><td style="color:var(--text-muted);font-size:0.68rem;">auth.py</td><td>Send OTP to operator phone</td></tr>
+                        <tr><td><span class="method-badge method-post">POST</span></td><td class="ep-path">/api/v1/auth/verify-otp</td><td style="color:var(--text-muted);font-size:0.68rem;">auth.py</td><td>Verify OTP and authenticate operator</td></tr>
+                        <tr><td><span class="method-badge method-get">GET</span></td><td class="ep-path">/api/v1/operator/routes</td><td style="color:var(--text-muted);font-size:0.68rem;">operator.py</td><td>List available routes for operator</td></tr>
+                        <tr><td><span class="method-badge method-post">POST</span></td><td class="ep-path">/api/v1/operator/trips/activate</td><td style="color:var(--text-muted);font-size:0.68rem;">operator.py</td><td>Activate a bus trip</td></tr>
+                        <tr><td><span class="method-badge method-get">GET</span></td><td class="ep-path">/api/v1/operator/trips/active</td><td style="color:var(--text-muted);font-size:0.68rem;">operator.py</td><td>List currently active trips</td></tr>
+                        <tr><td><span class="method-badge method-post">POST</span></td><td class="ep-path">/api/v1/operator/trips/{id}/deactivate</td><td style="color:var(--text-muted);font-size:0.68rem;">operator.py</td><td>Deactivate a running trip</td></tr>
+                        <tr><td><span class="method-badge method-post">POST</span></td><td class="ep-path">/api/v1/admin/seed</td><td style="color:var(--text-muted);font-size:0.68rem;">admin.py</td><td>Seed database with route/stop data</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div>
+                <div class="section-label" style="border-left-color: var(--blue-light);">Application Services</div>
+                <div class="component-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+                    <div class="service-box react" style="padding: 1rem;"><div class="service-name" style="font-size: 0.8rem;">TripStatusService</div><div class="service-detail">Manages trip lifecycle: activation, deactivation, status tracking</div></div>
+                    <div class="service-box react" style="padding: 1rem;"><div class="service-name" style="font-size: 0.8rem;">ArrivalPredictionService</div><div class="service-detail">Calculates ETA using schedule data, historical patterns, confidence scoring</div></div>
+                    <div class="service-box react" style="padding: 1rem;"><div class="service-name" style="font-size: 0.8rem;">DelayClassifierService</div><div class="service-detail">Classifies delay causes into 5 categories using rule-based and ML models</div></div>
+                    <div class="service-box react" style="padding: 1rem;"><div class="service-name" style="font-size: 0.8rem;">RateLimiterService</div><div class="service-detail">Sliding-window rate limiter backed by Redis for per-phone throttling</div></div>
+                    <div class="service-box react" style="padding: 1rem;"><div class="service-name" style="font-size: 0.8rem;">AuditLoggerService</div><div class="service-detail">Structured audit logging to S3 with 90-day lifecycle policies</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="connector-vertical sync" style="height: 24px;"><div class="c-pulse" style="animation-delay: 0.9s;"></div></div>
+
+    <!-- LAYER 5 -->
+    <div class="layer layer-ml" id="layer-5">
+        <div class="layer-header" onclick="toggleLayer('layer-5')">
+            <div class="layer-header-left">
+                <span class="layer-number">LAYER 5</span>
+                <span class="layer-title">ML / AI Services</span>
+                <span class="layer-desc">Prediction, classification, and confidence scoring</span>
+            </div>
+            <span class="layer-toggle">&#9660;</span>
+        </div>
+        <div class="layer-content">
+            <div class="component-grid grid-3">
+                <div class="service-box ml-box">
+                    <div class="service-icon icon-ml">CC</div>
+                    <div class="service-name">ConfidenceCalculator</div>
+                    <div class="service-type">Rule-Based Scoring Engine</div>
+                    <div class="service-detail">Computes prediction confidence (0-100%) using data freshness, GPS availability, historical accuracy, and time-of-day factors.</div>
+                    <ul class="detail-list">
+                        <li>Source: <code>confidence.py</code></li>
+                        <li>Multi-factor weighted scoring</li>
+                        <li>Returns confidence + reasoning text</li>
+                    </ul>
+                </div>
+                <div class="service-box ml-box">
+                    <div class="service-icon icon-ml">SM</div>
+                    <div class="service-name">SageMaker Endpoints</div>
+                    <div class="service-type">ML Model Serving (Planned)</div>
+                    <div class="service-detail">Production ML inference endpoints for real-time transit predictions.</div>
+                    <ul class="detail-list">
+                        <li><code>transit-forecasting</code> &mdash; Prophet / LSTM</li>
+                        <li><code>transit-delay-classifier</code> &mdash; XGBoost</li>
+                        <li>Model artifacts in S3: <code>transit-india-ml-*</code></li>
+                        <li>Training notebooks in <code>ml_training/</code></li>
+                    </ul>
+                </div>
+                <div class="service-box ml-box">
+                    <div class="service-icon icon-ml">DC</div>
+                    <div class="service-name">Delay Classification</div>
+                    <div class="service-type">5-Category Classifier</div>
+                    <div class="service-detail">Classifies the root cause of bus delays using feature vectors from trip data.</div>
+                    <div class="delay-tags">
+                        <span class="delay-tag traffic">Traffic Congestion</span>
+                        <span class="delay-tag weather">Weather Related</span>
+                        <span class="delay-tag mechanical">Mechanical Issue</span>
+                        <span class="delay-tag deviation">Route Deviation</span>
+                        <span class="delay-tag overload">Passenger Overload</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="connector-vertical sync" style="height: 24px;"><div class="c-pulse" style="animation-delay: 1.2s;"></div></div>
+
+    <!-- LAYER 6 -->
+    <div class="layer layer-data expanded" id="layer-6">
+        <div class="layer-header" onclick="toggleLayer('layer-6')">
+            <div class="layer-header-left">
+                <span class="layer-number">LAYER 6</span>
+                <span class="layer-title">Data Layer</span>
+                <span class="layer-desc">PostgreSQL, Redis, and S3 storage</span>
+            </div>
+            <span class="layer-toggle">&#9660;</span>
+        </div>
+        <div class="layer-content">
+            <div class="component-grid grid-3" style="margin-bottom: 1.5rem;">
+                <div class="service-box db">
+                    <div class="service-icon icon-db">RDS</div>
+                    <div class="service-name">RDS PostgreSQL 15</div>
+                    <div class="service-type">Primary Relational Database</div>
+                    <div class="service-detail">Managed PostgreSQL instance in private subnets. Handles all transactional data with multi-AZ deployment.</div>
+                    <ul class="detail-list">
+                        <li>Engine: PostgreSQL 15</li>
+                        <li>Instance: db.t3.micro (free tier)</li>
+                        <li>Encrypted at rest (KMS)</li>
+                        <li>Automated backups: 7-day retention</li>
+                    </ul>
+                </div>
+                <div class="service-box db">
+                    <div class="service-icon icon-db">EC</div>
+                    <div class="service-name">ElastiCache Redis</div>
+                    <div class="service-type">In-Memory Cache and Store</div>
+                    <div class="service-detail">Sub-millisecond cache for trip status, rate limiting counters, and session management.</div>
+                    <ul class="detail-list">
+                        <li>Trip status cache (TTL: 60s)</li>
+                        <li>Rate limiting counters (sliding window)</li>
+                        <li>Session cache for auth tokens</li>
+                        <li>Instance: cache.t3.micro</li>
+                    </ul>
+                </div>
+                <div class="service-box aws">
+                    <div class="service-icon icon-aws">S3</div>
+                    <div class="service-name">S3 Buckets</div>
+                    <div class="service-type">Object Storage</div>
+                    <div class="service-detail">Three dedicated S3 buckets for different data classes.</div>
+                    <ul class="detail-list">
+                        <li><code>transit-india-frontend-*</code> &mdash; Static assets</li>
+                        <li><code>transit-india-audit-*</code> &mdash; 90-day audit logs</li>
+                        <li><code>transit-india-ml-*</code> &mdash; Model artifacts</li>
+                        <li>Lifecycle policies for cost optimization</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="section-label" style="border-left-color: var(--amber);">Database Schema &mdash; 7 Tables</div>
+            <div class="db-schema-grid">
+                <div class="db-table-card"><div class="db-table-name">routes</div><div class="db-table-rows">50 routes</div><div class="db-table-desc">Bus routes with number, name, type (city/express), schedule</div></div>
+                <div class="db-table-card"><div class="db-table-name">stops</div><div class="db-table-rows">95+ stops</div><div class="db-table-desc">Stops with GPS coords, names in Tamil + English + Hindi</div></div>
+                <div class="db-table-card"><div class="db-table-name">trips</div><div class="db-table-rows">1,556 trips</div><div class="db-table-desc">7-day trip data: status, departure, ETA, delay info</div></div>
+                <div class="db-table-card"><div class="db-table-name">otp_records</div><div class="db-table-rows">Dynamic</div><div class="db-table-desc">OTP codes with phone, expiry (5min), used flag</div></div>
+                <div class="db-table-card"><div class="db-table-name">operators</div><div class="db-table-rows">2+ accounts</div><div class="db-table-desc">Operator profiles: name, phone, role, created date</div></div>
+                <div class="db-table-card"><div class="db-table-name">safety_escalations</div><div class="db-table-rows">Dynamic</div><div class="db-table-desc">Incident reports: type, bus, location, severity, status</div></div>
+                <div class="db-table-card"><div class="db-table-name">feedback</div><div class="db-table-rows">Dynamic</div><div class="db-table-desc">Trip feedback: rating (1-5), comment, route, timestamp</div></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="connector-vertical sync" style="height: 24px;"><div class="c-pulse" style="animation-delay: 1.5s;"></div></div>
+
+    <!-- LAYER 7 -->
+    <div class="layer layer-network" id="layer-7">
+        <div class="layer-header" onclick="toggleLayer('layer-7')">
+            <div class="layer-header-left">
+                <span class="layer-number">LAYER 7</span>
+                <span class="layer-title">Networking</span>
+                <span class="layer-desc">VPC, subnets, gateways, and security groups</span>
+            </div>
+            <span class="layer-toggle">&#9660;</span>
+        </div>
+        <div class="layer-content">
+            <div class="component-grid grid-2" style="margin-bottom: 1.5rem;">
+                <div class="service-box network">
+                    <div class="service-icon icon-net">VPC</div>
+                    <div class="service-name">Virtual Private Cloud</div>
+                    <div class="service-type">CIDR: 10.0.0.0/16</div>
+                    <div class="service-detail">Isolated network environment with public and private subnet tiers across two availability zones.</div>
+                    <div class="subnet-container" style="margin-top: 0.75rem;">
+                        <div class="subnet-box subnet-public">
+                            <div class="subnet-label">Public Subnets (2)</div>
+                            <ul class="subnet-items"><li>NAT Gateway</li><li>Application Load Balancer</li><li>Internet-facing resources</li></ul>
+                        </div>
+                        <div class="subnet-box subnet-private">
+                            <div class="subnet-label">Private Subnets (2)</div>
+                            <ul class="subnet-items"><li>Lambda Functions</li><li>RDS PostgreSQL</li><li>ElastiCache Redis</li></ul>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="service-box network" style="margin-bottom: 1rem;">
+                        <div class="service-icon icon-net">GW</div>
+                        <div class="service-name">Gateways</div>
+                        <div class="service-type">Network Connectivity</div>
+                        <ul class="detail-list">
+                            <li><strong>Internet Gateway</strong> &mdash; Public subnet internet access</li>
+                            <li><strong>NAT Gateway</strong> &mdash; Private subnet outbound internet (for Lambda to call external APIs)</li>
+                        </ul>
+                    </div>
+                    <div class="service-box security">
+                        <div class="service-icon icon-sec">SG</div>
+                        <div class="service-name">Security Groups</div>
+                        <div class="service-type">Stateful Firewall Rules</div>
+                        <table class="sg-table">
+                            <thead><tr><th>Group</th><th>Rule</th><th>Port</th></tr></thead>
+                            <tbody>
+                                <tr><td class="sg-name">lambda-sg</td><td>Outbound to DB SG</td><td>5432</td></tr>
+                                <tr><td class="sg-name">lambda-sg</td><td>Outbound to Redis SG</td><td>6379</td></tr>
+                                <tr><td class="sg-name">db-sg</td><td>Inbound from Lambda SG</td><td>5432</td></tr>
+                                <tr><td class="sg-name">redis-sg</td><td>Inbound from Lambda SG</td><td>6379</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="section-label" style="border-left-color: var(--pink);">Availability Zone Distribution</div>
+            <div class="region-indicator">
+                <div class="az-box">
+                    <div class="az-label">ap-south-1a</div>
+                    <ul class="detail-list">
+                        <li>Public Subnet 1 (10.0.1.0/24)</li>
+                        <li>Private Subnet 1 (10.0.3.0/24)</li>
+                        <li>NAT Gateway</li>
+                        <li>RDS Primary</li>
+                        <li>Redis Node</li>
+                    </ul>
+                </div>
+                <div class="az-box">
+                    <div class="az-label">ap-south-1b</div>
+                    <ul class="detail-list">
+                        <li>Public Subnet 2 (10.0.2.0/24)</li>
+                        <li>Private Subnet 2 (10.0.4.0/24)</li>
+                        <li>RDS Standby (Multi-AZ)</li>
+                        <li>Lambda failover</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="connector-vertical async" style="height: 24px;"></div>
+
+    <!-- LAYER 8 -->
+    <div class="layer layer-external" id="layer-8">
+        <div class="layer-header" onclick="toggleLayer('layer-8')">
+            <div class="layer-header-left">
+                <span class="layer-number">LAYER 8</span>
+                <span class="layer-title">External Services</span>
+                <span class="layer-desc">Third-party integrations and data sources</span>
+            </div>
+            <span class="layer-toggle">&#9660;</span>
+        </div>
+        <div class="layer-content">
+            <div class="component-grid grid-3">
+                <div class="service-box aws">
+                    <div class="service-icon icon-aws">SNS</div>
+                    <div class="service-name">Amazon SNS</div>
+                    <div class="service-type">OTP SMS Delivery</div>
+                    <div class="service-detail">Transactional SMS delivery for operator OTP authentication. Configured for India (+91) with sender ID.</div>
+                    <ul class="detail-list">
+                        <li>Type: Transactional SMS</li>
+                        <li>Region: ap-south-1</li>
+                        <li>OTP format: 6-digit, 5-min expiry</li>
+                        <li>Fallback: Debug OTP in response</li>
+                    </ul>
+                </div>
+                <div class="service-box ext">
+                    <div class="service-icon icon-ext">ETM</div>
+                    <div class="service-name">ETM Systems</div>
+                    <div class="service-type">Electronic Ticketing Machines</div>
+                    <div class="service-detail">Bus-mounted ticketing devices that generate login and ticket events used for trip data ingestion.</div>
+                    <ul class="detail-list">
+                        <li>Bus login/logout events</li>
+                        <li>Ticket issuance data</li>
+                        <li>Real-time data pipeline planned</li>
+                    </ul>
+                </div>
+                <div class="service-box ext">
+                    <div class="service-icon icon-ext">GPS</div>
+                    <div class="service-name">GPS Data Sources</div>
+                    <div class="service-type">Vehicle Location Tracking</div>
+                    <div class="service-detail">Optional GPS feeds from bus-mounted trackers. Currently sparse; system designed to work with or without GPS data.</div>
+                    <ul class="detail-list">
+                        <li>NMEA data format support</li>
+                        <li>Fallback to schedule-based ETA</li>
+                        <li>Confidence adjusts with GPS availability</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="connector-vertical async" style="height: 24px;"></div>
+
+    <!-- LAYER 9 -->
+    <div class="layer layer-monitoring" id="layer-9">
+        <div class="layer-header" onclick="toggleLayer('layer-9')">
+            <div class="layer-header-left">
+                <span class="layer-number">LAYER 9</span>
+                <span class="layer-title">Monitoring and Security</span>
+                <span class="layer-desc">Observability, audit, and access control</span>
+            </div>
+            <span class="layer-toggle">&#9660;</span>
+        </div>
+        <div class="layer-content">
+            <div class="component-grid grid-4">
+                <div class="service-box aws">
+                    <div class="service-icon icon-aws">CW</div>
+                    <div class="service-name">CloudWatch</div>
+                    <div class="service-type">Logs + Metrics</div>
+                    <div class="service-detail">Centralized logging and monitoring for all Lambda invocations, API Gateway access, and custom application metrics.</div>
+                    <ul class="detail-list">
+                        <li>Log groups per Lambda function</li>
+                        <li>Custom metrics: latency, errors</li>
+                        <li>Alarms for error rate thresholds</li>
+                    </ul>
+                </div>
+                <div class="service-box aws">
+                    <div class="service-icon icon-aws">AL</div>
+                    <div class="service-name">S3 Audit Logs</div>
+                    <div class="service-type">90-Day Lifecycle</div>
+                    <div class="service-detail">Structured audit trail for all safety escalations, operator actions, and administrative operations.</div>
+                    <ul class="detail-list">
+                        <li>JSON-structured log entries</li>
+                        <li>S3 lifecycle: 90-day expiry</li>
+                        <li>Queryable via Athena (planned)</li>
+                    </ul>
+                </div>
+                <div class="service-box security">
+                    <div class="service-icon icon-sec">IAM</div>
+                    <div class="service-name">IAM Roles and Policies</div>
+                    <div class="service-type">Least-Privilege Access</div>
+                    <div class="service-detail">Fine-grained IAM roles for Lambda execution, S3 access, RDS connectivity, and SNS publishing.</div>
+                    <ul class="detail-list">
+                        <li>Lambda execution role</li>
+                        <li>S3 read/write policies</li>
+                        <li>RDS connect permissions</li>
+                        <li>SNS publish permissions</li>
+                    </ul>
+                </div>
+                <div class="service-box aws">
+                    <div class="service-icon icon-aws">BK</div>
+                    <div class="service-name">AWS Backup</div>
+                    <div class="service-type">Automated Backups</div>
+                    <div class="service-detail">Automated backup plans for RDS and critical data with cross-region copy for disaster recovery.</div>
+                    <ul class="detail-list">
+                        <li>RDS: 7-day automated snapshots</li>
+                        <li>S3: Versioning enabled</li>
+                        <li>Recovery point objective: 1 hour</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DATA FLOW PATHS -->
+    <div class="flow-section">
+        <div class="section-title">Data Flow Paths</div>
+
+        <div class="flow-diagram">
+            <div class="flow-title"><span class="flow-num">1</span> Static Content Delivery</div>
+            <div class="flow-path">
+                <div class="flow-node"><div class="flow-node-label">User</div><div class="flow-node-sub">Browser</div></div>
+                <div class="flow-arrow"><div class="flow-arrow-line sync flow-1"><span class="flow-arrow-label">HTTPS</span><div class="pulse"></div></div></div>
+                <div class="flow-node"><div class="flow-node-label">CloudFront</div><div class="flow-node-sub">CDN Edge</div></div>
+                <div class="flow-arrow"><div class="flow-arrow-line sync flow-2"><span class="flow-arrow-label">Origin Fetch</span><div class="pulse"></div></div></div>
+                <div class="flow-node"><div class="flow-node-label">S3 Bucket</div><div class="flow-node-sub">Static Assets</div></div>
+            </div>
+        </div>
+
+        <div class="flow-diagram">
+            <div class="flow-title"><span class="flow-num">2</span> API Request Flow (Bus Search / Tracking)</div>
+            <div class="flow-path">
+                <div class="flow-node"><div class="flow-node-label">User</div><div class="flow-node-sub">React App</div></div>
+                <div class="flow-arrow"><div class="flow-arrow-line sync flow-1"><span class="flow-arrow-label">HTTPS</span><div class="pulse"></div></div></div>
+                <div class="flow-node"><div class="flow-node-label">CloudFront</div><div class="flow-node-sub">API Origin</div></div>
+                <div class="flow-arrow"><div class="flow-arrow-line sync flow-2"><span class="flow-arrow-label">Proxy</span><div class="pulse"></div></div></div>
+                <div class="flow-node"><div class="flow-node-label">API Gateway</div><div class="flow-node-sub">REST</div></div>
+                <div class="flow-arrow"><div class="flow-arrow-line sync flow-3"><span class="flow-arrow-label">Invoke</span><div class="pulse"></div></div></div>
+                <div class="flow-node"><div class="flow-node-label">Lambda</div><div class="flow-node-sub">FastAPI</div></div>
+                <div class="flow-arrow"><div class="flow-arrow-line sync flow-4"><span class="flow-arrow-label">Query</span><div class="pulse"></div></div></div>
+                <div class="flow-node"><div class="flow-node-label">RDS / Redis</div><div class="flow-node-sub">Data</div></div>
+            </div>
+        </div>
+
+        <div class="flow-diagram">
+            <div class="flow-title"><span class="flow-num">3</span> SMS Query Processing</div>
+            <div class="flow-path">
+                <div class="flow-node"><div class="flow-node-label">SMS</div><div class="flow-node-sub">"BUS 42B Adyar"</div></div>
+                <div class="flow-arrow"><div class="flow-arrow-line async flow-1"><span class="flow-arrow-label">Webhook</span><div class="pulse"></div></div></div>
+                <div class="flow-node"><div class="flow-node-label">API Gateway</div><div class="flow-node-sub">sms/webhook</div></div>
+                <div class="flow-arrow"><div class="flow-arrow-line sync flow-2"><span class="flow-arrow-label">Invoke</span><div class="pulse"></div></div></div>
+                <div class="flow-node"><div class="flow-node-label">Lambda</div><div class="flow-node-sub">Parse + Query</div></div>
+                <div class="flow-arrow"><div class="flow-arrow-line async flow-3"><span class="flow-arrow-label">Reply SMS</span><div class="pulse"></div></div></div>
+                <div class="flow-node"><div class="flow-node-label">SNS</div><div class="flow-node-sub">SMS Response</div></div>
+            </div>
+        </div>
+
+        <div class="flow-diagram">
+            <div class="flow-title"><span class="flow-num">4</span> ML Prediction Pipeline</div>
+            <div class="flow-path">
+                <div class="flow-node"><div class="flow-node-label">Lambda</div><div class="flow-node-sub">FastAPI</div></div>
+                <div class="flow-arrow"><div class="flow-arrow-line sync flow-1"><span class="flow-arrow-label">Inference</span><div class="pulse"></div></div></div>
+                <div class="flow-node"><div class="flow-node-label">SageMaker</div><div class="flow-node-sub">ML Endpoint</div></div>
+                <div class="flow-arrow"><div class="flow-arrow-line sync flow-2"><span class="flow-arrow-label">Prediction</span><div class="pulse"></div></div></div>
+                <div class="flow-node"><div class="flow-node-label">Response</div><div class="flow-node-sub">ETA + Confidence</div></div>
+            </div>
+        </div>
+
+        <div class="flow-diagram">
+            <div class="flow-title"><span class="flow-num">5</span> Audit Logging and OTP Delivery</div>
+            <div class="flow-path">
+                <div class="flow-node"><div class="flow-node-label">Lambda</div><div class="flow-node-sub">AuditLogger</div></div>
+                <div class="flow-arrow"><div class="flow-arrow-line async flow-1"><span class="flow-arrow-label">Async Write</span><div class="pulse"></div></div></div>
+                <div class="flow-node"><div class="flow-node-label">S3</div><div class="flow-node-sub">Audit Bucket</div></div>
+                <div style="width: 3rem;"></div>
+                <div class="flow-node"><div class="flow-node-label">Lambda</div><div class="flow-node-sub">Auth Router</div></div>
+                <div class="flow-arrow"><div class="flow-arrow-line async flow-3"><span class="flow-arrow-label">OTP SMS</span><div class="pulse"></div></div></div>
+                <div class="flow-node"><div class="flow-node-label">SNS</div><div class="flow-node-sub">SMS Delivery</div></div>
+            </div>
+        </div>
+
+        <div class="flow-diagram">
+            <div class="flow-title"><span class="flow-num">6</span> ETM Data Ingestion</div>
+            <div class="flow-path">
+                <div class="flow-node"><div class="flow-node-label">ETM Systems</div><div class="flow-node-sub">Bus Devices</div></div>
+                <div class="flow-arrow"><div class="flow-arrow-line async flow-1"><span class="flow-arrow-label">Events</span><div class="pulse"></div></div></div>
+                <div class="flow-node"><div class="flow-node-label">API Gateway</div><div class="flow-node-sub">Ingestion EP</div></div>
+                <div class="flow-arrow"><div class="flow-arrow-line sync flow-2"><span class="flow-arrow-label">Process</span><div class="pulse"></div></div></div>
+                <div class="flow-node"><div class="flow-node-label">Lambda</div><div class="flow-node-sub">TripStatusSvc</div></div>
+                <div class="flow-arrow"><div class="flow-arrow-line sync flow-3"><span class="flow-arrow-label">Store</span><div class="pulse"></div></div></div>
+                <div class="flow-node"><div class="flow-node-label">RDS</div><div class="flow-node-sub">Trips Table</div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TECHNOLOGY STACK -->
+    <div class="tech-stack-section">
+        <div class="section-title" style="margin-top: 0;">Technology Stack</div>
+        <div class="stack-grid">
+            <div class="stack-category">
+                <div class="stack-category-title" style="color: var(--blue-light);">Frontend</div>
+                <div class="stack-item"><span class="stack-dot" style="background: var(--blue-light);"></span>React<span class="version">v18</span></div>
+                <div class="stack-item"><span class="stack-dot" style="background: var(--purple);"></span>Vite<span class="version">v5</span></div>
+                <div class="stack-item"><span class="stack-dot" style="background: var(--cyan);"></span>TailwindCSS<span class="version">v3</span></div>
+                <div class="stack-item"><span class="stack-dot" style="background: var(--emerald-light);"></span>React Router<span class="version">v6</span></div>
+                <div class="stack-item"><span class="stack-dot" style="background: var(--saffron);"></span>Axios<span class="version">HTTP</span></div>
+            </div>
+            <div class="stack-category">
+                <div class="stack-category-title" style="color: var(--emerald-light);">Backend</div>
+                <div class="stack-item"><span class="stack-dot" style="background: var(--emerald-light);"></span>FastAPI<span class="version">ASGI</span></div>
+                <div class="stack-item"><span class="stack-dot" style="background: var(--blue-light);"></span>Python<span class="version">3.9</span></div>
+                <div class="stack-item"><span class="stack-dot" style="background: var(--saffron);"></span>Mangum<span class="version">Lambda</span></div>
+                <div class="stack-item"><span class="stack-dot" style="background: var(--purple);"></span>SQLAlchemy<span class="version">ORM</span></div>
+                <div class="stack-item"><span class="stack-dot" style="background: var(--cyan);"></span>Pydantic<span class="version">v2</span></div>
+                <div class="stack-item"><span class="stack-dot" style="background: var(--pink);"></span>Uvicorn<span class="version">ASGI</span></div>
+            </div>
+            <div class="stack-category">
+                <div class="stack-category-title" style="color: var(--saffron);">AWS Services</div>
+                <div class="stack-item"><span class="stack-dot" style="background: var(--saffron);"></span>Lambda<span class="version">Compute</span></div>
+                <div class="stack-item"><span class="stack-dot" style="background: var(--saffron);"></span>API Gateway<span class="version">REST</span></div>
+                <div class="stack-item"><span class="stack-dot" style="background: var(--saffron);"></span>CloudFront<span class="version">CDN</span></div>
+                <div class="stack-item"><span class="stack-dot" style="background: var(--saffron);"></span>S3<span class="version">Storage</span></div>
+                <div class="stack-item"><span class="stack-dot" style="background: var(--saffron);"></span>RDS<span class="version">PostgreSQL</span></div>
+                <div class="stack-item"><span class="stack-dot" style="background: var(--saffron);"></span>ElastiCache<span class="version">Redis</span></div>
+                <div class="stack-item"><span class="stack-dot" style="background: var(--saffron);"></span>SNS<span class="version">SMS</span></div>
+                <div class="stack-item"><span class="stack-dot" style="background: var(--saffron);"></span>SageMaker<span class="version">ML</span></div>
+                <div class="stack-item"><span class="stack-dot" style="background: var(--saffron);"></span>CloudWatch<span class="version">Monitoring</span></div>
+            </div>
+            <div class="stack-category">
+                <div class="stack-category-title" style="color: var(--purple);">Data and ML</div>
+                <div class="stack-item"><span class="stack-dot" style="background: var(--cyan);"></span>PostgreSQL<span class="version">v15</span></div>
+                <div class="stack-item"><span class="stack-dot" style="background: var(--red);"></span>Redis<span class="version">Cache</span></div>
+                <div class="stack-item"><span class="stack-dot" style="background: var(--purple);"></span>Prophet<span class="version">Forecast</span></div>
+                <div class="stack-item"><span class="stack-dot" style="background: var(--purple);"></span>LSTM<span class="version">Deep</span></div>
+                <div class="stack-item"><span class="stack-dot" style="background: var(--emerald-light);"></span>XGBoost<span class="version">Classify</span></div>
+            </div>
+            <div class="stack-category">
+                <div class="stack-category-title" style="color: var(--pink);">DevOps and IaC</div>
+                <div class="stack-item"><span class="stack-dot" style="background: var(--saffron);"></span>AWS SAM<span class="version">IaC</span></div>
+                <div class="stack-item"><span class="stack-dot" style="background: var(--saffron);"></span>CloudFormation<span class="version">Stack</span></div>
+                <div class="stack-item"><span class="stack-dot" style="background: var(--blue-light);"></span>Git<span class="version">VCS</span></div>
+                <div class="stack-item"><span class="stack-dot" style="background: var(--emerald-light);"></span>npm<span class="version">Build</span></div>
+                <div class="stack-item"><span class="stack-dot" style="background: var(--purple);"></span>pip<span class="version">Deps</span></div>
+            </div>
+            <div class="stack-category">
+                <div class="stack-category-title" style="color: var(--red);">Security</div>
+                <div class="stack-item"><span class="stack-dot" style="background: var(--saffron);"></span>IAM<span class="version">Access</span></div>
+                <div class="stack-item"><span class="stack-dot" style="background: var(--red);"></span>WAF<span class="version">Firewall</span></div>
+                <div class="stack-item"><span class="stack-dot" style="background: var(--emerald-light);"></span>ACM<span class="version">TLS/SSL</span></div>
+                <div class="stack-item"><span class="stack-dot" style="background: var(--cyan);"></span>KMS<span class="version">Encryption</span></div>
+                <div class="stack-item"><span class="stack-dot" style="background: var(--purple);"></span>VPC<span class="version">Network</span></div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p><span class="footer-brand">Transit India</span> &mdash; Serverless Cloud-Native Architecture on AWS</p>
+        <div class="footer-links">
+            <span>Region: ap-south-1 (Mumbai)</span>
+            <span>Stack: transit-india-api</span>
+            <span>Runtime: Python 3.9</span>
+            <span>IaC: SAM + CloudFormation</span>
+        </div>
+        <p style="margin-top: 1rem; font-size: 0.65rem; color: var(--text-muted);">Architecture Diagram v2 &mdash; College Project Submission &mdash; 2026</p>
+    </footer>
+
+</div>
+
+<script>
+    function toggleLayer(id) {
+        var layer = document.getElementById(id);
+        if (layer) { layer.classList.toggle('expanded'); }
+    }
+    function expandAll() {
+        document.querySelectorAll('.layer').forEach(function(l) { l.classList.add('expanded'); });
+    }
+    function collapseAll() {
+        document.querySelectorAll('.layer').forEach(function(l) { l.classList.remove('expanded'); });
+    }
+    var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+            if (entry.isIntersecting) { entry.target.classList.add('expanded'); }
+        });
+    }, { threshold: 0.3 });
+    document.querySelectorAll('.layer').forEach(function(layer) { observer.observe(layer); });
+</script>
+
+</body>
+</html>
