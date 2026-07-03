@@ -8,16 +8,16 @@ export default {
     theme: {
         extend: {
             colors: {
-                'ti-navy': '#0B1F3A',
-                'ti-saffron': '#FF9933',
-                'ti-saffron-light': '#FFB347',
-                'ti-emerald': '#138808'
+                'ti-navy': 'var(--color-bg-navy)',
+                'ti-saffron': 'var(--color-primary)',
+                'ti-saffron-light': 'var(--color-primary-light)',
+                'ti-emerald': 'var(--color-emerald)',
             },
             fontFamily: {
                 sans: ['Inter', 'Poppins', 'sans-serif'],
             },
             backgroundImage: {
-                'saffron-gradient': 'linear-gradient(to right, #FF9933, #FFB347)',
+                'saffron-gradient': 'linear-gradient(to right, var(--color-primary), var(--color-primary-light))',
             }
         },
     },

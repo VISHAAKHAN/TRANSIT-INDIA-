@@ -1,228 +1,290 @@
 import React, { useState } from 'react';
-import { Bus, Bell, Home, ThumbsUp, ThumbsDown, AlertCircle, AlertTriangle, Send, CheckCircle2 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import {
+    AlertCircle, AlertTriangle, Send, CheckCircle2,
+    Search, Shield, CheckCircle, User, Zap,
+    ThumbsUp, ThumbsDown, Home, MessageSquare
+} from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { api } from '../api';
+import { t } from '../translations';
 
-export default function ServiceReporting({ routeData, navigateTo }) {
-    const [feedback, setFeedback] = useState(null); // 'satisfied' or 'unsatisfied'
+export default function ServiceReporting({ routeData, navigateTo, lang }) {
+    const [feedback, setFeedback] = useState(null);
     const [concern, setConcern] = useState(null);
     const [details, setDetails] = useState('');
+    const [route, setRoute] = useState(routeData?.route || '');
     const [showModal, setShowModal] = useState(false);
 
-    const activeRoute = routeData?.route || '500A-1';
-
-    const handleHome = () => {
-        navigateTo('track');
-    };
+    const handleHome = () => navigateTo('track');
 
     const handleSubmit = async () => {
-        // Map to backend enum values
         const feedbackType = feedback === 'satisfied' ? 'Satisfactory' : 'Needs Improvement';
-
-        // Submit feedback to real API
         try {
-            await api.submitFeedback(activeRoute, feedbackType, 'Web');
+            await api.submitFeedback(routeData?.id || route || '500A', feedbackType, 'Web');
         } catch (e) {
             console.warn('Feedback submission failed:', e);
         }
-
         setShowModal(true);
     };
 
+    const concerns = [
+        { id: 'rash',         emoji: '🚗', labelKey: 'rashDriving' },
+        { id: 'misconduct',   emoji: '🚫', labelKey: 'misconduct' },
+        { id: 'overcrowding', emoji: '👥', labelKey: 'overcrowding' },
+    ];
+
+    const trustPillars = [
+        { icon: Shield,       titleKey: 'safeAndSecure',  descKey: 'safeAndSecureDesc' },
+        { icon: CheckCircle,  titleKey: 'monitored247',   descKey: 'monitored247Desc' },
+        { icon: Zap,          titleKey: 'actionable',     descKey: 'actionableDesc' },
+    ];
+
     return (
-        <div className="bg-[#F8FAFC] dark:bg-slate-900 min-h-screen text-gray-800 dark:text-gray-200 font-sans transition-colors">
-            {/* Header */}
-            <header className="bg-ti-navy dark:bg-slate-800 text-white px-6 py-4 flex justify-between items-center shadow-md transition-colors">
-                <div className="flex items-center space-x-4">
-                    <div className="bg-white dark:bg-slate-700 rounded-md p-1.5 flex items-center justify-center transition-colors">
-                        <Bus className="w-6 h-6 text-ti-navy dark:text-white" />
-                    </div>
-                    <div>
-                        <h1 className="text-xl font-bold leading-tight">Service Reporting & Trip Feedback</h1>
-                        <p className="text-[10px] text-ti-saffron dark:text-orange-400 tracking-widest font-bold uppercase transition-colors">Government Transport Department</p>
-                    </div>
-                </div>
-                <div className="flex items-center space-x-6">
-                    <button className="text-gray-300 dark:text-gray-400 hover:text-white transition-colors">
-                        <Bell className="w-5 h-5" />
-                    </button>
-                    <button onClick={handleHome} className="text-gray-300 dark:text-gray-400 hover:text-white transition-colors">
-                        <Home className="w-6 h-6" />
-                    </button>
-                </div>
-            </header>
+        <div className="bg-[#f5f6f8] dark:bg-[#070F1E] min-h-screen text-[#0F1E36] dark:text-gray-100 font-sans">
+            <main className="max-w-3xl mx-auto px-4 py-8 space-y-6">
 
-            <main className="max-w-4xl mx-auto w-full p-6 space-y-8 mt-4">
-                {/* Trip Feedback */}
-                <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden transition-colors">
-                    <div className="bg-orange-50/50 dark:bg-slate-900/50 px-6 py-4 border-b border-gray-100 dark:border-slate-700 flex items-center transition-colors">
-                        <div className="text-ti-navy dark:text-gray-300 mr-3 transition-colors"><MessageSquareIcon /></div>
-                        <h2 className="text-lg font-bold text-gray-900 dark:text-white transition-colors">Trip Feedback</h2>
-                    </div>
-                    <div className="p-6">
-                        <p className="text-gray-600 dark:text-gray-300 text-sm mb-8 text-center max-w-2xl mx-auto transition-colors">
-                            Your feedback is vital for continuous service improvement and maintaining high standards of public transport. Please let us know how your last journey was.
-                        </p>
+                {/* ── Trip Feedback Card ── */}
+                <div className="bg-white dark:bg-[#0B1E36] rounded-2xl shadow-sm border border-gray-200 dark:border-slate-700 overflow-hidden">
+                    {/* Top banner row */}
+                    <div className="flex items-stretch">
+                        {/* Left content */}
+                        <div className="flex-1 p-7">
+                            <div className="flex items-center space-x-2 mb-4">
+                                <MessageSquare className="w-4 h-4 text-[#0F1E36] dark:text-white" />
+                                <span className="text-sm font-black text-[#0F1E36] dark:text-white uppercase tracking-wider">{t('tripFeedback', lang)}</span>
+                            </div>
+                            <h2 className="text-2xl font-black text-[#0F1E36] dark:text-white leading-tight mb-3">
+                                {t('helpImproveJourney', lang)}
+                            </h2>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 font-medium leading-relaxed max-w-xs">
+                                {t('feedbackHelpsUs', lang)}
+                            </p>
+                        </div>
 
-                        <div className="flex justify-center space-x-12 mb-8">
+                        {/* Right illustration */}
+                        <div className="w-44 bg-gradient-to-br from-[#f0f4ff] to-[#e8f5e9] dark:from-[#0d1f35] dark:to-[#0a1f10] flex items-center justify-center p-4 shrink-0">
+                            <div className="relative">
+                                <div className="w-24 h-36 bg-[#0F1E36] rounded-2xl border-4 border-[#1a2d4a] shadow-lg flex flex-col overflow-hidden">
+                                    <div className="bg-[#1a2d4a] h-4 flex items-center justify-center">
+                                        <div className="w-8 h-1 bg-[#2a3d5a] rounded-full"></div>
+                                    </div>
+                                    <div className="flex-1 bg-white flex flex-col items-center justify-center px-2 py-2 space-y-1">
+                                        <span className="text-[7px] text-gray-500 font-bold uppercase tracking-wider">{t('yourFeedback', lang)}</span>
+                                        <div className="w-8 h-8 bg-[#FF9933] rounded-full flex items-center justify-center shadow">
+                                            <span className="text-sm">😊</span>
+                                        </div>
+                                        <div className="flex space-x-0.5">
+                                            {[1,2,3,4].map(s => (
+                                                <svg key={s} className="w-2.5 h-2.5 text-[#FF9933]" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                                </svg>
+                                            ))}
+                                            <svg className="w-2.5 h-2.5 text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                            </svg>
+                                        </div>
+                                        <div className="w-12 h-1.5 bg-gray-100 rounded-full mt-1"></div>
+                                        <div className="w-10 h-1.5 bg-gray-100 rounded-full"></div>
+                                    </div>
+                                </div>
+                                <div className="absolute -top-2 right-0 w-7 h-7 bg-[#FF9933] rounded-full opacity-80"></div>
+                                <div className="absolute bottom-0 -right-3 w-4 h-4 bg-[#12820B] rounded-full opacity-70"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Experience rating */}
+                    <div className="border-t border-gray-100 dark:border-slate-700 px-7 py-5">
+                        <p className="text-center text-sm font-black text-[#0F1E36] dark:text-white mb-4">{t('overallExperience', lang)}</p>
+                        <div className="grid grid-cols-2 gap-4">
                             <button
                                 onClick={() => setFeedback('satisfied')}
-                                className="flex flex-col items-center group"
+                                className={`flex items-center justify-center space-x-2.5 py-3.5 rounded-xl border-2 font-black text-sm transition-all active:scale-95 ${
+                                    feedback === 'satisfied'
+                                        ? 'border-[#FF9933] bg-[#FF9933]/10 text-[#FF9933]'
+                                        : 'border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-500 dark:text-gray-300 hover:border-[#FF9933]/50'
+                                }`}
                             >
-                                <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-3 transition-colors ${feedback === 'satisfied' ? 'bg-ti-navy dark:bg-slate-700 text-white' : 'bg-gray-100 dark:bg-slate-700/50 text-gray-400 dark:text-gray-500 group-hover:bg-gray-200 dark:group-hover:bg-slate-600'}`}>
-                                    <ThumbsUp className="w-8 h-8" />
-                                </div>
-                                <span className={`text-sm font-bold transition-colors ${feedback === 'satisfied' ? 'text-ti-navy dark:text-white' : 'text-gray-600 dark:text-gray-400'}`}>Satisfied</span>
+                                <ThumbsUp className="w-5 h-5" />
+                                <span>{t('satisfied', lang)}</span>
                             </button>
                             <button
                                 onClick={() => setFeedback('unsatisfied')}
-                                className="flex flex-col items-center group"
+                                className={`flex items-center justify-center space-x-2.5 py-3.5 rounded-xl border-2 font-black text-sm transition-all active:scale-95 ${
+                                    feedback === 'unsatisfied'
+                                        ? 'border-red-500 bg-red-50 dark:bg-red-950/20 text-red-500'
+                                        : 'border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-500 dark:text-gray-300 hover:border-red-300'
+                                }`}
                             >
-                                <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-3 transition-colors ${feedback === 'unsatisfied' ? 'bg-red-500 text-white' : 'bg-gray-100 dark:bg-slate-700/50 text-gray-400 dark:text-gray-500 group-hover:bg-gray-200 dark:group-hover:bg-slate-600'}`}>
-                                    <ThumbsDown className="w-8 h-8 mt-1" />
-                                </div>
-                                <span className={`text-sm font-bold transition-colors ${feedback === 'unsatisfied' ? 'text-red-600 dark:text-red-400' : 'text-gray-600 dark:text-gray-400'}`}>Unsatisfied</span>
+                                <ThumbsDown className="w-5 h-5" />
+                                <span>{t('unsatisfied', lang)}</span>
                             </button>
                         </div>
+                    </div>
 
-                        <div className="bg-gray-50 dark:bg-slate-900 border border-gray-100 dark:border-slate-700 rounded-lg p-4 text-xs italic text-gray-500 dark:text-gray-400 transition-colors">
-                            <strong>LEGAL DISCLAIMER</strong><br />
-                            Feedback provided is recorded for quality assurance purposes. Personal data is handled according to the National Data Protection Policy. Submissions are monitored 24/7.
+                    {/* Legal disclaimer */}
+                    <div className="mx-7 mb-6 flex items-start space-x-3 bg-gray-50 dark:bg-slate-800/50 border border-gray-200 dark:border-slate-700 rounded-xl p-4">
+                        <div className="w-7 h-7 bg-gray-200 dark:bg-slate-700 rounded-lg flex items-center justify-center shrink-0 mt-0.5">
+                            <Shield className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                        </div>
+                        <div>
+                            <p className="text-[10px] font-black text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-0.5">{t('legalDisclaimer', lang)}</p>
+                            <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium leading-relaxed">
+                                {t('legalDisclaimerText', lang)}
+                            </p>
                         </div>
                     </div>
                 </div>
 
-                {/* Reporting Service */}
-                <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden transition-colors">
-                    <div className="bg-ti-navy dark:bg-slate-900 px-6 py-4 flex items-center text-white transition-colors">
-                        <AlertTriangle className="w-5 h-5 mr-3 text-ti-saffron dark:text-orange-400 transition-colors" />
-                        <h2 className="text-lg font-bold">Reporting Service</h2>
+                {/* ── Report a Service Issue Card ── */}
+                <div className="bg-white dark:bg-[#0B1E36] rounded-2xl shadow-sm border border-gray-200 dark:border-slate-700 overflow-hidden">
+                    <div className="px-7 pt-7 pb-2 flex items-center space-x-2.5">
+                        <AlertTriangle className="w-5 h-5 text-[#FF9933]" />
+                        <h2 className="text-lg font-black text-[#0F1E36] dark:text-white">{t('reportServiceIssue', lang)}</h2>
                     </div>
 
-                    <div className="p-6 space-y-6">
+                    <div className="px-7 pb-7 pt-5 space-y-5">
+                        {/* Route input */}
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 transition-colors">Ask for Bus Route / Route Number</label>
+                            <label className="block text-xs font-black text-[#0F1E36] dark:text-gray-200 mb-2 uppercase tracking-wider">{t('routeDestination', lang)}</label>
                             <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <SearchIcon className="h-5 w-5 text-gray-400 dark:text-gray-500 transition-colors" />
+                                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                    <Search className="w-4 h-4 text-gray-400" />
                                 </div>
                                 <input
                                     type="text"
-                                    value={activeRoute}
-                                    onChange={() => { }}
-                                    className="block w-full pl-10 pr-3 py-3 border border-gray-200 dark:border-slate-600 rounded-lg text-gray-900 dark:text-white bg-white dark:bg-slate-900 focus:ring-ti-saffron focus:border-ti-saffron transition-colors"
-                                    placeholder="Enter route number or destination..."
+                                    value={route}
+                                    onChange={e => setRoute(e.target.value)}
+                                    placeholder={t('enterRouteOrDest', lang)}
+                                    className="w-full pl-10 pr-4 py-3 border border-gray-200 dark:border-slate-600 rounded-xl text-sm text-[#0F1E36] dark:text-white bg-white dark:bg-slate-800 focus:outline-none focus:border-[#FF9933] font-medium placeholder-gray-400 transition-colors"
                                 />
                             </div>
                         </div>
 
+                        {/* Type of concern */}
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-3">Type of Concern</label>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <button
-                                    onClick={() => setConcern('rash')}
-                                    className={`py-3 px-4 border rounded-lg flex items-center justify-center font-bold text-sm transition-colors ${concern === 'rash' ? 'border-ti-saffron bg-orange-50 text-ti-navy' : 'border-gray-200 text-gray-700 hover:bg-gray-50'}`}
-                                >
-                                    <ZapIcon className="w-4 h-4 mr-2 text-ti-saffron" /> Rash Driving
-                                </button>
-                                <button
-                                    onClick={() => setConcern('misconduct')}
-                                    className={`py-3 px-4 border rounded-lg flex items-center justify-center font-bold text-sm transition-colors ${concern === 'misconduct' ? 'border-ti-saffron bg-orange-50 text-ti-navy' : 'border-gray-200 text-gray-700 hover:bg-gray-50'}`}
-                                >
-                                    <UserXIcon className="w-4 h-4 mr-2 text-ti-saffron" /> Misconduct
-                                </button>
-                                <button
-                                    onClick={() => setConcern('overcrowding')}
-                                    className={`py-3 px-4 border rounded-lg flex items-center justify-center font-bold text-sm transition-colors ${concern === 'overcrowding' ? 'border-ti-saffron bg-orange-50 text-ti-navy' : 'border-gray-200 text-gray-700 hover:bg-gray-50'}`}
-                                >
-                                    <UsersIcon className="w-4 h-4 mr-2 text-ti-saffron" /> Overcrowding
-                                </button>
+                            <label className="block text-xs font-black text-[#0F1E36] dark:text-gray-200 mb-3 uppercase tracking-wider">{t('typeOfConcern', lang)}</label>
+                            <div className="grid grid-cols-3 gap-3">
+                                {concerns.map(c => (
+                                    <button
+                                        key={c.id}
+                                        type="button"
+                                        onClick={() => setConcern(c.id)}
+                                        className={`flex items-center space-x-2 px-4 py-3.5 border-2 rounded-xl text-sm font-bold transition-all active:scale-95 ${
+                                            concern === c.id
+                                                ? 'border-[#FF9933] bg-[#FF9933]/8 text-[#0F1E36] dark:text-white'
+                                                : 'border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-300 hover:border-gray-300'
+                                        }`}
+                                    >
+                                        <span className="text-base">{c.emoji}</span>
+                                        <span className="text-[11px] font-black">{t(c.labelKey, lang)}</span>
+                                    </button>
+                                ))}
                             </div>
                         </div>
 
+                        {/* Additional details */}
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-2">Additional Details (Optional)</label>
+                            <label className="block text-xs font-black text-[#0F1E36] dark:text-gray-200 mb-2 uppercase tracking-wider">{t('additionalDetails', lang)}</label>
                             <textarea
-                                rows="4"
+                                rows={4}
                                 value={details}
-                                onChange={(e) => setDetails(e.target.value)}
-                                className="block w-full p-3 border border-gray-200 rounded-lg text-gray-900 focus:ring-ti-saffron focus:border-ti-saffron resize-none shadow-inner"
-                                placeholder="Describe the incident in brief..."
-                            ></textarea>
+                                onChange={e => setDetails(e.target.value.slice(0, 500))}
+                                placeholder={t('describeIncident', lang)}
+                                className="w-full p-3.5 border border-gray-200 dark:border-slate-600 rounded-xl text-sm text-[#0F1E36] dark:text-white bg-white dark:bg-slate-800 focus:outline-none focus:border-[#FF9933] resize-none font-medium placeholder-gray-400 transition-colors"
+                            />
+                            <div className="flex justify-end mt-1">
+                                <span className="text-[10px] text-gray-400 font-bold">{details.length} / 500</span>
+                            </div>
                         </div>
 
-                        <div className="bg-orange-50 border-l-4 border-ti-saffron p-4 rounded-r-lg flex items-start">
-                            <AlertCircle className="w-5 h-5 text-ti-saffron mr-3 flex-shrink-0 mt-0.5" />
-                            <p className="text-xs font-bold text-orange-900">
-                                IMPORTANT: All reports are logged for pattern-based analysis and are subject to review by relevant transport authorities. Data integrity is maintained for administrative action.
+                        {/* Important notice */}
+                        <div className="flex items-start space-x-3 bg-orange-50 dark:bg-orange-950/20 border border-orange-100 dark:border-orange-900/40 rounded-xl p-4">
+                            <AlertCircle className="w-5 h-5 text-[#FF9933] shrink-0 mt-0.5" />
+                            <p className="text-[11px] text-orange-900 dark:text-orange-300 font-medium leading-relaxed">
+                                {t('importantAllReports', lang)}
                             </p>
                         </div>
 
+                        {/* Submit button */}
                         <button
                             disabled={!concern}
                             onClick={handleSubmit}
-                            className="w-full py-4 bg-[#F25E22] hover:bg-[#d44d18] text-white font-bold rounded-lg transition-colors flex items-center justify-center disabled:opacity-50 shadow-md active:scale-95"
+                            className="w-full py-4 bg-[#E84B1A] hover:bg-[#c93f14] disabled:opacity-40 text-white font-black rounded-xl transition-all flex items-center justify-center space-x-2 text-sm uppercase tracking-widest shadow-md active:scale-95 cursor-pointer"
                         >
-                            <Send className="w-5 h-5 mr-2" /> Submit Report
+                            <Send className="w-4 h-4" />
+                            <span>{t('submitReport', lang)}</span>
                         </button>
 
-                        <div className="bg-red-50 p-4 border border-red-100 rounded-lg flex items-start">
-                            <AlertTriangle className="w-5 h-5 text-red-500 mr-3 flex-shrink-0 mt-0.5" />
-                            <p className="text-xs font-bold text-red-700">
-                                WARNING: Misuse of this service results in severe crime under suitable sections of the Penal Code. False reporting is a punishable offense.
+                        {/* Warning */}
+                        <div className="flex items-start space-x-3 bg-red-50 dark:bg-red-950/20 border-l-4 border-red-500 rounded-r-xl p-4">
+                            <AlertTriangle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
+                            <p className="text-[11px] text-red-700 dark:text-red-400 font-medium leading-relaxed">
+                                {t('warningMisuse', lang)}
                             </p>
                         </div>
                     </div>
                 </div>
+
+                {/* ── Trust Pillars ── */}
+                <div className="grid grid-cols-3 gap-4">
+                    {trustPillars.map((p, i) => (
+                        <div key={i} className="bg-white dark:bg-[#0B1E36] rounded-2xl border border-gray-200 dark:border-slate-700 p-5 flex flex-col items-start space-y-2 shadow-sm">
+                            <div className="w-9 h-9 rounded-xl bg-[#FF9933]/10 border border-[#FF9933]/20 flex items-center justify-center">
+                                <p.icon className="w-4.5 h-4.5 text-[#FF9933]" />
+                            </div>
+                            <p className="text-xs font-black text-[#0F1E36] dark:text-white">{t(p.titleKey, lang)}</p>
+                            <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium leading-relaxed">{t(p.descKey, lang)}</p>
+                        </div>
+                    ))}
+                </div>
+
+                {/* ── Safety tagline ── */}
+                <div className="bg-white dark:bg-[#0B1E36] rounded-2xl border border-gray-200 dark:border-slate-700 px-6 py-5 flex items-center space-x-4 shadow-sm">
+                    <div className="w-10 h-10 bg-gray-100 dark:bg-slate-700 rounded-xl flex items-center justify-center shrink-0">
+                        <Shield className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                    </div>
+                    <div>
+                        <p className="text-sm font-black text-[#0F1E36] dark:text-white">{t('yourSafetyTitle', lang)}</p>
+                        <p className="text-[10px] text-gray-500 dark:text-gray-400 font-medium mt-0.5">{t('yourSafetyDesc', lang)}</p>
+                    </div>
+                </div>
+
             </main>
 
-            {/* Success Modal */}
+            {/* ── Success Modal ── */}
             <AnimatePresence>
                 {showModal && (
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ti-navy/60 backdrop-blur-sm"
+                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0F1E36]/80 backdrop-blur-sm"
                     >
                         <motion.div
                             initial={{ scale: 0.95, opacity: 0, y: 10 }}
                             animate={{ scale: 1, opacity: 1, y: 0 }}
-                            className="bg-white dark:bg-slate-800 rounded-xl shadow-2xl max-w-sm w-full overflow-hidden text-center relative pointer-events-auto border-t-4 border-ti-saffron dark:border-orange-500 transition-colors"
+                            className="bg-white dark:bg-[#0B1E36] rounded-3xl shadow-2xl max-w-sm w-full overflow-hidden text-center relative border-t-8 border-[#FF9933]"
                         >
-                            <button
-                                onClick={() => setShowModal(false)}
-                                className="absolute top-3 right-3 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-                            >
-                                ✕
-                            </button>
-
-                            <div className="pt-8 pb-6 px-8">
-                                <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-6 transition-colors">
+                            <button onClick={() => setShowModal(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 font-bold text-lg">✕</button>
+                            <div className="pt-10 pb-8 px-8">
+                                <div className="w-20 h-20 bg-green-50 dark:bg-green-950/25 rounded-full flex items-center justify-center mx-auto mb-5">
                                     <CheckCircle2 className="w-10 h-10 text-green-500" />
                                 </div>
-                                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 transition-colors">Report Submitted Successfully</h3>
-                                <p className="text-sm text-gray-600 dark:text-gray-300 mb-8 px-4 transition-colors">
-                                    Your report has been logged for official review. We promise to maintain the confidentiality of your report and investigate the matter promptly.
-                                </p>
-
+                                <h3 className="text-xl font-black text-[#0F1E36] dark:text-white mb-3">{t('reportSubmitted', lang)}</h3>
+                                <p className="text-xs text-gray-500 dark:text-gray-300 font-medium mb-8 leading-relaxed">{t('reportSubmittedDesc', lang)}</p>
                                 <div className="space-y-3">
-                                    <button
-                                        onClick={handleHome}
-                                        className="w-full py-3 bg-ti-navy dark:bg-slate-700 text-white font-bold rounded-lg hover:bg-slate-800 dark:hover:bg-slate-600 transition-colors shadow flex justify-center items-center"
-                                    >
-                                        <Home className="w-4 h-4 mr-2" /> Go to Home
+                                    <button onClick={handleHome} className="w-full py-3 bg-[#0F1E36] dark:bg-slate-700 text-white font-black rounded-xl hover:bg-[#1b2f4f] transition-all shadow-md flex justify-center items-center text-xs uppercase tracking-widest space-x-2">
+                                        <Home className="w-4 h-4" />
+                                        <span>{t('goToHome', lang)}</span>
                                     </button>
-                                    <button
-                                        onClick={() => setShowModal(false)}
-                                        className="w-full py-3 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 font-bold rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
-                                    >
-                                        View Report Details
+                                    <button onClick={() => setShowModal(false)} className="w-full py-3 bg-gray-50 dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-700 text-gray-600 dark:text-gray-300 font-black rounded-xl hover:bg-gray-100 transition-colors text-xs uppercase tracking-widest">
+                                        {t('viewDetails', lang)}
                                     </button>
                                 </div>
-
-                                <div className="mt-8 pt-4 border-t border-gray-100 dark:border-slate-700 flex items-center justify-center text-xs font-bold text-gray-400 dark:text-gray-500 transition-colors">
-                                    <ShieldIcon className="w-3 h-3 mr-1" /> OFFICIAL GOVERNMENT CONFIRMATION
+                                <div className="mt-7 pt-4 border-t border-gray-100 dark:border-slate-700 flex items-center justify-center space-x-1.5 text-[9px] font-black text-gray-400 tracking-wider">
+                                    <Shield className="w-3 h-3 text-[#FF9933]" />
+                                    <span>{t('officialConfirmationEmbedded', lang)}</span>
                                 </div>
                             </div>
                         </motion.div>
@@ -232,11 +294,3 @@ export default function ServiceReporting({ routeData, navigateTo }) {
         </div>
     );
 }
-
-// Icons
-const MessageSquareIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
-const SearchIcon = (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
-const ZapIcon = (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></svg>
-const UserXIcon = (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5c-2.2 0-4 1.8-4 4v2" /><circle cx="8.5" cy="7" r="4" /><line x1="18" y1="8" x2="23" y2="13" /><line x1="23" y1="8" x2="18" y2="13" /></svg>
-const UsersIcon = (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>
-const ShieldIcon = (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>

@@ -4,13 +4,122 @@
 
 @layer base {
   body {
-    @apply bg-gray-50 text-gray-900 font-sans;
+    background-color: #F4EFE3 !important; /* Rich warm heritage cream */
+    @apply text-[#091726] dark:bg-[#070F1E] dark:text-gray-100 font-sans transition-colors duration-300;
   }
 }
 
-.chakra-pattern {
-  background-image: radial-gradient(#0B1F3A 20%, transparent 20%), radial-gradient(#0B1F3A 20%, transparent 20%);
-  background-size: 40px 40px;
-  background-position: 0 0, 20px 20px;
-  opacity: 0.03;
+/* Transform light mode white panels to warm cream/ivory */
+html:not(.dark) .bg-white {
+  background-color: #FAF6ED !important; /* Lighter warm cream card background */
+}
+
+/* Transform light mode gray backgrounds to soft warm sand/parchment */
+html:not(.dark) .bg-gray-50 {
+  background-color: #ECE3D2 !important;
+}
+html:not(.dark) .bg-gray-100 {
+  background-color: #E2D7C2 !important;
+}
+
+/* Transform light mode borders to warm cream sand borders */
+html:not(.dark) .border-gray-100,
+html:not(.dark) .border-gray-150,
+html:not(.dark) .border-gray-200,
+html:not(.dark) .border-gray-300,
+html:not(.dark) .border-gray-250 {
+  border-color: #E2D7C3 !important;
+}
+
+/* Custom CSS variables for the Mockup Theme */
+:root {
+  --color-primary: #12820B;        /* Vibrant Emerald/Tiranga Green */
+  --color-accent: #FF9933;         /* Saffron Accent */
+  --color-sidebar: #0B1B2D;        /* Dark Slate/Navy Sidebar */
+  --color-sidebar-hover: #11253C;
+  --color-bg-light: #F8FAFC;       /* Clean Off-white */
+  --color-card-light: #FFFFFF;
+  --color-border-light: #E2E8F0;
+  
+  --color-bg-dark: #070F1E;
+  --color-card-dark: #0B1E36;
+  --color-border-dark: #1E293B;
+}
+
+/* Sidebar Specific Classes */
+.sidebar-active-link {
+  @apply bg-gradient-to-r from-[#12820B]/10 to-[#12820B]/20 text-[#12820B] border-l-4 border-[#12820B] font-extrabold;
+}
+
+.dark .sidebar-active-link {
+  @apply bg-gradient-to-r from-[#12820B]/20 to-[#12820B]/30 text-green-400 border-l-4 border-green-500 font-extrabold;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-[#12820B]/20 rounded-full hover:bg-[#12820B]/40 transition-colors;
+}
+
+/* Glowing Highlights */
+.glow-green {
+  box-shadow: 0 4px 20px rgba(18, 130, 11, 0.08);
+}
+
+.glow-orange {
+  box-shadow: 0 4px 20px rgba(255, 153, 51, 0.08);
+}
+
+/* Monument Outline Watermark */
+.monument-sketch-bg {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 300" opacity="0.04" fill="none" stroke="%23091726" stroke-width="1.5"><path d="M100 280 L100 240 L120 240 L120 280 M120 280 L150 280 L150 200 L170 170 L190 200 L190 280 M190 280 L250 280 L250 220 L270 220 L270 280 M300 280 L300 120 L350 70 L400 120 L400 280 M320 280 L320 180 Q350 150 380 180 L380 280 M450 280 L450 220 L470 220 L470 280 M480 280 L510 280 L510 200 L530 170 L550 200 L550 280 M570 280 L570 240 L590 240 L590 280 M50 280 L750 280" stroke-linecap="round" stroke-linejoin="round"/></svg>');
+  background-position: bottom right;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.dark .monument-sketch-bg {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 300" opacity="0.04" fill="none" stroke="%23FFFFFF" stroke-width="1.5"><path d="M100 280 L100 240 L120 240 L120 280 M120 280 L150 280 L150 200 L170 170 L190 200 L190 280 M190 280 L250 280 L250 220 L270 220 L270 280 M300 280 L300 120 L350 70 L400 120 L400 280 M320 280 L320 180 Q350 150 380 180 L380 280 M450 280 L450 220 L470 220 L470 280 M480 280 L510 280 L510 200 L530 170 L550 200 L550 280 M570 280 L570 240 L590 240 L590 280 M50 280 L750 280" stroke-linecap="round" stroke-linejoin="round"/></svg>');
+}
+
+/* Animated flow line for route tracking */
+.route-flow-line {
+  stroke-dasharray: 10, 15;
+  animation: routeFlow 2.5s linear infinite;
+}
+
+@keyframes routeFlow {
+  from {
+    stroke-dashoffset: 25;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Pulse Beacon */
+.pulse-beacon-green {
+  animation: beaconGreen 2s infinite;
+}
+@keyframes beaconGreen {
+  0% { box-shadow: 0 0 0 0 rgba(18, 130, 11, 0.4); }
+  70% { box-shadow: 0 0 0 12px rgba(18, 130, 11, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(18, 130, 11, 0); }
+}
+
+.pulse-beacon-red {
+  animation: beaconRed 2s infinite;
+}
+@keyframes beaconRed {
+  0% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0.4); }
+  70% { box-shadow: 0 0 0 12px rgba(211, 47, 47, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(211, 47, 47, 0); }
 }

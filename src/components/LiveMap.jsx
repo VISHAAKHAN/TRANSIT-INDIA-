@@ -12,28 +12,28 @@ L.Icon.Default.mergeOptions({
 });
 
 const busIcon = new L.DivIcon({
-    html: `<div class="bus-marker-pulse"><div style="background:#f97316;color:white;width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:20px;border:3px solid white;box-shadow:0 4px 14px rgba(249,115,22,0.5);position:relative;z-index:10;">🚌</div></div>`,
+    html: `<div class="bus-marker-pulse"><div style="background:#FF9933;color:white;width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:20px;border:3px solid #0F1E36;box-shadow:0 4px 14px rgba(255,153,51,0.5);position:relative;z-index:10;">🚌</div></div>`,
     className: '',
     iconSize: [42, 42],
     iconAnchor: [21, 21],
 });
 
 const stopIcon = new L.DivIcon({
-    html: `<div style="background:white;width:12px;height:12px;border-radius:50%;border:3px solid #f97316;box-shadow:0 1px 4px rgba(0,0,0,0.2);"></div>`,
+    html: `<div style="background:white;width:12px;height:12px;border-radius:50%;border:3px solid #FF9933;box-shadow:0 1px 4px rgba(0,0,0,0.2);"></div>`,
     className: '',
     iconSize: [12, 12],
     iconAnchor: [6, 6],
 });
 
 const boardingIcon = new L.DivIcon({
-    html: `<div style="position:relative;"><div style="background:#22c55e;color:white;width:28px;height:28px;border-radius:50%;border:3px solid white;box-shadow:0 2px 8px rgba(34,197,94,0.4);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;">A</div></div>`,
+    html: `<div style="position:relative;"><div class="signal-pulse-green" style="background:#12820B;color:white;width:28px;height:28px;border-radius:8px;border:2.5px solid white;box-shadow:0 2px 8px rgba(18,130,11,0.4);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;font-family:sans-serif;">A</div></div>`,
     className: '',
     iconSize: [28, 28],
     iconAnchor: [14, 14],
 });
 
 const destinationIcon = new L.DivIcon({
-    html: `<div style="position:relative;"><div style="background:#ef4444;color:white;width:28px;height:28px;border-radius:50%;border:3px solid white;box-shadow:0 2px 8px rgba(239,68,68,0.4);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;">B</div></div>`,
+    html: `<div style="position:relative;"><div class="signal-pulse-red" style="background:#D32F2F;color:white;width:28px;height:28px;border-radius:8px;border:2.5px solid white;box-shadow:0 2px 8px rgba(211,47,47,0.4);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;font-family:sans-serif;">B</div></div>`,
     className: '',
     iconSize: [28, 28],
     iconAnchor: [14, 14],
@@ -109,12 +109,12 @@ function AnimatedBus({ stops, initialPosition, routeData }) {
             <CircleMarker
                 center={position}
                 radius={20}
-                pathOptions={{ color: '#f97316', fillColor: '#f97316', fillOpacity: 0.1, weight: 1 }}
+                pathOptions={{ color: '#FF9933', fillColor: '#FF9933', fillOpacity: 0.1, weight: 1 }}
             />
             <Marker position={position} icon={busIcon} zIndexOffset={1000}>
                 <Popup>
                     <div style={{ fontFamily: 'system-ui', padding: '4px' }}>
-                        <div style={{ fontWeight: 'bold', color: '#f97316', fontSize: '14px', marginBottom: '4px' }}>Bus {routeData.id}</div>
+                        <div style={{ fontWeight: 'bold', color: '#FF9933', fontSize: '14px', marginBottom: '4px' }}>Bus {routeData.id}</div>
                         <div style={{ fontSize: '13px', color: '#333' }}>ETA: {routeData.expectedArrival}</div>
                         <div style={{ fontSize: '11px', color: '#666', marginTop: '2px' }}>Status: {routeData.status === 'running' ? 'On Time' : 'Delayed'}</div>
                     </div>
@@ -142,16 +142,17 @@ export default function LiveMap({ stops = [], busPosition = null, boarding = '',
                     width: 42px;
                     height: 42px;
                     margin: -21px 0 0 -21px;
-                    border-radius: 50%;
-                    background: rgba(249, 115, 22, 0.3);
+                    border-radius: 12px;
+                    background: rgba(255, 153, 51, 0.3);
                     animation: busPulse 2s ease-out infinite;
                 }
                 @keyframes busPulse {
                     0% { transform: scale(1); opacity: 0.6; }
-                    100% { transform: scale(2.5); opacity: 0; }
+                    100% { transform: scale(2.2); opacity: 0; }
                 }
             `}</style>
-            <div className="rounded-xl overflow-hidden border border-gray-200 dark:border-slate-600 shadow-lg" style={{ height: '420px' }}>
+            <div className="rounded-3xl overflow-hidden border-2 border-[#FF9933]/15 shadow-md relative" style={{ height: '420px' }}>
+                <div className="radar-sweep"></div>
                 <MapContainer
                     center={defaultCenter}
                     zoom={13}
@@ -166,32 +167,34 @@ export default function LiveMap({ stops = [], busPosition = null, boarding = '',
 
                     <FitBounds stops={stops} busPosition={busPosition} />
 
-                    {/* Route path - solid colored line */}
+                    {/* Route path */}
                     {routeLine.length >= 2 && (
                         <>
                             {/* Shadow line */}
                             <Polyline
                                 positions={routeLine}
-                                color="#0f172a"
+                                color="#0F1E36"
                                 weight={7}
                                 opacity={0.15}
                             />
                             {/* Main route line */}
                             <Polyline
                                 positions={routeLine}
-                                color="#f97316"
+                                color="#FF9933"
                                 weight={5}
                                 opacity={0.9}
                                 lineCap="round"
                                 lineJoin="round"
                             />
-                            {/* Animated dash overlay */}
+                            {/* Animated dash overlay mapping flow */}
                             <Polyline
                                 positions={routeLine}
-                                color="white"
-                                weight={2}
-                                opacity={0.5}
-                                dashArray="12,18"
+                                pathOptions={{
+                                    color: 'white',
+                                    weight: 2.5,
+                                    opacity: 0.7,
+                                    className: 'route-flow-line'
+                                }}
                             />
                         </>
                     )}
@@ -206,8 +209,8 @@ export default function LiveMap({ stops = [], busPosition = null, boarding = '',
                             <Marker key={i} position={[stop.lat, stop.lng]} icon={icon}>
                                 <Popup>
                                     <div style={{ fontFamily: 'system-ui', padding: '2px' }}>
-                                        {isBoarding && <span style={{ color: '#22c55e', fontWeight: 'bold', fontSize: '11px' }}>BOARDING POINT<br/></span>}
-                                        {isDest && <span style={{ color: '#ef4444', fontWeight: 'bold', fontSize: '11px' }}>DESTINATION<br/></span>}
+                                        {isBoarding && <span style={{ color: '#12820B', fontWeight: 'bold', fontSize: '11px' }}>BOARDING POINT<br/></span>}
+                                        {isDest && <span style={{ color: '#D32F2F', fontWeight: 'bold', fontSize: '11px' }}>DESTINATION<br/></span>}
                                         <span style={{ fontWeight: 'bold', fontSize: '13px' }}>{stop.name}</span>
                                     </div>
                                 </Popup>

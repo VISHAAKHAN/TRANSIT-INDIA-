@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { User, CheckCircle, ShieldAlert } from 'lucide-react';
+import { User, CheckCircle, ShieldAlert, Info, Headphones, Shield } from 'lucide-react';
 import { t } from '../translations';
 
-export default function Profile({ navigateTo, lang }) {
+export default function Profile({ navigateTo, lang, setLang }) {
     const [aadhaar, setAadhaar] = useState('');
     const [isVerified, setIsVerified] = useState(false);
     const [showModal, setShowModal] = useState(false);
@@ -59,10 +59,9 @@ export default function Profile({ navigateTo, lang }) {
 
     const handleSaveClick = () => {
         if (!isVerified) {
-            setValidationError(t('pleaseVerifyAadhaar', lang));
+            setValidationError(t('pleaseVerifyAadhaar', lang) || "Please verify your Aadhaar number before saving.");
             return;
         }
-        // Save core fields
         setValidationError('');
         localStorage.setItem('userRegion', region);
         localStorage.setItem('userDistrict', district);
@@ -74,41 +73,40 @@ export default function Profile({ navigateTo, lang }) {
     };
 
     return (
-        <div className="max-w-6xl mx-auto w-full pt-4 pb-12 transition-colors">
-            <h1 className="text-3xl font-extrabold text-ti-navy dark:text-white mb-1 inline-block transition-colors">{t('userProfileTitle', lang)}</h1>
-            <div className="w-16 h-1 bg-[#F25E22] mb-6"></div>
+        <div className="max-w-6xl mx-auto w-full pt-4 pb-12 px-2 transition-colors duration-300">
+            <h1 className="text-3xl font-black text-[#0F1E36] dark:text-white mb-2 tracking-tight">{t('userProfileTitle', lang)}</h1>
+            <div className="w-16 h-1 bg-gradient-to-r from-[#FF9933] to-[#FF6F00] rounded-full mb-8"></div>
 
             {validationError && (
-                <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 text-sm font-bold rounded-lg flex items-center max-w-2xl">
-                    <ShieldAlert className="w-5 h-5 mr-2" />
+                <div className="mb-6 p-4 bg-red-50 dark:bg-red-950/20 border-2 border-red-200 dark:border-red-900/40 text-red-700 dark:text-red-400 text-xs font-black uppercase tracking-wider rounded-2xl flex items-center max-w-2xl shadow-sm">
+                    <ShieldAlert className="w-5 h-5 mr-3 shrink-0" />
                     {validationError}
                 </div>
             )}
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Profile Setup (Left Column) */}
-                <div className="lg:col-span-2">
-                    <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden mb-6 transition-colors">
-                        <div className="px-6 py-4 flex items-center bg-gray-50/50 dark:bg-slate-900/50 border-b border-gray-100 dark:border-slate-700 transition-colors">
-                            <div className="w-6 h-6 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center mr-3">
-                                <User className="w-3.5 h-3.5 text-[#F25E22]" />
+                <div className="lg:col-span-2 space-y-6">
+                    <div className="bg-white dark:bg-[#0B1E36] rounded-3xl shadow-[0_8px_30px_rgba(15,30,54,0.06)] border-2 border-[#FF9933]/15 overflow-hidden transition-colors chakra-pattern-modern">
+                        <div className="px-6 py-4.5 flex items-center bg-[#FAF9F6] dark:bg-[#070F1E]/40 border-b border-gray-150 dark:border-slate-800">
+                            <div className="w-8 h-8 rounded-xl bg-[#FF9933]/10 dark:bg-[#FF9933]/5 border border-[#FF9933]/25 flex items-center justify-center mr-3">
+                                <User className="w-4 h-4 text-[#FF9933]" />
                             </div>
-                            <h2 className="text-lg font-bold text-gray-900 dark:text-white transition-colors">{t('profileSetup', lang)}</h2>
+                            <h2 className="text-base font-black text-[#0F1E36] dark:text-white uppercase tracking-wider">{t('profileSetup', lang)}</h2>
                         </div>
 
-                        <div className="p-6">
+                        <div className="p-6 sm:p-8">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                 <div>
-                                    <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 transition-colors">{t('fullName', lang)}</label>
-                                    <input type="text" defaultValue="Arjun Sharma" className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-600 rounded-lg text-gray-800 dark:text-gray-100 focus:ring-1 focus:ring-[#F25E22] transition-colors" />
+                                    <label className="block text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-2">{t('fullName', lang)}</label>
+                                    <input type="text" defaultValue="Arjun Sharma" className="w-full px-4 py-3 bg-white dark:bg-[#070F1E] border-2 border-gray-200 dark:border-slate-800 rounded-xl text-sm font-bold text-[#0F1E36] dark:text-white focus:border-[#FF9933] focus:ring-0 transition-colors" />
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 transition-colors">{t('mobileNumberLabel', lang)}</label>
+                                    <label className="block text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-2">{t('mobileNumberLabel', lang)}</label>
                                     <div className="relative">
-                                        <input type="text" defaultValue="+91 98765 43210" disabled className="w-full px-4 py-3 border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-800 rounded-lg text-gray-600 dark:text-gray-400 cursor-not-allowed transition-colors" />
-                                        <div className="absolute right-3 top-3 bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 text-xs font-bold px-2 py-0.5 rounded flex items-center blur-none border border-green-100 dark:border-green-800 transition-colors">
-                                            <CheckCircle className="w-3 h-3 mr-1" /> {t('verified', lang)}
+                                        <input type="text" defaultValue="+91 98765 43210" disabled className="w-full px-4 py-3 border-2 border-gray-200 dark:border-slate-800 bg-[#FAF9F6] dark:bg-[#070F1E]/60 rounded-xl text-xs font-black text-gray-405 dark:text-gray-500 cursor-not-allowed" />
+                                        <div className="absolute right-3.5 top-2.5 bg-[#12820B]/10 dark:bg-[#12820B]/5 text-[#12820B] text-[9px] font-black px-2 py-1.5 rounded-lg border border-[#12820B]/20 flex items-center uppercase tracking-wider">
+                                            <CheckCircle className="w-3.5 h-3.5 mr-1" /> {t('verified', lang)}
                                         </div>
                                     </div>
                                 </div>
@@ -116,50 +114,59 @@ export default function Profile({ navigateTo, lang }) {
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                 <div>
-                                    <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 transition-colors">{t('fullAddress', lang)}</label>
-                                    <textarea rows="4" className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-600 rounded-lg text-gray-800 dark:text-gray-100 focus:ring-1 focus:ring-[#F25E22] transition-colors" placeholder="Enter your complete residential address"></textarea>
+                                    <label className="block text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-2">{t('fullAddress', lang)}</label>
+                                    <textarea rows="3" className="w-full px-4 py-3 bg-white dark:bg-[#070F1E] border-2 border-gray-200 dark:border-slate-800 rounded-xl text-sm font-bold text-[#0F1E36] dark:text-white focus:border-[#FF9933] focus:ring-0 resize-none" placeholder="Enter your complete address..."></textarea>
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 transition-colors">{t('languagePreference', lang)}</label>
-                                    <select className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-600 rounded-lg text-gray-800 dark:text-gray-100 focus:ring-1 focus:ring-[#F25E22] appearance-none transition-colors">
-                                        <option>English</option>
-                                        <option>Hindi</option>
-                                        <option>Tamil</option>
+                                    <label className="block text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-2">{t('languagePreference', lang)}</label>
+                                    <select 
+                                        value={lang}
+                                        onChange={(e) => setLang && setLang(e.target.value)}
+                                        className="w-full px-4 py-3 bg-white dark:bg-[#070F1E] border-2 border-gray-200 dark:border-slate-800 rounded-xl text-sm font-bold text-[#0F1E36] dark:text-white focus:border-[#FF9933] focus:ring-0 appearance-none cursor-pointer"
+                                    >
+                                        <option value="English">English</option>
+                                        <option value="Hindi">Hindi</option>
+                                        <option value="Tamil">Tamil</option>
+                                        <option value="Malayalam">Malayalam</option>
                                     </select>
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                            {/* Aadhaar Card Container design */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                                 <div>
-                                    <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 transition-colors">{t('dob', lang)}</label>
+                                    <label className="block text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-2">{t('dob', lang)}</label>
                                     <input
                                         type="date"
                                         value={dob}
                                         onChange={(e) => setDob(e.target.value)}
-                                        className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-600 rounded-lg text-gray-800 dark:text-gray-100 focus:ring-1 focus:ring-[#F25E22] transition-colors max-h-[50px]"
+                                        className="w-full px-4 py-3 bg-white dark:bg-[#070F1E] border-2 border-gray-200 dark:border-slate-800 rounded-xl text-xs font-bold text-[#0F1E36] dark:text-white focus:border-[#FF9933] focus:ring-0"
                                     />
                                 </div>
-                                <div className="col-span-1">
-                                    <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 transition-colors">{t('aadhaarNumber', lang)} <span className="text-[10px] text-gray-400 dark:text-gray-500 font-normal normal-case">{t('forVerification', lang)}</span></label>
+                                <div>
+                                    <label className="block text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-2">
+                                        {t('aadhaarNumber', lang)} <span className="text-[8px] text-gray-400 font-bold normal-case">({t('forVerification', lang)})</span>
+                                    </label>
                                     <div className="relative">
                                         <input
                                             type="text"
                                             placeholder="XXXX XXXX XXXX"
                                             value={aadhaar}
                                             onChange={handleAadhaarChange}
-                                            className="w-full pl-4 pr-16 py-3 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-600 rounded-lg text-gray-800 dark:text-gray-100 font-mono tracking-widest focus:ring-1 focus:ring-[#F25E22] transition-colors"
+                                            className="w-full pl-4 pr-16 py-3 bg-white dark:bg-[#070F1E] border-2 border-gray-200 dark:border-slate-800 rounded-xl text-xs font-black text-[#0F1E36] dark:text-white tracking-widest focus:border-[#FF9933] focus:ring-0 font-mono"
                                         />
                                         <button
+                                            type="button"
                                             onClick={handleVerifyClick}
-                                            className={`absolute right-2 top-2 bottom-2 px-3 rounded text-xs font-bold transition-colors ${isVerified ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400' : 'bg-orange-50 dark:bg-orange-950/40 text-orange-600 dark:text-orange-400 hover:bg-orange-100 dark:hover:bg-orange-900/60'}`}
+                                            className={`absolute right-2 top-2 bottom-2 px-3 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all ${isVerified ? 'bg-[#12820B]/10 text-[#12820B] border border-[#12820B]/20' : 'bg-[#FF9933]/15 text-[#FF9933] border border-[#FF9933]/30 hover:bg-[#FF9933]/25 active:scale-95'}`}
                                         >
                                             {isVerified ? t('verified', lang) : t('verify', lang)}
                                         </button>
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 transition-colors">{t('gender', lang)}</label>
-                                    <select className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-600 rounded-lg text-gray-800 dark:text-gray-100 focus:ring-1 focus:ring-[#F25E22] appearance-none transition-colors">
+                                    <label className="block text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-2">{t('gender', lang)}</label>
+                                    <select className="w-full px-4 py-3 bg-white dark:bg-[#070F1E] border-2 border-gray-200 dark:border-slate-800 rounded-xl text-sm font-bold text-[#0F1E36] dark:text-white focus:border-[#FF9933] focus:ring-0 appearance-none cursor-pointer">
                                         <option value="">{t('selectGender', lang) || "Select Gender"}</option>
                                         <option>{t('male', lang) || "Male"}</option>
                                         <option>{t('female', lang) || "Female"}</option>
@@ -170,14 +177,14 @@ export default function Profile({ navigateTo, lang }) {
 
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                                 <div>
-                                    <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 transition-colors">{t('regionState', lang)}</label>
+                                    <label className="block text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-2">{t('regionState', lang)}</label>
                                     <select
                                         value={region}
                                         onChange={(e) => {
                                             setRegion(e.target.value);
                                             setDistrict('');
                                         }}
-                                        className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-600 rounded-lg text-gray-800 dark:text-gray-100 focus:ring-1 focus:ring-[#F25E22] appearance-none transition-colors"
+                                        className="w-full px-4 py-3 bg-white dark:bg-[#070F1E] border-2 border-gray-200 dark:border-slate-800 rounded-xl text-sm font-bold text-[#0F1E36] dark:text-white focus:border-[#FF9933] focus:ring-0 appearance-none cursor-pointer"
                                     >
                                         <option value="">{t('selectState', lang)}</option>
                                         <option value="Tamil Nadu">Tamil Nadu</option>
@@ -185,12 +192,12 @@ export default function Profile({ navigateTo, lang }) {
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 transition-colors">{t('city', lang)}</label>
+                                    <label className="block text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-2">{t('city', lang)}</label>
                                     {region === 'Tamil Nadu' ? (
                                         <select
                                             value={district}
                                             onChange={(e) => setDistrict(e.target.value)}
-                                            className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-600 rounded-lg text-gray-800 dark:text-gray-100 focus:ring-1 focus:ring-[#F25E22] appearance-none transition-colors"
+                                            className="w-full px-4 py-3 bg-white dark:bg-[#070F1E] border-2 border-gray-200 dark:border-slate-800 rounded-xl text-sm font-bold text-[#0F1E36] dark:text-white focus:border-[#FF9933] focus:ring-0 appearance-none cursor-pointer"
                                         >
                                             <option value="">{t('selectDistrict', lang) || "Select District"}</option>
                                             {tamilNaduDistricts.map(d => (
@@ -201,7 +208,7 @@ export default function Profile({ navigateTo, lang }) {
                                         <select
                                             value={district}
                                             onChange={(e) => setDistrict(e.target.value)}
-                                            className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-600 rounded-lg text-gray-800 dark:text-gray-100 focus:ring-1 focus:ring-[#F25E22] appearance-none transition-colors"
+                                            className="w-full px-4 py-3 bg-white dark:bg-[#070F1E] border-2 border-gray-200 dark:border-slate-800 rounded-xl text-sm font-bold text-[#0F1E36] dark:text-white focus:border-[#FF9933] focus:ring-0 appearance-none cursor-pointer"
                                         >
                                             <option value="">{t('selectDistrict', lang) || "Select District"}</option>
                                             {keralaDistricts.map(d => (
@@ -214,24 +221,24 @@ export default function Profile({ navigateTo, lang }) {
                                             value={district}
                                             onChange={(e) => setDistrict(e.target.value)}
                                             placeholder={t('enterDistrict', lang) || "Enter District"}
-                                            className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-lg text-gray-800 dark:text-gray-100 cursor-not-allowed transition-colors"
+                                            className="w-full px-4 py-3 bg-[#FAF9F6] dark:bg-[#070F1E] border-2 border-gray-200 dark:border-slate-800 rounded-xl text-xs font-black text-gray-405 dark:text-gray-500 cursor-not-allowed"
                                             disabled
                                         />
                                     )}
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 transition-colors">{t('pincode', lang)}</label>
-                                    <input type="text" placeholder="XXXXXX" className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-600 rounded-lg text-gray-800 dark:text-gray-100 tracking-widest focus:ring-1 focus:ring-[#F25E22] transition-colors" />
+                                    <label className="block text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-2">{t('pincode', lang)}</label>
+                                    <input type="text" placeholder="XXXXXX" className="w-full px-4 py-3 bg-white dark:bg-[#070F1E] border-2 border-gray-200 dark:border-slate-800 rounded-xl text-sm font-bold text-[#0F1E36] dark:text-white tracking-widest focus:border-[#FF9933] focus:ring-0" />
                                 </div>
                             </div>
 
-                            <div className="flex justify-end space-x-4 border-t border-gray-100 dark:border-slate-700 pt-6 transition-colors">
-                                <button className="px-6 py-2.5 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 text-gray-700 dark:text-gray-300 font-bold rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors shadow-sm">
+                            <div className="flex justify-end space-x-4 border-t border-gray-150 dark:border-slate-800 pt-6">
+                                <button className="px-6 py-3 bg-white dark:bg-slate-900 border-2 border-gray-250 dark:border-slate-800 text-gray-650 dark:text-gray-300 font-extrabold text-xs uppercase tracking-widest rounded-xl hover:bg-gray-50 dark:hover:bg-slate-850 shadow-sm transition-all transform active:scale-95">
                                     {t('discardChanges', lang)}
                                 </button>
                                 <button
                                     onClick={handleSaveClick}
-                                    className="px-6 py-2.5 bg-[#F25E22] hover:bg-[#d44d18] text-white font-bold rounded-lg shadow-sm transition-colors inline-block"
+                                    className="px-6 py-3 bg-gradient-to-r from-[#FF9933] to-[#FF6F00] hover:from-orange-655 hover:to-orange-700 text-white font-extrabold text-xs uppercase tracking-widest rounded-xl shadow-md transition-all transform active:scale-95"
                                 >
                                     {t('saveProfile', lang)}
                                 </button>
@@ -239,114 +246,109 @@ export default function Profile({ navigateTo, lang }) {
                         </div>
                     </div>
 
-                    {/* Digital India Banner */}
-                    <div className="bg-[#0f1d3a] rounded-xl overflow-hidden shadow-lg relative h-32 flex items-center px-8 border border-[#1b2b4e]">
-                        <div className="absolute right-0 top-0 bottom-0 opacity-10 pointer-events-none w-1/2">
-                            {/* fingerprint / concentric rings pattern mock */}
+                    {/* Digital India Banner in Ashoka Navy */}
+                    <div className="bg-[#0F1E36] rounded-3xl overflow-hidden shadow-lg relative min-h-32 flex items-center px-6 sm:px-8 border-2 border-[#FF9933]/15">
+                        <div className="absolute right-0 top-0 bottom-0 opacity-[0.03] pointer-events-none w-1/2 text-white">
                             <svg viewBox="0 0 100 100" className="w-full h-full object-cover">
-                                <circle cx="80" cy="50" r="10" fill="none" stroke="white" strokeWidth="2" />
-                                <circle cx="80" cy="50" r="20" fill="none" stroke="white" strokeWidth="2" />
-                                <circle cx="80" cy="50" r="30" fill="none" stroke="white" strokeWidth="2" />
-                                <circle cx="80" cy="50" r="40" fill="none" stroke="white" strokeWidth="2" />
-                                <circle cx="80" cy="50" r="50" fill="none" stroke="white" strokeWidth="2" />
+                                <circle cx="80" cy="50" r="10" fill="none" stroke="currentColor" strokeWidth="2" />
+                                <circle cx="80" cy="50" r="20" fill="none" stroke="currentColor" strokeWidth="2" />
+                                <circle cx="80" cy="50" r="30" fill="none" stroke="currentColor" strokeWidth="2" />
+                                <circle cx="80" cy="50" r="40" fill="none" stroke="currentColor" strokeWidth="2" />
+                                <circle cx="80" cy="50" r="50" fill="none" stroke="currentColor" strokeWidth="2" />
                             </svg>
                         </div>
-                        <div className="relative z-10 w-full flex justify-between items-center">
+                        <div className="relative z-10 w-full flex flex-col sm:flex-row justify-between items-start sm:items-center py-5 sm:py-0 gap-4">
                             <div>
-                                <h3 className="text-white font-bold text-lg mb-1">{t('digitalIndiaInitiative', lang)}</h3>
-                                <p className="text-gray-300 text-sm max-w-sm">{t('dataEncryptedDesc', lang)}</p>
+                                <h3 className="text-white font-black text-base uppercase tracking-wider mb-1">{t('digitalIndiaInitiative', lang) || "Digital India Initiative"}</h3>
+                                <p className="text-gray-300 text-xs font-bold leading-relaxed max-w-sm">{t('dataEncryptedDesc', lang) || "All personal Aadhaar data logs are securely encrypted at routing points under the State Data Security Guidelines."}</p>
                             </div>
-                            <div className="w-16 h-16 border border-[#2a3c63] rounded bg-[#0b162c] flex flex-col items-center justify-center p-2">
-                                <span className="text-[10px] text-gray-400 font-bold mb-1">GOVERNMENT OF INDIA</span>
-                                <div className="w-8 h-8 opacity-50"><LogoIcon /></div>
+                            <div className="w-16 h-16 border border-white/10 rounded-xl bg-white/5 backdrop-blur-md flex flex-col items-center justify-center p-1.5 shrink-0 self-end sm:self-center">
+                                <span className="text-[7px] text-gray-300 font-black text-center mb-1 leading-tight uppercase">GOVERNMENT OF BHARAT</span>
+                                <div className="w-6 h-6 text-[#FF9933]"><LogoIcon /></div>
                             </div>
                         </div>
                     </div>
-
                 </div>
 
                 {/* Right Column */}
                 <div className="lg:col-span-1 space-y-6">
                     {/* About Transit India */}
-                    <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden transition-colors">
-                        <div className="px-6 py-4 flex items-center bg-gray-50/50 dark:bg-slate-900/50 border-b border-gray-100 dark:border-slate-700 transition-colors">
-                            <div className="w-6 h-6 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center mr-3">
-                                <InfoIcon className="w-3.5 h-3.5 text-[#F25E22]" />
+                    <div className="bg-white dark:bg-[#0B1E36] rounded-3xl shadow-sm border-2 border-[#FF9933]/15 overflow-hidden transition-colors">
+                        <div className="px-6 py-4.5 flex items-center bg-[#FAF9F6] dark:bg-[#070F1E]/40 border-b border-gray-150 dark:border-slate-800">
+                            <div className="w-8 h-8 rounded-xl bg-[#FF9933]/10 dark:bg-[#FF9933]/5 border border-[#FF9933]/25 flex items-center justify-center mr-3">
+                                <Info className="w-4 h-4 text-[#FF9933]" />
                             </div>
-                            <h2 className="text-lg font-bold text-gray-900 dark:text-white transition-colors">{t('aboutTransitIndia', lang)}</h2>
+                            <h2 className="text-sm font-black text-[#0F1E36] dark:text-white uppercase tracking-wider">{t('aboutTransitIndia', lang)}</h2>
                         </div>
                         <div className="p-6">
-                            <p className="text-sm text-gray-700 dark:text-gray-300 mb-4 leading-relaxed transition-colors">
+                            <p className="text-xs text-gray-600 dark:text-gray-300 mb-4 leading-relaxed font-bold">
                                 {t('aboutDesc1', lang)}
                             </p>
-                            <p className="text-sm text-gray-700 dark:text-gray-300 mb-6 leading-relaxed transition-colors">
+                            <p className="text-xs text-gray-600 dark:text-gray-300 mb-6 leading-relaxed font-bold">
                                 {t('aboutDesc2', lang)}
                             </p>
 
-                            <div className="bg-orange-50 dark:bg-orange-950/30 border-l-4 border-[#F25E22] p-4 rounded-r-lg mb-6 transition-colors">
-                                <h4 className="text-[10px] font-bold text-[#F25E22] uppercase tracking-wider mb-2">{t('howItWorks', lang)}</h4>
-                                <p className="text-xs text-gray-700 dark:text-gray-300 leading-relaxed transition-colors">
+                            <div className="bg-[#FF9933]/10 border-l-4 border-[#FF9933] p-4.5 rounded-r-2xl mb-6">
+                                <h4 className="text-[10px] font-black text-[#FF9933] uppercase tracking-widest mb-1.5">{t('howItWorks', lang)}</h4>
+                                <p className="text-[11px] text-orange-950 dark:text-orange-355 font-bold leading-relaxed">
                                     {t('howItWorksDesc', lang)}
                                 </p>
                             </div>
 
                             <div className="flex flex-wrap gap-2">
-                                <span className="bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 text-[10px] font-bold py-1 px-3 rounded-full uppercase tracking-wider transition-colors">Real-Time GPS</span>
-                                <span className="bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 text-[10px] font-bold py-1 px-3 rounded-full uppercase tracking-wider transition-colors">Predictive ML</span>
-                                <span className="bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 text-[10px] font-bold py-1 px-3 rounded-full uppercase tracking-wider transition-colors">Multi-Modal</span>
+                                <span className="bg-[#FAF9F6] dark:bg-[#070F1E] border border-gray-150 dark:border-slate-800 text-gray-500 dark:text-gray-400 text-[9px] font-black py-1.5 px-3 rounded-xl uppercase tracking-wider">Real-Time GPS</span>
+                                <span className="bg-[#FAF9F6] dark:bg-[#070F1E] border border-gray-150 dark:border-slate-800 text-gray-500 dark:text-gray-400 text-[9px] font-black py-1.5 px-3 rounded-xl uppercase tracking-wider">Predictive ML</span>
+                                <span className="bg-[#FAF9F6] dark:bg-[#070F1E] border border-gray-150 dark:border-slate-800 text-gray-500 dark:text-gray-400 text-[9px] font-black py-1.5 px-3 rounded-xl uppercase tracking-wider">Multi-Modal</span>
                             </div>
                         </div>
                     </div>
 
                     {/* Help & Support */}
-                    <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 overflow-hidden transition-colors">
-                        <div className="px-6 py-4 flex items-center bg-gray-50/50 dark:bg-slate-900/50 border-b border-gray-100 dark:border-slate-700 transition-colors">
-                            <HeadsetIcon className="w-5 h-5 text-gray-500 dark:text-gray-400 mr-3" />
-                            <h2 className="text-sm font-bold text-gray-900 dark:text-white transition-colors">{t('helpSupport', lang)}</h2>
+                    <div className="bg-white dark:bg-[#0B1E36] rounded-3xl shadow-sm border-2 border-[#FF9933]/15 overflow-hidden transition-colors">
+                        <div className="px-6 py-4.5 flex items-center bg-[#FAF9F6] dark:bg-[#070F1E]/40 border-b border-gray-150 dark:border-slate-800">
+                            <Headphones className="w-4.5 h-4.5 text-[#FF9933] mr-3" />
+                            <h2 className="text-sm font-black text-[#0F1E36] dark:text-white uppercase tracking-wider">{t('helpSupport', lang)}</h2>
                         </div>
                         <div className="p-6">
-                            <p className="text-xs text-gray-600 dark:text-gray-400 mb-4 leading-relaxed transition-colors">
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-4 leading-relaxed font-bold">
                                 {t('helpSupportDesc', lang)}
                             </p>
-                            <button className="w-full py-2.5 bg-gray-50 dark:bg-slate-700 hover:bg-gray-100 dark:hover:bg-slate-600 text-gray-800 dark:text-gray-200 font-bold text-sm border border-gray-200 dark:border-slate-600 rounded-lg transition-colors">
+                            <button className="w-full py-2.5 bg-[#FAF9F6] dark:bg-slate-900 border-2 border-gray-250 dark:border-slate-800 text-gray-650 dark:text-gray-300 font-extrabold text-xs uppercase tracking-widest rounded-xl hover:bg-gray-50 dark:hover:bg-slate-850 shadow-sm transition-all transform active:scale-95">
                                 {t('contactSupport', lang)}
                             </button>
                         </div>
                     </div>
                 </div>
-
             </div>
 
             {/* Success Modal */}
             {showModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 backdrop-blur-sm px-4">
-                    <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl w-full max-w-sm overflow-hidden animate-in fade-in zoom-in-95 duration-200 transition-colors">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0f172a]/80 backdrop-blur-sm px-4">
+                    <div className="bg-white dark:bg-[#0B1E36] rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden border-t-8 border-[#12820B] border-x border-b border-gray-150 dark:border-slate-800">
                         <div className="p-8 text-center pb-6">
-                            <div className="w-16 h-16 bg-green-100 dark:bg-green-900/40 rounded-full flex items-center justify-center mx-auto mb-6 transition-colors">
-                                <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" strokeWidth={3} />
+                            <div className="w-16 h-16 bg-green-50 dark:bg-green-950/25 rounded-full flex items-center justify-center mx-auto mb-6">
+                                <CheckCircle className="w-8 h-8 text-green-500" strokeWidth={3} />
                             </div>
 
-                            <h2 className="text-xl font-extrabold text-gray-900 dark:text-white mb-6 transition-colors">{t('profileSavedSuccessfully', lang)}</h2>
+                            <h2 className="text-xl font-black text-[#0F1E36] dark:text-white mb-6 uppercase tracking-wide">{t('profileSavedSuccessfully', lang)}</h2>
 
-                            <div className="bg-gray-50 dark:bg-slate-900/50 border-l-4 border-green-500 p-4 rounded-r-lg mb-8 text-left transition-colors">
-                                <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-medium transition-colors">
+                            <div className="bg-[#FAF9F6] dark:bg-[#070F1E]/50 border-l-4 border-green-500 p-4.5 rounded-r-2xl mb-8 text-left">
+                                <p className="text-xs text-gray-650 dark:text-gray-300 leading-relaxed font-bold">
                                     {t('profileUpdateDesc', lang)}
                                 </p>
                             </div>
 
                             <button
                                 onClick={() => setShowModal(false)}
-                                className="w-full py-3.5 bg-[#0b162c] hover:bg-[#1a2b4c] dark:bg-slate-700 dark:hover:bg-slate-600 text-white font-bold rounded-lg shadow-md transition-colors mb-4"
+                                className="w-full py-4 bg-[#0F1E36] dark:bg-slate-700 text-white font-extrabold rounded-2xl hover:bg-[#1b2f4f] dark:hover:bg-slate-600 transition-all shadow-md mb-4 text-xs uppercase tracking-widest"
                             >
                                 {t('acknowledgeContinue', lang)}
                             </button>
 
-                            <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest pb-2 transition-colors">
+                            <p className="text-[9px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-wider pb-2">
                                 REFERENCE ID: TRN-2024-B842-SHRM
                             </p>
                         </div>
-
-                        <div className="h-1.5 w-full bg-green-500"></div>
                     </div>
                 </div>
             )}
@@ -354,6 +356,4 @@ export default function Profile({ navigateTo, lang }) {
     );
 }
 
-const InfoIcon = (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" /></svg>;
-const HeadsetIcon = (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6" /><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z" /></svg>;
 const LogoIcon = (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" /></svg>;

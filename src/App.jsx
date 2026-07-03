@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import Hero from './components/Hero';
+import Sidebar from './components/Sidebar';
+import TopHeader from './components/TopHeader';
 import TrackingDashboard from './components/TrackingDashboard';
 import EmergencyDashboard from './components/EmergencyDashboard';
 import ServiceReporting from './components/ServiceReporting';
@@ -12,12 +13,13 @@ import Profile from './components/Profile';
 import LogoutSuccess from './components/LogoutSuccess';
 import AboutAI from './components/AboutAI';
 import OperatorDashboard from './components/OperatorDashboard';
+import AlertsPage from './components/AlertsPage';
 
 function App() {
     const [currentPage, setCurrentPage] = useState('track');
-    const [isAdmin, setIsAdmin] = useState(false);
     const [lang, setLang] = useState('English');
     const [globalRouteDetails, setGlobalRouteDetails] = useState(null);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isDarkMode, setIsDarkMode] = useState(() => {
         const saved = localStorage.getItem('transitIndiaTheme');
         return saved === 'dark';
@@ -33,12 +35,25 @@ function App() {
         }
     }, [isDarkMode]);
 
+    // Font & lang attribute switching per selected language
+    React.useEffect(() => {
+        const fontMap = {
+            English: "'Inter', 'Noto Sans', sans-serif",
+            Hindi:   "'Noto Sans Devanagari', 'Noto Sans', sans-serif",
+            Tamil:   "'Noto Sans Tamil', 'Noto Sans', sans-serif",
+            Malayalam: "'Noto Sans Malayalam', 'Noto Sans', sans-serif",
+        };
+        const langAttr = { English: 'en', Hindi: 'hi', Tamil: 'ta', Malayalam: 'ml' };
+        document.documentElement.style.fontFamily = fontMap[lang] || fontMap.English;
+        document.documentElement.lang = langAttr[lang] || 'en';
+    }, [lang]);
+
     const renderContent = () => {
         switch (currentPage) {
             case 'login':
-                return <Login navigateTo={setCurrentPage} lang={lang} />;
+                return <Login navigateTo={setCurrentPage} lang={lang} setLang={setLang} />;
             case 'otp':
-                return <OTP navigateTo={setCurrentPage} lang={lang} />;
+                return <OTP navigateTo={setCurrentPage} lang={lang} setLang={setLang} />;
             case 'track':
                 return <TrackingDashboard navigateTo={setCurrentPage} setGlobalRouteDetails={setGlobalRouteDetails} lang={lang} />;
             case 'routeDetails':
@@ -52,34 +67,54 @@ function App() {
             case 'about':
                 return <AboutAI lang={lang} />;
             case 'profile':
-                return <Profile navigateTo={setCurrentPage} lang={lang} />;
+                return <Profile navigateTo={setCurrentPage} lang={lang} setLang={setLang} />;
             case 'logoutSuccess':
                 return <LogoutSuccess navigateTo={setCurrentPage} lang={lang} />;
+            case 'alerts':
+                return <AlertsPage navigateTo={setCurrentPage} lang={lang} />;
             default:
-                return <Login navigateTo={setCurrentPage} lang={lang} />;
+                return <TrackingDashboard navigateTo={setCurrentPage} setGlobalRouteDetails={setGlobalRouteDetails} lang={lang} />;
         }
     };
 
-    return (
-        <div className="min-h-screen bg-[#F8FAFC] dark:bg-slate-900 flex flex-col font-sans relative transition-colors duration-300">
-            {currentPage !== 'service-reporting' && (
-                <Hero
-                    activeTab={currentPage}
-                    setActiveTab={setCurrentPage}
-                    lang={lang}
-                    setLang={setLang}
-                    navigateTo={setCurrentPage}
-                    isDarkMode={isDarkMode}
-                    setIsDarkMode={setIsDarkMode}
-                />
-            )}
-
-            <main className={`flex-grow w-full relative ${currentPage !== 'service-reporting' ? 'z-20 mb-16 px-4 md:px-8 pt-4' : ''}`}>
+    if (currentPage === 'login' || currentPage === 'otp' || currentPage === 'operatorDashboard') {
+        return (
+            <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#070F1E] flex flex-col font-sans transition-colors duration-300">
                 {renderContent()}
-            </main>
+            </div>
+        );
+    }
 
-            <BusAnimation />
-            <Footer />
+    return (
+        <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#070F1E] flex font-sans transition-colors duration-300">
+            {/* Sidebar Left panel */}
+            <Sidebar
+                currentPage={currentPage}
+                navigateTo={setCurrentPage}
+                isDarkMode={isDarkMode}
+                setIsDarkMode={setIsDarkMode}
+                lang={lang}
+                setLang={setLang}
+                isOpen={isSidebarOpen}
+                setIsOpen={setIsSidebarOpen}
+            />
+
+            {/* Main Content Area Right panel */}
+            <div className="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto">
+                <TopHeader 
+                    navigateTo={setCurrentPage} 
+                    lang={lang} 
+                    toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} 
+                    currentPage={currentPage}
+                />
+                
+                <main className="flex-grow p-6">
+                    {renderContent()}
+                </main>
+
+                <BusAnimation />
+                <Footer lang={lang} />
+            </div>
         </div>
     );
 }
