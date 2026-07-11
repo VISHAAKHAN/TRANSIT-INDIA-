@@ -18,6 +18,7 @@ import AlertsPage from './components/AlertsPage';
 function App() {
     const [currentPage, setCurrentPage] = useState('track');
     const [lang, setLang] = useState('English');
+    const [region, setRegion] = useState(() => localStorage.getItem('userRegion') || 'Tamil Nadu');
     const [globalRouteDetails, setGlobalRouteDetails] = useState(null);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -51,29 +52,38 @@ function App() {
     const renderContent = () => {
         switch (currentPage) {
             case 'login':
-                return <Login navigateTo={setCurrentPage} lang={lang} setLang={setLang} />;
+                return <Login navigateTo={setCurrentPage} lang={lang} setLang={setLang} region={region} setGlobalRegion={setRegion} />;
             case 'otp':
-                return <OTP navigateTo={setCurrentPage} lang={lang} setLang={setLang} />;
+                return <OTP navigateTo={setCurrentPage} lang={lang} setLang={setLang} region={region} />;
             case 'track':
-                return <TrackingDashboard navigateTo={setCurrentPage} setGlobalRouteDetails={setGlobalRouteDetails} lang={lang} />;
+                return <TrackingDashboard navigateTo={setCurrentPage} setGlobalRouteDetails={setGlobalRouteDetails} lang={lang} region={region} />;
             case 'routeDetails':
-                return <RouteDetails routeData={globalRouteDetails} navigateTo={setCurrentPage} setGlobalRouteDetails={setGlobalRouteDetails} lang={lang} />;
+                return <RouteDetails routeData={globalRouteDetails} navigateTo={setCurrentPage} setGlobalRouteDetails={setGlobalRouteDetails} lang={lang} region={region} />;
             case 'emergency':
                 return <EmergencyDashboard routeData={globalRouteDetails} navigateTo={setCurrentPage} lang={lang} />;
             case 'service-reporting':
                 return <ServiceReporting routeData={globalRouteDetails} navigateTo={setCurrentPage} lang={lang} />;
             case 'operatorDashboard':
-                return <OperatorDashboard navigateTo={setCurrentPage} lang={lang} />;
+                return (
+                    <OperatorDashboard 
+                        navigateTo={setCurrentPage} 
+                        lang={lang} 
+                        setLang={setLang}
+                        region={region} 
+                        isDarkMode={isDarkMode}
+                        setIsDarkMode={setIsDarkMode}
+                    />
+                );
             case 'about':
                 return <AboutAI lang={lang} />;
             case 'profile':
-                return <Profile navigateTo={setCurrentPage} lang={lang} setLang={setLang} />;
+                return <Profile navigateTo={setCurrentPage} lang={lang} setLang={setLang} setGlobalRegion={setRegion} />;
             case 'logoutSuccess':
                 return <LogoutSuccess navigateTo={setCurrentPage} lang={lang} />;
             case 'alerts':
-                return <AlertsPage navigateTo={setCurrentPage} lang={lang} />;
+                return <AlertsPage navigateTo={setCurrentPage} lang={lang} region={region} />;
             default:
-                return <TrackingDashboard navigateTo={setCurrentPage} setGlobalRouteDetails={setGlobalRouteDetails} lang={lang} />;
+                return <TrackingDashboard navigateTo={setCurrentPage} setGlobalRouteDetails={setGlobalRouteDetails} lang={lang} region={region} />;
         }
     };
 
@@ -106,6 +116,7 @@ function App() {
                     lang={lang} 
                     toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} 
                     currentPage={currentPage}
+                    region={region}
                 />
                 
                 <main className="flex-grow p-6">
@@ -113,7 +124,7 @@ function App() {
                 </main>
 
                 <BusAnimation />
-                <Footer lang={lang} />
+                <Footer lang={lang} region={region} />
             </div>
         </div>
     );

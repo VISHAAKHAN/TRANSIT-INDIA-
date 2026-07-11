@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, CircleMarker, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { t } from '../translations';
 
 // Fix default marker icons for Leaflet + bundlers
 delete L.Icon.Default.prototype._getIconUrl;
@@ -54,7 +55,7 @@ function FitBounds({ stops, busPosition }) {
 }
 
 // Animated bus that moves along the route
-function AnimatedBus({ stops, initialPosition, routeData }) {
+function AnimatedBus({ stops, initialPosition, routeData, lang }) {
     const [position, setPosition] = useState(initialPosition ? [initialPosition.lat, initialPosition.lng] : null);
     const posRef = useRef(position);
     const indexRef = useRef(0);
@@ -115,8 +116,8 @@ function AnimatedBus({ stops, initialPosition, routeData }) {
                 <Popup>
                     <div style={{ fontFamily: 'system-ui', padding: '4px' }}>
                         <div style={{ fontWeight: 'bold', color: '#FF9933', fontSize: '14px', marginBottom: '4px' }}>Bus {routeData.id}</div>
-                        <div style={{ fontSize: '13px', color: '#333' }}>ETA: {routeData.expectedArrival}</div>
-                        <div style={{ fontSize: '11px', color: '#666', marginTop: '2px' }}>Status: {routeData.status === 'running' ? 'On Time' : 'Delayed'}</div>
+                        <div style={{ fontSize: '13px', color: '#333' }}>{t('eta', lang) || 'ETA'}: {routeData.expectedArrival}</div>
+                        <div style={{ fontSize: '11px', color: '#666', marginTop: '2px' }}>{t('status', lang) || 'Status'}: {routeData.status === 'running' ? t('onTime', lang) : t('delayed', lang)}</div>
                     </div>
                 </Popup>
             </Marker>
@@ -124,8 +125,8 @@ function AnimatedBus({ stops, initialPosition, routeData }) {
     );
 }
 
-export default function LiveMap({ stops = [], busPosition = null, boarding = '', destination = '', routeData = {} }) {
-    const defaultCenter = [11.0168, 76.9558]; // Coimbatore center (Gandhipuram)
+export default function LiveMap({ stops = [], busPosition = null, boarding = '', destination = '', routeData = {}, lang = 'English', region }) {
+    const defaultCenter = region === 'Kerala' ? [9.9816, 76.2999] : [11.0168, 76.9558]; // Kochi center vs Coimbatore center
     const routeLine = stops.map(s => [s.lat, s.lng]);
 
     return (
@@ -209,8 +210,8 @@ export default function LiveMap({ stops = [], busPosition = null, boarding = '',
                             <Marker key={i} position={[stop.lat, stop.lng]} icon={icon}>
                                 <Popup>
                                     <div style={{ fontFamily: 'system-ui', padding: '2px' }}>
-                                        {isBoarding && <span style={{ color: '#12820B', fontWeight: 'bold', fontSize: '11px' }}>BOARDING POINT<br/></span>}
-                                        {isDest && <span style={{ color: '#D32F2F', fontWeight: 'bold', fontSize: '11px' }}>DESTINATION<br/></span>}
+                                        {isBoarding && <span style={{ color: '#12820B', fontWeight: 'bold', fontSize: '11px' }}>{(t('boardingPoint', lang) || 'BOARDING POINT').toUpperCase()}<br/></span>}
+                                        {isDest && <span style={{ color: '#D32F2F', fontWeight: 'bold', fontSize: '11px' }}>{(t('destinationPoint', lang) || 'DESTINATION').toUpperCase()}<br/></span>}
                                         <span style={{ fontWeight: 'bold', fontSize: '13px' }}>{stop.name}</span>
                                     </div>
                                 </Popup>
@@ -223,6 +224,7 @@ export default function LiveMap({ stops = [], busPosition = null, boarding = '',
                         stops={stops}
                         initialPosition={busPosition}
                         routeData={routeData}
+                        lang={lang}
                     />
                 </MapContainer>
             </div>

@@ -1,21 +1,27 @@
 import React from 'react';
-import { ShieldCheck, Award, Share2, HelpCircle } from 'lucide-react';
+import { Award, Share2, HelpCircle } from 'lucide-react';
 import { t } from '../translations';
 
-export default function Footer({ lang }) {
+export default function Footer({ lang, region = localStorage.getItem('userRegion') || 'Tamil Nadu' }) {
     return (
         <footer className="bg-[#0F1E36] dark:bg-[#070F1E] text-white py-12 w-full z-20 relative border-t-2 border-[#12820B]/30 transition-colors duration-300">
             <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-8 items-center">
 
                 {/* Left Column — Brand */}
-                <div className="flex flex-col items-center md:items-start text-center md:text-left">
-                    <div className="flex items-center space-x-2 mb-3">
-                        <ShieldCheck className="text-[#FF9933] w-6 h-6 transition-colors" />
-                        <span className="text-xl font-black tracking-wide bg-gradient-to-r from-[#FF9933] to-[#FAF9F6] bg-clip-text text-transparent">{t('transitIndia', lang)}</span>
+                <div className="flex flex-col items-center md:items-start justify-center">
+                    <div className="flex items-center space-x-5">
+                        <img
+                            src="/transit_logo.png"
+                            alt="Transit India Logo"
+                            className="h-36 w-36 rounded-full shrink-0 object-cover"
+                        />
+                        <div className="flex flex-col text-left space-y-1.5 justify-center">
+                            <span className="text-2xl md:text-3xl font-extrabold tracking-wider bg-gradient-to-r from-[#FF9933] via-[#FAF9F6] to-[#12820B] bg-clip-text text-transparent">{t('transitIndia', lang)}</span>
+                            <span className="text-sm md:text-base text-[#FF9933] font-extrabold tracking-[0.2em] uppercase">
+                                {region === 'Kerala' ? 'കേരളം' : 'தமிழ்நாடு'}
+                            </span>
+                        </div>
                     </div>
-                    <p className="text-xs text-gray-300 dark:text-gray-400 max-w-sm leading-relaxed transition-colors">
-                        {t('footerDescription', lang)}
-                    </p>
                 </div>
 
                 {/* Center Column — Icons, Bharat badge & copyright */}
@@ -54,7 +60,7 @@ export default function Footer({ lang }) {
                         <img
                             src="/emblem.png"
                             alt="State Emblem of India"
-                            className="h-20 w-auto shrink-0 object-contain brightness-[1.15]"
+                            className="h-24 w-auto shrink-0 object-contain brightness-[1.15]"
                         />
                         <div className="flex flex-col text-left leading-none space-y-2">
                             <span className="text-xl text-white font-black tracking-widest">सत्यमेव जयते</span>

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { User, CheckCircle, ShieldAlert, Info, Headphones, Shield } from 'lucide-react';
 import { t } from '../translations';
 
-export default function Profile({ navigateTo, lang, setLang }) {
+export default function Profile({ navigateTo, lang, setLang, setGlobalRegion }) {
     const [aadhaar, setAadhaar] = useState('');
     const [isVerified, setIsVerified] = useState(false);
     const [showModal, setShowModal] = useState(false);
@@ -10,6 +10,7 @@ export default function Profile({ navigateTo, lang, setLang }) {
     const [region, setRegion] = useState('');
     const [district, setDistrict] = useState('');
     const [dob, setDob] = useState('');
+    const [userName, setUserName] = useState('');
 
     const tamilNaduDistricts = [
         "Ariyalur", "Chengalpattu", "Chennai", "Coimbatore", "Cuddalore",
@@ -32,12 +33,14 @@ export default function Profile({ navigateTo, lang, setLang }) {
         const savedAadhaar = localStorage.getItem('userAadhaar');
         const savedDob = localStorage.getItem('userDOB');
         const savedVerified = localStorage.getItem('userVerified');
+        const savedName = localStorage.getItem('userName');
 
         if (savedRegion) setRegion(savedRegion);
         if (savedDistrict) setDistrict(savedDistrict);
         if (savedAadhaar) setAadhaar(savedAadhaar);
         if (savedDob) setDob(savedDob);
         if (savedVerified === 'true') setIsVerified(true);
+        if (savedName) setUserName(savedName);
     }, []);
 
     const handleAadhaarChange = (e) => {
@@ -63,11 +66,16 @@ export default function Profile({ navigateTo, lang, setLang }) {
             return;
         }
         setValidationError('');
+        localStorage.setItem('userName', userName);
         localStorage.setItem('userRegion', region);
         localStorage.setItem('userDistrict', district);
         localStorage.setItem('userAadhaar', aadhaar);
         localStorage.setItem('userDOB', dob);
         localStorage.setItem('userVerified', 'true');
+
+        if (setGlobalRegion) {
+            setGlobalRegion(region);
+        }
 
         setShowModal(true);
     };
@@ -99,7 +107,13 @@ export default function Profile({ navigateTo, lang, setLang }) {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                 <div>
                                     <label className="block text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-2">{t('fullName', lang)}</label>
-                                    <input type="text" defaultValue="Arjun Sharma" className="w-full px-4 py-3 bg-white dark:bg-[#070F1E] border-2 border-gray-200 dark:border-slate-800 rounded-xl text-sm font-bold text-[#0F1E36] dark:text-white focus:border-[#FF9933] focus:ring-0 transition-colors" />
+                                    <input
+                                        type="text"
+                                        value={userName}
+                                        onChange={(e) => setUserName(e.target.value)}
+                                        placeholder="Enter your full name"
+                                        className="w-full px-4 py-3 bg-white dark:bg-[#070F1E] border-2 border-gray-200 dark:border-slate-800 rounded-xl text-sm font-bold text-[#0F1E36] dark:text-white focus:border-[#FF9933] focus:ring-0 transition-colors"
+                                    />
                                 </div>
                                 <div>
                                     <label className="block text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-2">{t('mobileNumberLabel', lang)}</label>

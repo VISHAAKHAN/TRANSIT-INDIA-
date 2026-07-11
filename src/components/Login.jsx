@@ -3,7 +3,7 @@ import { ShieldCheck, Lock, User, Eye, EyeOff, Bell, Phone, Shield, Loader2, Arr
 import { t } from '../translations';
 import { api } from '../api';
 
-export default function Login({ navigateTo, lang, setLang }) {
+export default function Login({ navigateTo, lang, setLang, region = localStorage.getItem('userRegion') || 'Tamil Nadu', setGlobalRegion }) {
     const [mobile, setMobile] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
@@ -22,7 +22,7 @@ export default function Login({ navigateTo, lang, setLang }) {
         if (mobile === '1234567890' && password === '123123') {
             sessionStorage.setItem('authToken', 'mock-admin-token-123123');
             sessionStorage.setItem('userRole', 'operator');
-            sessionStorage.setItem('operatorName', 'Admin Authority');
+            sessionStorage.setItem('operatorName', 'Vishaakhan');
             sessionStorage.setItem('operatorId', 'OP-1234');
             navigateTo('operatorDashboard');
             return;
@@ -76,6 +76,20 @@ export default function Login({ navigateTo, lang, setLang }) {
                         <option value="Hindi">हिन्दी</option>
                         <option value="Tamil">தமிழ்</option>
                         <option value="Malayalam">മലയാളം</option>
+                    </select>
+                    <select 
+                        value={region} 
+                        onChange={(e) => {
+                            const newRegion = e.target.value;
+                            localStorage.setItem('userRegion', newRegion);
+                            if (setGlobalRegion) {
+                                setGlobalRegion(newRegion);
+                            }
+                        }}
+                        className="bg-[#0B1E36] text-xs font-black uppercase text-white border border-white/20 rounded-xl px-2.5 py-1.5 focus:ring-0 cursor-pointer shadow-sm"
+                    >
+                        <option value="Tamil Nadu">Tamil Nadu</option>
+                        <option value="Kerala">Kerala</option>
                     </select>
                     <div className="flex items-center space-x-1.5 text-[10px] font-black text-[#FF9933] uppercase tracking-widest shrink-0">
                         <ShieldCheck className="w-4 h-4 text-[#FF9933]" />
@@ -136,11 +150,13 @@ export default function Login({ navigateTo, lang, setLang }) {
                 {/* Right side panel (warm white/cream) */}
                 <div className="w-full md:w-1/2 bg-[#F4EFE3] flex items-center justify-center p-6 md:p-12">
                     <div className="bg-white dark:bg-[#0B1E36] rounded-[2rem] shadow-[0_15px_50px_rgba(0,0,0,0.06)] border border-gray-100 dark:border-slate-800/80 p-8 max-w-md w-full relative z-10 transition-colors duration-300">
-                        {/* Circular Lock icon badge */}
+                        {/* Brand Logo Badge */}
                         <div className="flex justify-center mb-6">
-                            <div className="w-16 h-16 rounded-full bg-[#E8F8F5] dark:bg-[#008060]/10 flex items-center justify-center border-4 border-white dark:border-slate-900 shadow-md">
-                                <Lock className="w-6 h-6 text-[#008060]" />
-                            </div>
+                            <img
+                                src="/transit_logo.png"
+                                alt="Transit India Logo"
+                                className="w-16 h-16 rounded-full object-cover border-2 border-gray-150 dark:border-slate-800 shadow-md"
+                            />
                         </div>
 
                         <h3 className="text-lg md:text-xl font-black text-[#0F1E36] dark:text-white text-center mb-1 tracking-tight">
@@ -268,7 +284,14 @@ export default function Login({ navigateTo, lang, setLang }) {
                         {/* Powered by State government seal inside popup */}
                         <div className="pt-5 border-t border-gray-100 dark:border-slate-850 flex flex-col items-center justify-center space-y-1.5 text-gray-500 dark:text-gray-400 font-bold">
                             <span className="text-[9px] uppercase tracking-[0.25em]">{t('poweredBy', lang)}</span>
-                            <img src="/tn_seal.png" className="h-12 w-auto object-contain filter dark:brightness-90" alt="Government of Tamil Nadu Seal" />
+                            <img 
+                                src={region === 'Kerala' ? '/kerala_seal.png' : '/tn_seal.png'} 
+                                className={region === 'Kerala' ? "h-20 w-auto object-contain filter dark:brightness-90" : "h-12 w-auto object-contain filter dark:brightness-90"} 
+                                alt={region === 'Kerala' ? 'Government of Kerala Seal' : 'Government of Tamil Nadu Seal'} 
+                            />
+                            <span className="text-[10px] font-black uppercase tracking-wider text-[#0F1E36] dark:text-white mt-1">
+                                {region === 'Kerala' ? t('govtOfKerala', lang) : t('govtOfTamilNadu', lang)}
+                            </span>
                         </div>
                     </div>
                 </div>

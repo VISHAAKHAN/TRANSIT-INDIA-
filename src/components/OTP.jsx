@@ -3,7 +3,7 @@ import { ShieldCheck, Lock, ArrowRight, ArrowLeft, Loader2, Shield, Phone, Bell 
 import { t } from '../translations';
 import { api } from '../api';
 
-export default function OTP({ navigateTo, lang, setLang }) {
+export default function OTP({ navigateTo, lang, setLang, region = localStorage.getItem('userRegion') || 'Tamil Nadu' }) {
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
     const [error, setError] = useState('');
     const [verifying, setVerifying] = useState(false);
@@ -47,7 +47,7 @@ export default function OTP({ navigateTo, lang, setLang }) {
         if (result.status === 'verified') {
             sessionStorage.setItem('authToken', result.token);
             sessionStorage.setItem('userRole', 'operator');
-            sessionStorage.setItem('operatorName', 'Admin Authority');
+            sessionStorage.setItem('operatorName', result.operator_name || 'Vishaakhan');
             if (result.operator_id) {
                 sessionStorage.setItem('operatorId', result.operator_id);
             }
@@ -172,11 +172,13 @@ export default function OTP({ navigateTo, lang, setLang }) {
                             <ArrowLeft className="w-5 h-5" />
                         </button>
 
-                        {/* Circular Lock icon badge */}
+                        {/* Brand Logo Badge */}
                         <div className="flex justify-center mb-6">
-                            <div className="w-16 h-16 rounded-full bg-[#E8F8F5] dark:bg-[#008060]/10 flex items-center justify-center border-4 border-white dark:border-slate-900 shadow-md">
-                                <ShieldCheck className="w-6 h-6 text-[#008060]" />
-                            </div>
+                            <img
+                                src="/transit_logo.png"
+                                alt="Transit India Logo"
+                                className="w-16 h-16 rounded-full object-cover border-2 border-gray-150 dark:border-slate-800 shadow-md"
+                            />
                         </div>
 
                         <h3 className="text-lg md:text-xl font-black text-[#0F1E36] dark:text-white text-center mb-1.5 uppercase tracking-wide">
@@ -249,7 +251,14 @@ export default function OTP({ navigateTo, lang, setLang }) {
                         {/* Powered by State government seal inside popup */}
                         <div className="pt-5 border-t border-gray-100 dark:border-slate-850 flex flex-col items-center justify-center space-y-1.5 text-gray-500 dark:text-gray-400 font-bold">
                             <span className="text-[9px] uppercase tracking-[0.25em]">{t('poweredBy', lang)}</span>
-                            <img src="/tn_seal.png" className="h-12 w-auto object-contain filter dark:brightness-90" alt="Government of Tamil Nadu Seal" />
+                            <img 
+                                src={region === 'Kerala' ? '/kerala_seal.png' : '/tn_seal.png'} 
+                                className={region === 'Kerala' ? "h-20 w-auto object-contain filter dark:brightness-90" : "h-12 w-auto object-contain filter dark:brightness-90"} 
+                                alt={region === 'Kerala' ? 'Government of Kerala Seal' : 'Government of Tamil Nadu Seal'} 
+                            />
+                            <span className="text-[10px] font-black uppercase tracking-wider text-[#0F1E36] dark:text-white mt-1">
+                                {region === 'Kerala' ? t('govtOfKerala', lang) : t('govtOfTamilNadu', lang)}
+                            </span>
                         </div>
                     </div>
                 </div>
